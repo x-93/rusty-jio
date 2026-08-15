@@ -1,5 +1,6 @@
-use crate::model::services::reachability::ReachabilityService;
+use crate::model::services::reachability::{MTReachabilityService, ReachabilityService};
 use crate::model::stores::ghostdag::{GhostdagData, GhostdagStore};
+use crate::model::stores::reachability::ReachabilityStore;
 use crate::model::stores::relations::RelationsStore;
 use crate::processes::ghostdag::mergeset::find_mergeset_candidates;
 use crate::processes::ghostdag::ordering::sort_blocks_topological;
@@ -13,7 +14,7 @@ pub struct GhostdagManager {
     k: u64,
     ghostdag_store: GhostdagStore,
     relations: RelationsStore,
-    reachability: ReachabilityService,
+    reachability: MTReachabilityService<ReachabilityStore>,
 }
 
 impl GhostdagManager {
@@ -21,7 +22,7 @@ impl GhostdagManager {
         k: u64,
         ghostdag_store: GhostdagStore,
         relations: RelationsStore,
-        reachability: ReachabilityService,
+        reachability: MTReachabilityService<ReachabilityStore>,
     ) -> Self {
         Self {
             k,
@@ -102,8 +103,8 @@ impl GhostdagManager {
 
             // Check against newly colored mergeset blues
             for &blue in &mergeset_blues {
-                if !self.reachability.is_dag_ancestor_of(&blue, &candidate)
-                    && !self.reachability.is_dag_ancestor_of(&candidate, &blue)
+                if !self.reachability.is_dag_ancestor_of(blue, candidate)
+                    && !self.reachability.is_dag_ancestor_of(candidate, blue)
                 {
                     anticone_blues.push(blue);
                 }
@@ -111,8 +112,8 @@ impl GhostdagManager {
 
             // Check against selected parent's mergeset blues
             for &blue in &selected_parent_data.mergeset_blues {
-                if !self.reachability.is_dag_ancestor_of(&blue, &candidate)
-                    && !self.reachability.is_dag_ancestor_of(&candidate, &blue)
+                if !self.reachability.is_dag_ancestor_of(blue, candidate)
+                    && !self.reachability.is_dag_ancestor_of(candidate, blue)
                 {
                     anticone_blues.push(blue);
                 }

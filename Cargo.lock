@@ -599,6 +599,7 @@ dependencies = [
  "jio-addresses",
  "jio-consensus-core",
  "jio-core",
+ "jio-database",
  "jio-hashes",
  "jio-math",
  "jio-txscript",

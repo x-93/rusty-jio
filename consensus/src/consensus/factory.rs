@@ -76,7 +76,7 @@ impl ConsensusInstance {
         let genesis = params.genesis.to_block();
         let genesis_hash = genesis.hash();
         instance.storage.pruning_store.set_pruning_point(genesis_hash, 0);
-        instance.services.reachability_service.init_genesis(genesis_hash);
+        instance.storage.reachability_store.init_genesis(genesis_hash);
         let _ = instance.body_processor.process_body(&genesis);
         let _ = instance.virtual_processor.process_block(&genesis);
 

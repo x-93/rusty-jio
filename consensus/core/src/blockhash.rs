@@ -1,7 +1,9 @@
 use jio_hashes::Hash;
 
 pub type BlockHash = Hash;
+pub type BlockHashes = std::sync::Arc<Vec<BlockHash>>;
 pub const ORIGIN: BlockHash = Hash::from_bytes([0u8; 32]);
+pub const NONE: BlockHash = Hash::from_bytes([0xff; 32]);
 
 #[cfg(test)]
 mod tests {

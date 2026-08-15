@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::model::services::reachability::ReachabilityService;
+    use crate::model::services::reachability::MTReachabilityService;
     use crate::model::stores::ghostdag::{GhostdagData, GhostdagStore};
     use crate::model::stores::reachability::ReachabilityStore;
     use crate::model::stores::relations::RelationsStore;
@@ -8,15 +8,29 @@ mod tests {
     use jio_consensus_core::blockhash::BlockHash;
     use jio_hashes::Hash;
     use jio_math::Uint192;
+    use parking_lot::RwLock;
     use std::sync::Arc;
 
-    fn setup_ghostdag_manager(k: u64) -> (GhostdagManager, GhostdagStore, RelationsStore, ReachabilityService) {
+    fn setup_ghostdag_manager(
+        k: u64,
+    ) -> (
+        GhostdagManager,
+        GhostdagStore,
+        RelationsStore,
+        ReachabilityStore,
+    ) {
         let ghostdag_store = GhostdagStore::new();
         let relations = RelationsStore::new();
         let reachability_store = ReachabilityStore::new();
-        let reachability = ReachabilityService::new(relations.clone(), reachability_store);
-        let manager = GhostdagManager::new(k, ghostdag_store.clone(), relations.clone(), reachability.clone());
-        (manager, ghostdag_store, relations, reachability)
+        let reachability =
+            MTReachabilityService::new(Arc::new(RwLock::new(reachability_store.clone())));
+        let manager = GhostdagManager::new(
+            k,
+            ghostdag_store.clone(),
+            relations.clone(),
+            reachability.clone(),
+        );
+        (manager, ghostdag_store, relations, reachability_store)
     }
 
     #[test]
@@ -32,7 +46,13 @@ mod tests {
         reachability.init_genesis(genesis);
         ghostdag_store.insert(
             genesis,
-            Arc::new(GhostdagData::new(0, Uint192::ZERO, BlockHash::default(), vec![], vec![])),
+            Arc::new(GhostdagData::new(
+                0,
+                Uint192::ZERO,
+                BlockHash::default(),
+                vec![],
+                vec![],
+            )),
         );
 
         // 2. Block B (child of Genesis)
@@ -53,7 +73,11 @@ mod tests {
         let gd_d = manager.ghostdag(&[block_b, block_c]);
 
         assert_eq!(gd_d.selected_parent, block_b.min(block_c)); // Tie-breaking selects lower hash
-        let non_selected = if gd_d.selected_parent == block_b { block_c } else { block_b };
+        let non_selected = if gd_d.selected_parent == block_b {
+            block_c
+        } else {
+            block_b
+        };
         assert!(gd_d.mergeset_blues.contains(&non_selected));
         assert!(gd_d.mergeset_reds.is_empty());
         assert_eq!(gd_d.blue_score, 3); // Genesis(0) -> Selected(1) -> NonSelected(+1) -> D(+1) = 3
@@ -68,7 +92,13 @@ mod tests {
         reachability.init_genesis(genesis);
         ghostdag_store.insert(
             genesis,
-            Arc::new(GhostdagData::new(0, Uint192::ZERO, BlockHash::default(), vec![], vec![])),
+            Arc::new(GhostdagData::new(
+                0,
+                Uint192::ZERO,
+                BlockHash::default(),
+                vec![],
+                vec![],
+            )),
         );
 
         // Create 5 parallel blocks off Genesis: P1, P2, P3, P4, P5
@@ -95,6 +125,9 @@ mod tests {
         // The 4th candidate (P5) must be colored RED!
         assert_eq!(gd_merge.mergeset_blues.len(), 3);
         assert_eq!(gd_merge.mergeset_reds.len(), 1);
-        assert_eq!(gd_merge.mergeset_blues.len() + gd_merge.mergeset_reds.len(), 4); // 5 parents - 1 selected_parent = 4
+        assert_eq!(
+            gd_merge.mergeset_blues.len() + gd_merge.mergeset_reds.len(),
+            4
+        ); // 5 parents - 1 selected_parent = 4
     }
 }

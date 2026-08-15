@@ -365,13 +365,16 @@ fn test_utxo_double_spend_and_negative_fee_prevention() {
 
 #[test]
 fn test_reachability_interval_and_dag_ancestor() {
-    use crate::model::services::reachability::ReachabilityService;
+    use crate::model::services::reachability::{MTReachabilityService, ReachabilityService};
     use crate::model::stores::reachability::ReachabilityStore;
     use crate::model::stores::relations::RelationsStore;
+    use parking_lot::RwLock;
+    use std::sync::Arc;
 
     let relations = RelationsStore::new();
     let reachability_store = ReachabilityStore::new();
-    let reachability = ReachabilityService::new(relations.clone(), reachability_store);
+    let reachability =
+        MTReachabilityService::new(Arc::new(RwLock::new(reachability_store.clone())));
 
     let genesis = Hash::from_bytes([1u8; 32]);
     let block_a = Hash::from_bytes([2u8; 32]);
@@ -379,31 +382,31 @@ fn test_reachability_interval_and_dag_ancestor() {
     let block_c = Hash::from_bytes([4u8; 32]);
 
     // Genesis setup
-    reachability.init_genesis(genesis);
+    reachability_store.init_genesis(genesis);
 
     // Block A is child of Genesis
     relations.insert(block_a, vec![genesis]);
-    reachability.add_block(block_a, genesis);
+    reachability_store.add_block(block_a, genesis);
 
     // Block B is child of Block A
     relations.insert(block_b, vec![block_a]);
-    reachability.add_block(block_b, block_a);
+    reachability_store.add_block(block_b, block_a);
 
     // Block C merges Genesis and Block B
     relations.insert(block_c, vec![genesis, block_b]);
-    reachability.add_block(block_c, block_b);
+    reachability_store.add_block(block_c, block_b);
 
     // Assert ancestry
-    assert!(reachability.is_dag_ancestor_of(&genesis, &block_a));
-    assert!(reachability.is_dag_ancestor_of(&genesis, &block_b));
-    assert!(reachability.is_dag_ancestor_of(&genesis, &block_c));
-    assert!(reachability.is_dag_ancestor_of(&block_a, &block_b));
-    assert!(reachability.is_dag_ancestor_of(&block_a, &block_c));
-    assert!(reachability.is_dag_ancestor_of(&block_b, &block_c));
+    assert!(reachability.is_dag_ancestor_of(genesis, block_a));
+    assert!(reachability.is_dag_ancestor_of(genesis, block_b));
+    assert!(reachability.is_dag_ancestor_of(genesis, block_c));
+    assert!(reachability.is_dag_ancestor_of(block_a, block_b));
+    assert!(reachability.is_dag_ancestor_of(block_a, block_c));
+    assert!(reachability.is_dag_ancestor_of(block_b, block_c));
 
     // Non-ancestor
-    assert!(!reachability.is_dag_ancestor_of(&block_c, &genesis));
-    assert!(!reachability.is_dag_ancestor_of(&block_b, &block_a));
+    assert!(!reachability.is_dag_ancestor_of(block_c, genesis));
+    assert!(!reachability.is_dag_ancestor_of(block_b, block_a));
 }
 
 #[test]

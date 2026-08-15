@@ -13,7 +13,7 @@ pub fn find_mergeset_candidates(
     parents: &[BlockHash],
     selected_parent: BlockHash,
     relations: &RelationsStore,
-    reachability: &ReachabilityService,
+    reachability: &(impl ReachabilityService + ?Sized),
 ) -> Vec<BlockHash> {
     let mut candidates = Vec::new();
     let mut queue = VecDeque::new();
@@ -26,7 +26,7 @@ pub fn find_mergeset_candidates(
     }
 
     while let Some(current) = queue.pop_front() {
-        if reachability.is_dag_ancestor_of(&current, &selected_parent) {
+        if reachability.is_dag_ancestor_of(current, selected_parent) {
             continue;
         }
 

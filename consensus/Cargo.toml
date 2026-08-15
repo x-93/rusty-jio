@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 jio-consensus-core = { workspace = true }
+jio-database = { workspace = true }
 jio-hashes = { workspace = true }
 jio-txscript = { workspace = true }
 jio-addresses = { workspace = true }

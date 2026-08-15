@@ -1,5 +1,6 @@
 use crate::consensus::storage::ConsensusStorage;
-use crate::model::services::reachability::ReachabilityService;
+use crate::model::services::reachability::MTReachabilityService;
+use crate::model::stores::reachability::ReachabilityStore;
 use crate::processes::coinbase::CoinbaseManager;
 use crate::processes::difficulty::DifficultyManager;
 use crate::processes::ghostdag::GhostdagManager;
@@ -10,10 +11,12 @@ use crate::processes::relations::RelationsManager;
 use crate::processes::sync::SyncManager;
 use crate::processes::traversal_manager::TraversalManager;
 use jio_consensus_core::config::params::Params;
+use parking_lot::RwLock;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct ConsensusServices {
-    pub reachability_service: ReachabilityService,
+    pub reachability_service: MTReachabilityService<ReachabilityStore>,
     pub ghostdag_manager: GhostdagManager,
     pub difficulty_manager: DifficultyManager,
     pub pmt_manager: PastMedianTimeManager,
@@ -27,10 +30,9 @@ pub struct ConsensusServices {
 
 impl ConsensusServices {
     pub fn new(storage: &ConsensusStorage, params: &Params) -> Self {
-        let reachability_service = ReachabilityService::new(
-            storage.relations_store.clone(),
+        let reachability_service = MTReachabilityService::new(Arc::new(RwLock::new(
             storage.reachability_store.clone(),
-        );
+        )));
         let ghostdag_manager = GhostdagManager::new(
             params.ghostdag_k as u64,
             storage.ghostdag_store.clone(),

@@ -1,22 +1,27 @@
-use crate::model::stores::statuses::StatusesStore;
-use jio_consensus_core::blockhash::BlockHash;
+use crate::model::stores::statuses::StatusesStoreReader;
 use jio_consensus_core::blockstatus::BlockStatus;
+use jio_hashes::Hash;
+use parking_lot::RwLock;
+use std::sync::Arc;
 
+/// Multi-threaded block-statuses service imp
 #[derive(Clone)]
-pub struct StatusesService {
-    store: StatusesStore,
+pub struct MTStatusesService<T: StatusesStoreReader> {
+    store: Arc<RwLock<T>>,
 }
 
-impl StatusesService {
-    pub fn new(store: StatusesStore) -> Self {
+impl<T: StatusesStoreReader> MTStatusesService<T> {
+    pub fn new(store: Arc<RwLock<T>>) -> Self {
         Self { store }
     }
+}
 
-    pub fn get(&self, hash: &BlockHash) -> Option<BlockStatus> {
-        self.store.get(hash)
+impl<T: StatusesStoreReader> StatusesStoreReader for MTStatusesService<T> {
+    fn get(&self, hash: Hash) -> Option<BlockStatus> {
+        self.store.read().get(hash)
     }
 
-    pub fn set(&self, hash: BlockHash, status: BlockStatus) {
-        self.store.set(hash, status);
+    fn has(&self, hash: Hash) -> bool {
+        self.store.read().has(hash)
     }
 }
