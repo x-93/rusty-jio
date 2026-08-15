@@ -1,0 +1,39 @@
+[package]
+name = "jio-daemon"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "jiod"
+path = "src/main.rs"
+
+[dependencies]
+jio-core = { workspace = true }
+jio-utils = { workspace = true }
+jio-consensus = { workspace = true }
+jio-consensus-core = { workspace = true }
+jio-consensusmanager = { workspace = true }
+jio-mining = { workspace = true }
+jio-p2p = { workspace = true }
+jio-protocol-flows = { workspace = true }
+jio-database = { workspace = true }
+jio-addressmanager = { workspace = true }
+jio-connectionmanager = { workspace = true }
+jio-indexes-processor = { workspace = true }
+jio-utxoindex = { workspace = true }
+jio-notify = { workspace = true }
+jio-metrics-core = { workspace = true }
+jio-perf-monitor = { workspace = true }
+jio-rpc-core = { workspace = true }
+jio-rpc-service = { workspace = true }
+jio-grpc-server = { workspace = true }
+jio-wrpc-server = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }

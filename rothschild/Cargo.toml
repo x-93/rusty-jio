@@ -1,0 +1,22 @@
+[package]
+name = "jio-rothschild"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "jio-rothschild"
+path = "src/main.rs"
+
+[dependencies]
+jio-wallet-core = { workspace = true }
+jio-rpc-core = { workspace = true }
+jio-consensus-core = { workspace = true }
+jio-addresses = { workspace = true }
+jio-hashes = { workspace = true }
+tokio = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+rand = { workspace = true }

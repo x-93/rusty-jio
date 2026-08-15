@@ -1,0 +1,8 @@
+/* CLI Notifier Stylesheet */
+.notification {
+    color: #00ffcc;
+    font-family: monospace;
+    padding: 4px 8px;
+    background-color: #111111;
+    border-left: 3px solid #00ffcc;
+}

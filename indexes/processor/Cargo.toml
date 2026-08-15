@@ -1,0 +1,20 @@
+[package]
+name = "jio-indexes-processor"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-indexes-core = { workspace = true }
+jio-consensus-core = { workspace = true }
+jio-consensus = { workspace = true }
+jio-consensusmanager = { workspace = true }
+jio-core = { workspace = true }
+parking_lot = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }

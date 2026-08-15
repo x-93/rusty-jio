@@ -1,0 +1,30 @@
+[package]
+name = "jio-cli"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "jio-cli"
+path = "src/main.rs"
+
+[dependencies]
+jio-core = { workspace = true }
+jio-utils = { workspace = true }
+jio-addresses = { workspace = true }
+jio-consensus-core = { workspace = true }
+jio-bip32 = { workspace = true }
+jio-wallet-core = { workspace = true }
+jio-wallet-keys = { workspace = true }
+jio-rpc-core = { workspace = true }
+jio-grpc-client = { workspace = true }
+jio-wrpc-client = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

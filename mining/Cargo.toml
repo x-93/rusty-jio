@@ -1,0 +1,28 @@
+[package]
+name = "jio-mining"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-mining-errors = { workspace = true }
+jio-consensus-core = { workspace = true }
+jio-consensus-pow = { workspace = true }
+jio-consensusmanager = { workspace = true }
+jio-consensus = { workspace = true }
+jio-txscript = { workspace = true }
+jio-core = { workspace = true }
+jio-utils = { workspace = true }
+jio-hashes = { workspace = true }
+jio-math = { workspace = true }
+parking_lot = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+async-trait = { workspace = true }
+smallvec = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

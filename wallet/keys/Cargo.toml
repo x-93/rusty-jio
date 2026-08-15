@@ -1,0 +1,17 @@
+[package]
+name = "jio-wallet-keys"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-bip32 = { workspace = true }
+jio-addresses = { workspace = true }
+jio-hashes = { workspace = true }
+secp256k1 = { workspace = true }
+bip39 = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+rand = { workspace = true }

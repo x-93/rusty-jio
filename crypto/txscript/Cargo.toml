@@ -1,0 +1,19 @@
+[package]
+name = "jio-txscript"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-txscript-errors = { workspace = true }
+jio-hashes = { workspace = true }
+jio-utils = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+smallvec = { workspace = true }
+parking_lot = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

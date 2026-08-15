@@ -1,0 +1,19 @@
+[package]
+name = "jio-grpc-client"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-grpc-core = { workspace = true }
+jio-rpc-core = { workspace = true }
+jio-consensus-core = { workspace = true }
+jio-hashes = { workspace = true }
+jio-core = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+log = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }

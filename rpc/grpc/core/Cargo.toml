@@ -1,0 +1,14 @@
+[package]
+name = "jio-grpc-core"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-rpc-core = { workspace = true }
+jio-consensus-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

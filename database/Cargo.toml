@@ -1,0 +1,22 @@
+[package]
+name = "jio-database"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-core = { workspace = true }
+jio-utils = { workspace = true }
+jio-hashes = { workspace = true }
+parking_lot = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+log = { workspace = true }
+smallvec = { workspace = true }
+enum-primitive-derive = { workspace = true }
+num-traits = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

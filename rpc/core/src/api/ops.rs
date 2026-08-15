@@ -1,0 +1,31 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum RpcApiOps {
+    Ping,
+    GetInfo,
+    GetProcessMetrics,
+    GetCurrentNetwork,
+    SubmitBlock,
+    GetBlockTemplate,
+    GetPeerAddresses,
+    GetSelectedTipHash,
+    GetVirtualSelectedParentBlueScore,
+    GetBlock,
+    GetBlocks,
+    GetBlockCount,
+    GetBlockDagInfo,
+    ResolveFinalityConflict,
+    Shutdown,
+    GetHeaders,
+    GetUtxosByAddresses,
+    GetBalanceByAddress,
+    GetBalancesByAddresses,
+    GetSinkBlueScore,
+    GetVirtualDaaScore,
+    SubmitTransaction,
+    GetMempoolEntry,
+    GetMempoolEntries,
+    GetMempoolEntriesByAddresses,
+    EstimateNetworkHashesPerSecond,
+}
