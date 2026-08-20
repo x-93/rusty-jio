@@ -1,3 +1,0 @@
-# Clippy configuration for rusty-jio
-cognitive-complexity-threshold = 50
-too-many-arguments-threshold = 12
