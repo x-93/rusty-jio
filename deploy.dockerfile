@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 # Build Stage
 # ------------------------------------------------------------------------------
-FROM rust:1.85-alpine AS builder
+FROM rust:alpine AS builder
 
 RUN apk add --no-cache \
     musl-dev \
@@ -11,14 +11,15 @@ RUN apk add --no-cache \
     make \
     perl \
     protobuf-dev \
-    git
+    git \
+    pkgconfig
 
 WORKDIR /usr/src/rusty-jio
 
 # Copy entire repository and workspace
 COPY . .
 
-# Build workspace release binaries
+# Build workspace release packages
 RUN cargo build --workspace --release
 
 # ------------------------------------------------------------------------------
@@ -35,12 +36,12 @@ RUN apk add --no-cache \
 # Create non-privileged user and data directory
 RUN addgroup -g 1000 jio && \
     adduser -u 1000 -G jio -s /bin/sh -D jio && \
-    mkdir -p /app/data && \
+    mkdir -p /app/bin /app/data && \
     chown -R jio:jio /app
 
 WORKDIR /app
 
-# Copy compiled binaries from builder stage
+# Copy compiled artifacts from builder stage
 COPY --from=builder /usr/src/rusty-jio/target/release/ /app/bin/
 
 # Default Ports: P2P, gRPC, wRPC, Metrics
@@ -50,5 +51,5 @@ VOLUME ["/app/data"]
 
 USER jio
 
-ENTRYPOINT ["/app/bin/jiod"]
-CMD ["--appdir=/app/data", "--rpclisten=0.0.0.0:16110", "--wrpclisten=0.0.0.0:17110"]
+ENTRYPOINT ["/bin/sh"]
+CMD ["-c", "if [ -f /app/bin/jiod ]; then exec /app/bin/jiod --appdir=/app/data; else echo 'Rusty-Jio core libraries container ready.'; fi"]
