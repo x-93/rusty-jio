@@ -13,7 +13,10 @@ use std::{
     hash::{Hash as StdHash, Hasher as StdHasher},
     str::{self, FromStr},
 };
+
+#[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
+#[cfg(feature = "wasm")]
 use workflow_wasm::prelude::*;
 
 pub const HASH_SIZE: usize = 32;
@@ -22,10 +25,9 @@ pub use hashers::*;
 
 // TODO: Check if we use hash more as an array of u64 or of bytes and change the default accordingly
 /// @category General
-#[derive(
-    Eq, Clone, Copy, Default, PartialOrd, Ord, BorshSerialize, BorshDeserialize, CastFromJs,
-)]
-#[wasm_bindgen]
+#[derive(Eq, Clone, Copy, Default, PartialOrd, Ord, BorshSerialize, BorshDeserialize)]
+#[cfg_attr(feature = "wasm", derive(CastFromJs))]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct Hash([u8; HASH_SIZE]);
 
 serde_impl_ser_fixed_bytes_ref!(Hash, HASH_SIZE);
@@ -180,6 +182,7 @@ impl FromHex for Hash {
 
 impl MemSizeEstimator for Hash {}
 
+#[cfg(feature = "wasm")]
 #[wasm_bindgen]
 impl Hash {
     #[wasm_bindgen(constructor)]
@@ -193,7 +196,9 @@ impl Hash {
     }
 }
 
+#[cfg(feature = "wasm")]
 type TryFromError = workflow_wasm::error::Error;
+#[cfg(feature = "wasm")]
 impl TryCastFromJs for Hash {
     type Error = TryFromError;
     fn try_cast_from<'a, R>(value: &'a R) -> Result<Cast<Self>, Self::Error>
