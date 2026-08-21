@@ -1,0 +1,19 @@
+[package]
+name = "jio-utils"
+description = "Jio utility functions"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+faster-hex.workspace = true
+serde = { workspace = true, optional = true }
+
+[features]
+default = ["std"]
+std = ["faster-hex/std"]
+serde = ["dep:serde"]

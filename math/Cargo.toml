@@ -1,0 +1,20 @@
+[package]
+name = "jio-math"
+description = "Jio math primitives"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+
+[features]
+default = []
+serde = ["dep:serde"]
+wasm = ["dep:wasm-bindgen", "dep:js-sys"]
