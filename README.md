@@ -1,6 +1,6 @@
 # Rusty-Jio
 
-[![Rust](https://img.shields.io/badge/rust-2021%20edition-orange.svg)](https://www.rust-lang.org)
+[![Rust](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 [![Build & Test](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/x-93/rusty-jio)
 
@@ -94,7 +94,7 @@ rusty-jio/
 ## 🚀 Getting Started
 
 ### Prerequisites
-* **Rust**: Ensure you have the latest stable Rust toolchain installed (edition 2021, MSRV 1.79.0+).
+* **Rust**: Ensure you have the latest stable Rust toolchain installed (edition 2024, MSRV 1.85.0+).
   ```bash
   rustup update stable
   ```
