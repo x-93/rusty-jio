@@ -1,5 +1,5 @@
-use crate::hashers::{Hasher, HasherBase};
 use crate::Hash;
+use crate::hashers::{Hasher, HasherBase};
 
 /// PoW Hash state based on BLAKE3 domain-separated key derivation "ProofOfWorkHash".
 #[derive(Clone)]

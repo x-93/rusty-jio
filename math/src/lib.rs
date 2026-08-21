@@ -1,4 +1,4 @@
-﻿#[macro_use]
+#[macro_use]
 pub mod uint;
 pub mod int;
 pub mod wasm;

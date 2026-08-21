@@ -1,4 +1,4 @@
-﻿use std::cmp::Ordering;
+use std::cmp::Ordering;
 use std::fmt;
 use std::ops::{Add, BitAnd, BitOr, BitXor, Mul, Not, Shl, Shr, Sub};
 
@@ -465,7 +465,7 @@ mod tests {
     #[test]
     fn test_endian_serialization() {
         let val = Uint128::from_limbs([0x0123456789ABCDEF, 0x0FEDCBA987654321]);
-        
+
         let le = val.to_le_bytes();
         let from_le = Uint128::from_le_bytes(le);
         assert_eq!(val, from_le);

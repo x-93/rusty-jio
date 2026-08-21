@@ -1,4 +1,4 @@
-﻿use crate::uint::{Uint128, Uint192, Uint256};
+use crate::uint::{Uint128, Uint192, Uint256};
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -34,7 +34,10 @@ macro_rules! serde_impl_deser_fixed_bytes_ref {
                     impl<'de> serde::de::Visitor<'de> for BytesVisitor {
                         type Value = $type;
 
-                        fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                        fn expecting(
+                            &self,
+                            formatter: &mut std::fmt::Formatter,
+                        ) -> std::fmt::Result {
                             formatter.write_str(concat!("a ", stringify!($len), "-byte array"))
                         }
 
