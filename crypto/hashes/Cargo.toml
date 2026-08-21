@@ -15,8 +15,8 @@ blake3.workspace = true
 faster-hex = { workspace = true, features = ["alloc"] }
 serde = { workspace = true, optional = true }
 borsh.workspace = true
-wasm-bindgen = { workspace = true, optional = true }
-workflow-wasm = { workspace = true, optional = true }
+wasm-bindgen.workspace = true
+workflow-wasm.workspace = true
 
 [dev-dependencies]
 serde_json.workspace = true
@@ -25,4 +25,3 @@ serde_json.workspace = true
 default = ["std"]
 std = ["blake3/std", "faster-hex/std", "jio-utils/std", "borsh/std"]
 serde = ["dep:serde", "jio-utils/serde"]
-wasm = ["dep:wasm-bindgen", "dep:workflow-wasm"]
