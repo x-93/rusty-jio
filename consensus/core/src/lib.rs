@@ -8,15 +8,22 @@ use std::hash::{BuildHasher, Hasher};
 pub use jio_hashes::Hash;
 
 pub mod block;
+pub mod coinbase;
 pub mod constants;
 pub mod hashing;
 pub mod header;
+pub mod merkle;
+pub mod muhash;
 pub mod sign;
 pub mod subnets;
 pub mod tx;
 pub mod utxo;
 
+pub use block::{Block, BlockArc, BlockTemplate, MutableBlock};
+pub use coinbase::{CoinbaseData, create_coinbase_transaction};
 pub use header::Header;
+pub use merkle::{calc_merkle_root, calc_merkle_root_from_transactions, calc_tx_ids_merkle_root};
+pub use muhash::MuHash;
 pub use subnets::SubnetworkId;
 pub use tx::{
     ScriptPublicKey, ScriptVec, Transaction, TransactionArc, TransactionId, TransactionInput,

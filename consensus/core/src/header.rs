@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::mem::size_of;
 
 /// @category Consensus
-#[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Header {
     /// Cached hash
