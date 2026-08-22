@@ -11,10 +11,18 @@ pub mod block;
 pub mod constants;
 pub mod hashing;
 pub mod header;
+pub mod sign;
 pub mod subnets;
+pub mod tx;
+pub mod utxo;
 
 pub use header::Header;
 pub use subnets::SubnetworkId;
+pub use tx::{
+    ScriptPublicKey, ScriptVec, Transaction, TransactionArc, TransactionId, TransactionInput,
+    TransactionOutpoint, TransactionOutput,
+};
+pub use utxo::{UtxoCollection, UtxoDiff, UtxoEntry, UtxoView};
 
 /// Integer type for accumulated PoW of blue blocks. We expect no more than
 /// 2^128 work in a single block (btc has ~2^80), and no more than 2^64

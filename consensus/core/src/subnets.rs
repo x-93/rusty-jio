@@ -84,7 +84,6 @@ impl FromStr for SubnetworkId {
     }
 }
 
-#[cfg(feature = "serde")]
 impl serde::Serialize for SubnetworkId {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -98,14 +97,13 @@ impl serde::Serialize for SubnetworkId {
     }
 }
 
-#[cfg(feature = "serde")]
 impl<'de> serde::Deserialize<'de> for SubnetworkId {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
         if deserializer.is_human_readable() {
-            let s = String::deserialize(deserializer)?;
+            let s = <String as serde::Deserialize>::deserialize(deserializer)?;
             Self::from_str(&s).map_err(serde::de::Error::custom)
         } else {
             struct BytesVisitor;
