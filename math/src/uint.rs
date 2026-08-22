@@ -368,11 +368,27 @@ macro_rules! construct_uint {
             }
         }
 
+        impl Shl<usize> for $name {
+            type Output = Self;
+            #[inline(always)]
+            fn shl(self, rhs: usize) -> Self {
+                self.shl_unit(rhs as u32)
+            }
+        }
+
         impl Shr<u32> for $name {
             type Output = Self;
             #[inline(always)]
             fn shr(self, rhs: u32) -> Self {
                 self.shr_unit(rhs)
+            }
+        }
+
+        impl Shr<usize> for $name {
+            type Output = Self;
+            #[inline(always)]
+            fn shr(self, rhs: usize) -> Self {
+                self.shr_unit(rhs as u32)
             }
         }
 

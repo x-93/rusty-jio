@@ -19,7 +19,12 @@ wasm-bindgen.workspace = true
 workflow-wasm.workspace = true
 
 [dev-dependencies]
+criterion.workspace = true
 serde_json.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false
 
 [features]
 default = ["std"]
