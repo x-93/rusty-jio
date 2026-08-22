@@ -1,1 +1,15 @@
-﻿
+<html>
+
+<head>
+    <script type="module">
+        import * as jio from './jio-rpc/jio-rpc.js';
+        (async () => {
+            await jio.default('./jio-rpc/jio-rpc_bg.wasm');
+            console.log(jio.version());
+        })();
+    </script>
+</head>
+
+<body></body>
+
+</html>

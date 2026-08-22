@@ -1,1 +1,1 @@
-﻿
+wasm-pack build --target web --out-name jio-wallet --out-dir web/jio-wallet $@

@@ -1,1 +1,34 @@
-﻿
+[package]
+name = "jio-pow"
+description = "Jio proof-of-work"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+wasm32-sdk = []
+
+[dependencies]
+js-sys.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-client.workspace = true
+jio-hashes.workspace = true
+jio-math.workspace = true
+jio-utils.workspace = true
+wasm-bindgen.workspace = true
+workflow-wasm.workspace = true
+num.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false
+
+[lints]
+workspace = true

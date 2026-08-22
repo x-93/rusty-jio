@@ -1,1 +1,90 @@
-﻿
+#!/bin/bash
+# This script builds the Rusty Jio WASM32 SDK release.
+
+# make the script fail for any failed command
+set -e
+
+rm -rf release/*
+rm -rf web/*
+rm -rf nodejs/*
+rm -rf docs/*
+rm -rf examples/nodejs/typescript/lib
+
+mkdir -p release/jio-wasm32-sdk/web
+mkdir -p release/jio-wasm32-sdk/nodejs
+mkdir -p release/jio-wasm32-sdk/docs
+
+# pushd .
+# cd ../rpc/wrpc/wasm
+# wasm-pack build --target web --out-name jio-rpc --out-dir web/jio-rpc --features wasm32-sdk $@
+# popd
+
+wasm-pack build --weak-refs --target web --out-name jio --out-dir web/jio-keygen --features wasm32-keygen $@
+wasm-pack build --weak-refs --dev --target web --out-name jio --out-dir web/jio-keygen-dev --features wasm32-keygen $@
+
+wasm-pack build --weak-refs --target web --out-name jio --out-dir web/jio-rpc --features wasm32-rpc $@
+wasm-pack build --weak-refs --dev --target web --out-name jio --out-dir web/jio-rpc-dev --features wasm32-rpc $@
+
+wasm-pack build --weak-refs --target web --out-name jio --out-dir web/jio-core --features wasm32-core $@
+wasm-pack build --weak-refs --dev --target web --out-name jio --out-dir web/jio-core-dev --features wasm32-core $@
+
+wasm-pack build --weak-refs --target web --out-name jio --out-dir web/jio --features wasm32-sdk $@
+wasm-pack build --weak-refs --dev --target web --out-name jio --out-dir web/jio-dev --features wasm32-sdk $@
+
+wasm-pack build --weak-refs --target nodejs --out-name jio --out-dir nodejs/jio --features wasm32-sdk $@
+wasm-pack build --weak-refs --dev --target nodejs --out-name jio --out-dir nodejs/jio-dev --features wasm32-sdk $@
+
+# wasm-pack build --target web --dev --out-name jio --out-dir build/docs/jio --features wasm32-sdk $@
+typedoc --name "Jio WASM32 SDK - Key Generation" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out docs/jio-keygen ./build/docs/jio-keygen.ts
+typedoc --name "Jio WASM32 SDK - RPC" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out docs/jio-rpc ./build/docs/jio-rpc.ts
+typedoc --name "Jio WASM32 SDK - Core" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out docs/jio-core ./build/docs/jio-core.ts
+typedoc --name "Jio WASM32 SDK" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out docs/jio ./build/docs/jio.ts
+
+# cp -r ../rpc/wrpc/wasm/web/jio-rpc release/jio-wasm32-sdk/web/jio-rpc
+cp -r web/jio-keygen release/jio-wasm32-sdk/web/jio-keygen
+cp -r web/jio-keygen-dev release/jio-wasm32-sdk/web/jio-keygen-dev
+
+cp -r web/jio-rpc release/jio-wasm32-sdk/web/jio-rpc
+cp -r web/jio-rpc-dev release/jio-wasm32-sdk/web/jio-rpc-dev
+
+cp -r web/jio-core release/jio-wasm32-sdk/web/jio-core
+cp -r web/jio-core-dev release/jio-wasm32-sdk/web/jio-core-dev
+
+cp -r web/jio release/jio-wasm32-sdk/web/jio
+cp -r web/jio-dev release/jio-wasm32-sdk/web/jio-dev
+
+cp -r nodejs/jio release/jio-wasm32-sdk/nodejs/jio
+cp -r nodejs/jio-dev release/jio-wasm32-sdk/nodejs/jio-dev
+
+cp -r docs/jio-keygen release/jio-wasm32-sdk/docs/jio-keygen
+cp -r docs/jio-rpc release/jio-wasm32-sdk/docs/jio-rpc
+cp -r docs/jio-core release/jio-wasm32-sdk/docs/jio-core
+cp -r docs/jio release/jio-wasm32-sdk/docs/jio
+
+mkdir -p release/jio-wasm32-sdk/examples/data
+cp -r examples/data/.gitignore release/jio-wasm32-sdk/examples/data/.gitignore
+cp -r examples/nodejs release/jio-wasm32-sdk/examples/
+cp -r examples/web release/jio-wasm32-sdk/examples/
+cp -r examples/init.js release/jio-wasm32-sdk/examples/
+cp -r examples/jsconfig.json release/jio-wasm32-sdk/examples/
+cp -r examples/package.json release/jio-wasm32-sdk/examples/
+
+pushd .
+cd release/jio-wasm32-sdk/examples
+npm install
+popd
+
+# tsc release/jio-wasm32-sdk/examples/nodejs/typescript/
+
+cp index.html release/jio-wasm32-sdk/index.html
+cp README.md release/jio-wasm32-sdk/README.md
+cp CHANGELOG.md release/jio-wasm32-sdk/CHANGELOG.md
+cp LICENSE release/jio-wasm32-sdk/LICENSE
+
+node build/package-sizes.js
+cp package-sizes.js release/jio-wasm32-sdk/package-sizes.js
+
+pushd .
+cd release
+zip -q -r jio-wasm32-sdk.zip jio-wasm32-sdk
+popd

@@ -1,1 +1,23 @@
-﻿
+[package]
+name = "jio-connectionmanager"
+description = "Jio connection manager"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+duration-string.workspace = true
+futures-util.workspace = true
+itertools.workspace = true
+jio-addressmanager.workspace = true
+jio-core.workspace = true
+jio-p2p-lib.workspace = true
+jio-utils.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+rand.workspace = true
+tokio.workspace = true

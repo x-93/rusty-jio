@@ -1,1 +1,1 @@
-﻿
+wasm-pack build --target nodejs --out-name jio-wallet --out-dir nodejs/jio-wallet $@

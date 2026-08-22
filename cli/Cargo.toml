@@ -1,1 +1,86 @@
-﻿
+[package]
+name = "jio-cli"
+description = "Jio CLI"
+keywords = ["jio", "wallet", "cli", "rpc"]
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+include = [
+    "src/**/*.rs",
+    "src/**/*.txt",
+    "src/**/*.css",
+    "Cargo.toml",
+    "Cargo.lock",
+]
+
+[features]
+default = []
+
+[lib]
+name = "jio_cli_lib"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+async-trait.workspace = true
+borsh.workspace = true
+cfg-if.workspace = true
+convert_case.workspace = true
+dashmap.workspace = true
+downcast.workspace = true
+faster-hex.workspace = true
+futures.workspace = true
+js-sys.workspace = true
+hex.workspace = true
+jio-addresses.workspace = true
+jio-bip32.workspace = true
+jio-consensus-core.workspace = true
+jio-core.workspace = true
+jio-daemon.workspace = true
+jio-metrics-core.workspace = true
+jio-rpc-core.workspace = true
+jio-utils.workspace = true
+jio-wallet-core.workspace = true
+jio-wallet-keys.workspace = true
+jio-wallet-pskt.workspace = true
+jio-wrpc-client.workspace = true
+nw-sys.workspace = true
+pad.workspace = true
+regex.workspace = true
+separator.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+textwrap.workspace = true
+thiserror.workspace = true
+wasm-bindgen.workspace = true
+workflow-core.workspace = true
+workflow-dom.workspace = true
+workflow-log.workspace = true
+workflow-node.workspace = true
+workflow-nw.workspace = true
+workflow-store.workspace = true
+workflow-terminal.workspace = true
+workflow-wasm.workspace = true
+
+[dependencies.web-sys]
+workspace = true
+features = [
+    'console',
+    'Document',
+    'Window',
+    'Node',
+    'Element',
+    'HtmlElement',
+    'DomTokenList',
+    # 'HtmlElement',
+    # 'CustomEvent',
+    # 'MouseEvent'
+]
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio.workspace = true
+
+[lints]
+workspace = true

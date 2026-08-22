@@ -1,209 +1,142 @@
-use crate::uint::{Uint128, Uint192, Uint256};
-use std::fmt;
+use core::fmt::{self, Display};
+use core::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ConversionError {
-    Overflow,
+#[derive(Copy, Clone, Debug)]
+pub struct SignedInteger<T> {
+    abs: T,
+    negative: bool,
 }
 
-impl fmt::Display for ConversionError {
+impl<T> From<T> for SignedInteger<T> {
+    #[inline]
+    fn from(u: T) -> Self {
+        Self { abs: u, negative: false }
+    }
+}
+impl<T: From<u64>> SignedInteger<T> {
+    #[inline]
+    pub fn positive_u64(u: u64) -> Self {
+        Self { abs: T::from(u), negative: false }
+    }
+}
+
+impl<T: Display> Display for SignedInteger<T> {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Overflow => write!(f, "value exceeds destination integer bit width"),
+        if self.negative {
+            write!(f, "-")?;
+        }
+        write!(f, "{}", self.abs)
+    }
+}
+
+impl<T: Copy> SignedInteger<T> {
+    #[inline]
+    pub const fn abs(&self) -> T {
+        self.abs
+    }
+
+    #[inline]
+    pub const fn negative(&self) -> bool {
+        self.negative
+    }
+}
+
+impl<T: Sub<Output = T> + Add<Output = T> + Ord> Sub for SignedInteger<T> {
+    type Output = Self;
+    #[inline]
+    #[track_caller]
+    fn sub(self, other: Self) -> Self::Output {
+        match (self.negative, other.negative) {
+            (false, false) | (true, true) => {
+                if self.abs < other.abs {
+                    Self { negative: !self.negative, abs: other.abs - self.abs }
+                } else {
+                    Self { negative: self.negative, abs: self.abs - other.abs }
+                }
+            }
+            (false, true) | (true, false) => Self { negative: self.negative, abs: self.abs + other.abs },
         }
     }
 }
 
-impl std::error::Error for ConversionError {}
-
-// --- From conversions (Lossless / Widening) ---
-
-impl From<u64> for Uint256 {
-    #[inline(always)]
-    fn from(val: u64) -> Self {
-        Self::from_u64(val)
+impl<T: Mul<Output = T>> Mul for SignedInteger<T> {
+    type Output = Self;
+    #[inline]
+    #[track_caller]
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self { negative: self.negative ^ rhs.negative, abs: self.abs * rhs.abs }
     }
 }
 
-impl From<u128> for Uint256 {
-    #[inline(always)]
-    fn from(val: u128) -> Self {
-        Self::from_u128(val)
+impl<T: Div<Output = T>> Div for SignedInteger<T> {
+    type Output = Self;
+    #[inline]
+    #[track_caller]
+    fn div(self, rhs: Self) -> Self::Output {
+        Self { negative: self.negative ^ rhs.negative, abs: self.abs / rhs.abs }
     }
 }
 
-impl From<Uint128> for Uint256 {
-    #[inline(always)]
-    fn from(val: Uint128) -> Self {
-        Self([val.0[0], val.0[1], 0, 0])
-    }
-}
-
-impl From<Uint192> for Uint256 {
-    #[inline(always)]
-    fn from(val: Uint192) -> Self {
-        Self([val.0[0], val.0[1], val.0[2], 0])
-    }
-}
-
-impl From<u64> for Uint128 {
-    #[inline(always)]
-    fn from(val: u64) -> Self {
-        Self::from_u64(val)
-    }
-}
-
-impl From<u32> for Uint128 {
-    #[inline(always)]
-    fn from(val: u32) -> Self {
-        Self::from_u64(val as u64)
-    }
-}
-
-impl From<i32> for Uint128 {
-    #[inline(always)]
-    fn from(val: i32) -> Self {
-        Self::from_u64(val as u64)
-    }
-}
-
-impl From<u64> for Uint192 {
-    #[inline(always)]
-    fn from(val: u64) -> Self {
-        Self::from_u64(val)
-    }
-}
-
-impl From<u32> for Uint192 {
-    #[inline(always)]
-    fn from(val: u32) -> Self {
-        Self::from_u64(val as u64)
-    }
-}
-
-impl From<i32> for Uint192 {
-    #[inline(always)]
-    fn from(val: i32) -> Self {
-        Self::from_u64(val as u64)
-    }
-}
-
-impl From<u32> for Uint256 {
-    #[inline(always)]
-    fn from(val: u32) -> Self {
-        Self::from_u64(val as u64)
-    }
-}
-
-impl From<i32> for Uint256 {
-    #[inline(always)]
-    fn from(val: i32) -> Self {
-        Self::from_u64(val as u64)
-    }
-}
-
-// --- TryFrom conversions (Narrowing with Overflow Detection) ---
-
-impl TryFrom<Uint256> for u64 {
-    type Error = ConversionError;
-    fn try_from(val: Uint256) -> Result<Self, Self::Error> {
-        if val.0[1] != 0 || val.0[2] != 0 || val.0[3] != 0 {
-            return Err(ConversionError::Overflow);
+impl<T: PartialEq + PartialEq<u64>> PartialEq for SignedInteger<T> {
+    fn eq(&self, other: &Self) -> bool {
+        if self.abs == 0 && other.abs == 0 {
+            // neg/pos zeros are considered equal
+            return true;
         }
-        Ok(val.0[0])
+        self.negative == other.negative && self.abs == other.abs
     }
 }
 
-impl TryFrom<Uint256> for u128 {
-    type Error = ConversionError;
-    fn try_from(val: Uint256) -> Result<Self, Self::Error> {
-        if val.0[2] != 0 || val.0[3] != 0 {
-            return Err(ConversionError::Overflow);
+impl<T: PartialEq + PartialEq<u64>> Eq for SignedInteger<T> {}
+
+impl<T: PartialOrd + PartialEq<u64>> PartialOrd for SignedInteger<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self.abs == 0 && other.abs == 0 {
+            // neg/pos zeros are considered equal
+            return Some(std::cmp::Ordering::Equal);
         }
-        Ok((val.0[0] as u128) | ((val.0[1] as u128) << 64))
-    }
-}
-
-impl TryFrom<Uint256> for Uint128 {
-    type Error = ConversionError;
-    fn try_from(val: Uint256) -> Result<Self, Self::Error> {
-        if val.0[2] != 0 || val.0[3] != 0 {
-            return Err(ConversionError::Overflow);
+        match (self.negative, other.negative) {
+            (false, false) => self.abs.partial_cmp(&other.abs),
+            (true, true) => other.abs.partial_cmp(&self.abs),
+            (true, false) => Some(std::cmp::Ordering::Less),
+            (false, true) => Some(std::cmp::Ordering::Greater),
         }
-        Ok(Uint128([val.0[0], val.0[1]]))
-    }
-}
-
-impl TryFrom<Uint256> for Uint192 {
-    type Error = ConversionError;
-    fn try_from(val: Uint256) -> Result<Self, Self::Error> {
-        if val.0[3] != 0 {
-            return Err(ConversionError::Overflow);
-        }
-        Ok(Uint192([val.0[0], val.0[1], val.0[2]]))
-    }
-}
-
-// --- Floating-point conversion for DAA / Difficulty Calculations ---
-
-impl Uint256 {
-    /// Convert wide integer to f64 approximation for difficulty & target calculations
-    pub fn to_f64(&self) -> f64 {
-        let mut factor = 1.0f64;
-        let mut result = 0.0f64;
-        for &limb in &self.0 {
-            result += (limb as f64) * factor;
-            factor *= 18446744073709551616.0f64; // 2^64
-        }
-        result
-    }
-
-    /// Construct from non-negative f64 approximation
-    pub fn from_f64_saturating(val: f64) -> Self {
-        if val <= 0.0 || val.is_nan() {
-            return Self::ZERO;
-        }
-        if val >= f64::MAX || val.is_infinite() {
-            return Self::MAX;
-        }
-
-        let mut res = Self::ZERO;
-        let mut rem = val;
-        let base = 18446744073709551616.0f64; // 2^64
-
-        let mut i = 0;
-        while i < 4 && rem > 0.0 {
-            let limb = (rem % base) as u64;
-            res.0[i] = limb;
-            rem = (rem / base).floor();
-            i += 1;
-        }
-
-        res
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::{int::SignedInteger, Uint192};
 
-    #[test]
-    fn test_conversions_widening_and_narrowing() {
-        let u_val = 42u64;
-        let wide: Uint256 = u_val.into();
-        assert_eq!(wide.0, [42, 0, 0, 0]);
-
-        let narrow: u64 = wide.try_into().unwrap();
-        assert_eq!(narrow, 42);
-
-        let overflow_val = Uint256::from_limbs([0, 1, 0, 0]);
-        let err: Result<u64, _> = overflow_val.try_into();
-        assert_eq!(err, Err(ConversionError::Overflow));
+    fn from_u64(val: u64) -> SignedInteger<Uint192> {
+        SignedInteger::from(Uint192::from_u64(val))
     }
 
     #[test]
-    fn test_f64_conversion() {
-        let val = Uint256::from_u64(1_000_000);
-        assert!((val.to_f64() - 1_000_000.0).abs() < 1e-5);
+    fn test_partial_eq() {
+        assert_eq!(from_u64(0), SignedInteger::from(Uint192::ZERO));
+        assert_eq!(from_u64(0), from_u64(10) - from_u64(10));
+        assert_eq!(from_u64(0), from_u64(10) - from_u64(20) - from_u64(10) * (from_u64(0) - from_u64(1))); // 0 == 10 - 20 -(-10)
+        assert_eq!(from_u64(0) - from_u64(1000), from_u64(0) - from_u64(1000)); // -1000 = -1000
+        assert_eq!(from_u64(1000), from_u64(1000));
+    }
+
+    #[test]
+    fn test_partial_cmp() {
+        // Test cases related to 0 and equality
+        assert!(from_u64(0) >= from_u64(10) - from_u64(20) - from_u64(10) * (from_u64(0) - from_u64(1))); // pos 0 >= neg 0
+        assert!(from_u64(0) <= from_u64(10) - from_u64(20) - from_u64(10) * (from_u64(0) - from_u64(1))); // pos 0 <= neg 0
+
+        // Test all possible neg/pos combinations
+        assert!(from_u64(100) > from_u64(0) - from_u64(1000)); // pos > neg
+        assert!(from_u64(0) - from_u64(100) < from_u64(10)); // neg < pos
+        assert!(from_u64(0) - from_u64(1000) < from_u64(0) - from_u64(100)); // -1000 < -100
+        assert!(from_u64(0) - from_u64(1000) <= from_u64(0) - from_u64(1000)); // -1000 <= -1000
+        assert!(from_u64(0) - from_u64(1000) >= from_u64(0) - from_u64(1000)); // -1000 >= -1000
+        assert!(from_u64(1000) > from_u64(100));
+        assert!(from_u64(100) < from_u64(1000));
+        assert!(from_u64(1000) >= from_u64(1000));
+        assert!(from_u64(100) <= from_u64(100));
     }
 }

@@ -1,1 +1,4 @@
-﻿
+#!/bin/bash
+set -e
+
+wasm-pack build --weak-refs --target nodejs --out-name jio --out-dir nodejs/jio --features wasm32-sdk

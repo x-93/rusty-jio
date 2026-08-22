@@ -1,1 +1,18 @@
-﻿
+[package]
+name = "jio-wrpc-simple-client-example"
+description = "Jio wRPC simple client example"
+publish = false
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+futures.workspace = true
+jio-rpc-core.workspace = true
+jio-wrpc-client.workspace = true
+tokio.workspace = true
+

@@ -1,1 +1,31 @@
-﻿
+[package]
+name = "jio-addressmanager"
+description = "Jio address manager"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+borsh.workspace = true
+igd-next.workspace = true
+itertools.workspace = true
+jio-consensus-core.workspace = true
+jio-core.workspace = true
+jio-database.workspace = true
+jio-utils.workspace = true
+local-ip-address.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+rand.workspace = true
+rocksdb.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+statrs.workspace = true
+statest.workspace = true

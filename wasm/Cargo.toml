@@ -1,1 +1,69 @@
-﻿
+[package]
+name = "jio-wasm"
+description = "JIO WASM bindings"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+repository.workspace = true
+# wasm-pack requires this value to be a string
+# (it can not be derived from the workspace)
+license = "ISC"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cfg-if.workspace = true
+js-sys.workspace = true
+jio-addresses.workspace = true
+jio-bip32.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-wasm.workspace = true
+jio-core.workspace = true
+jio-math.workspace = true
+jio-pow.workspace = true
+jio-txscript.workspace = true
+jio-rpc-core.workspace = true
+jio-utils.workspace = true
+jio-wasm-core.workspace = true
+jio-wallet-core.workspace = true
+jio-wallet-keys.workspace = true
+jio-wrpc-client.workspace = true
+jio-wrpc-wasm.workspace = true
+num.workspace = true
+wasm-bindgen.workspace = true
+workflow-log.workspace = true
+workflow-core.workspace = true
+workflow-wasm.workspace = true
+
+[features] 
+wasm32-sdk = [
+    "jio-wallet-core/wasm32-sdk",
+    "jio-pow/wasm32-sdk",
+    "jio-txscript/wasm32-sdk",
+]
+wasm32-core = [
+    "jio-wallet-core/wasm32-core",
+    "jio-pow/wasm32-sdk",
+    "jio-txscript/wasm32-sdk",
+]
+wasm32-rpc = [
+    "jio-consensus-core/wasm32-sdk",
+    "jio-consensus-wasm/wasm32-sdk",
+    "jio-wrpc-client/wasm32-sdk",
+    "jio-wrpc-wasm/wasm32-sdk",
+]
+wasm32-keygen = []
+default = []
+
+[package.metadata.docs.rs]
+targets = ["wasm32-unknown-unknown"]
+
+[package.metadata.emanate.wasm]
+targets = [
+    { target = "nodejs", out-dir = "nodejs/jio" },
+    { target = "web", out-dir = "web/jio" }
+]
+folder = "setup"

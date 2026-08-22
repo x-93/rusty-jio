@@ -1,1 +1,25 @@
-﻿
+[package]
+name = "jio-consensus-notify"
+description = "Jio consensus notifier"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+async-channel.workspace = true
+cfg-if.workspace = true
+derive_more.workspace = true
+futures.workspace = true
+jio-consensus-core.workspace = true
+jio-core.workspace = true
+jio-hashes.workspace = true
+jio-notify.workspace = true
+jio-utils.workspace = true
+log.workspace = true
+paste.workspace = true
+thiserror.workspace = true
+triggered.workspace = true

@@ -1,1 +1,22 @@
-﻿
+[package]
+name = "jio-wrpc-example-subscriber"
+description = "Jio wRPC subscription example"
+publish = false
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+futures.workspace = true
+jio-consensus-core.workspace = true
+jio-rpc-core.workspace = true
+jio-wrpc-client.workspace = true
+jio-notify.workspace = true
+tokio.workspace = true
+workflow-core.workspace = true
+workflow-log.workspace = true
+ctrlc.workspace = true

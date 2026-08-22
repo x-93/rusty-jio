@@ -1,1 +1,77 @@
-﻿
+[package]
+name = "jio-testing-integration"
+publish = false
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-alloc.workspace = true            # This changes the global allocator for all of the next dependencies so should be kept first
+
+jio-addresses.workspace = true
+jio-bip32.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-consensus.workspace = true
+jio-consensusmanager.workspace = true
+jio-core.workspace = true
+jio-database.workspace = true
+jio-grpc-client.workspace = true
+jio-grpc-core.workspace = true
+jio-grpc-server.workspace = true
+jio-hashes.workspace = true
+jio-index-processor.workspace = true
+jio-math.workspace = true
+jio-merkle.workspace = true
+jio-muhash.workspace = true
+jio-notify.workspace = true
+jio-pow.workspace = true
+jio-rpc-core.workspace = true
+jio-rpc-service.workspace = true
+jio-txscript.workspace = true
+jio-utils.workspace = true
+jio-utxoindex.workspace = true
+jio-wrpc-server.workspace = true
+jiopad.workspace = true
+
+async-channel.workspace = true
+async-trait.workspace = true
+bincode.workspace = true
+clap.workspace = true
+chrono.workspace = true
+crossbeam-channel.workspace = true
+dhat = { workspace = true, optional = true }
+faster-hex.workspace = true
+flate2.workspace = true
+futures-util.workspace = true
+indexmap.workspace = true
+itertools.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+rand_distr.workspace = true
+rand.workspace = true
+rayon.workspace = true
+rocksdb.workspace = true
+secp256k1.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+smallvec.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+workflow-perf-monitor.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+rand = { workspace = true, features = ["small_rng"] }
+tokio = { workspace = true, features = ["rt", "macros", "process"] }
+jio-txscript-errors.workspace = true
+
+[features]
+heap = ["dhat"]
+html_reports = []
+devnet-prealloc = ["jiopad/devnet-prealloc"]

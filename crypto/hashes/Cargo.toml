@@ -9,24 +9,33 @@ include.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[features]
+no-asm = ["keccak"]
+
 [dependencies]
-jio-utils.workspace = true
-blake3.workspace = true
-faster-hex = { workspace = true, features = ["alloc"] }
-serde = { workspace = true, optional = true }
+blake2b_simd.workspace = true
 borsh.workspace = true
+faster-hex.workspace = true
+js-sys.workspace = true
+jio-utils.workspace = true
+keccak = { workspace = true, optional = true }
+once_cell.workspace = true
+serde.workspace = true
+sha2.workspace = true
 wasm-bindgen.workspace = true
 workflow-wasm.workspace = true
 
+[target.'cfg(any(target_os = "windows", not(target_arch = "x86_64")))'.dependencies]
+keccak.workspace = true
+
 [dev-dependencies]
 criterion.workspace = true
-serde_json.workspace = true
+rand.workspace = true
+sha3.workspace = true
+
+[build-dependencies]
+cc.workspace = true
 
 [[bench]]
 name = "bench"
 harness = false
-
-[features]
-default = ["std", "serde"]
-std = ["blake3/std", "faster-hex/std", "jio-utils/std", "borsh/std"]
-serde = ["dep:serde", "jio-utils/serde"]

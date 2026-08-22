@@ -1,1 +1,29 @@
-﻿
+[package]
+name = "jio-utxoindex"
+description = "Jio UTXO index"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+futures.workspace = true
+jio-consensus-core.workspace = true
+jio-consensusmanager.workspace = true
+jio-core.workspace = true
+jio-database.workspace = true
+jio-hashes.workspace = true
+jio-index-core.workspace = true
+jio-utils.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+rocksdb.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+jio-consensus.workspace = true
+rand = { workspace = true, features = ["small_rng"] }

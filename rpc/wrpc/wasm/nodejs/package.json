@@ -1,1 +1,7 @@
-﻿
+{
+    "name": "jio-rpc-client-example",
+    "version": "1.0.0",
+    "dependencies": {
+        "websocket": "1.0.34"
+    }
+}

@@ -1,20 +1,41 @@
-use std::fmt;
+use thiserror::Error;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+use crate::tx::TransactionOutpoint;
+
+#[derive(Error, Debug, Eq)]
 pub enum UtxoAlgebraError {
-    DiffIntersection(String),
-    KeyNotFound(String),
-    General(String),
+    #[error("outpoint {0} both in self.remove and in other.remove")]
+    DuplicateRemovePoint(TransactionOutpoint),
+
+    #[error("outpoint {0} both in self.add and in other.add")]
+    DuplicateAddPoint(TransactionOutpoint),
+
+    #[error("cannot remove outpoint {0} twice")]
+    DoubleRemoveCall(TransactionOutpoint),
+
+    #[error("cannot add outpoint {0} twice")]
+    DoubleAddCall(TransactionOutpoint),
+
+    #[error("outpoint {0} {1}")]
+    DiffIntersectionPoint(TransactionOutpoint, &'static str),
+
+    #[error("{0}")]
+    General(&'static str),
 }
 
-impl fmt::Display for UtxoAlgebraError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::DiffIntersection(msg) => write!(f, "UTXO diff intersection error: {}", msg),
-            Self::KeyNotFound(msg) => write!(f, "UTXO key not found: {}", msg),
-            Self::General(msg) => write!(f, "UTXO error: {}", msg),
+/// Explicit imp in order to ignore the description strings in test equality assertions
+impl PartialEq for UtxoAlgebraError {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::DuplicateRemovePoint(l0), Self::DuplicateRemovePoint(r0)) => l0 == r0,
+            (Self::DuplicateAddPoint(l0), Self::DuplicateAddPoint(r0)) => l0 == r0,
+            (Self::DoubleRemoveCall(l0), Self::DoubleRemoveCall(r0)) => l0 == r0,
+            (Self::DoubleAddCall(l0), Self::DoubleAddCall(r0)) => l0 == r0,
+            (Self::DiffIntersectionPoint(l0, _), Self::DiffIntersectionPoint(r0, _)) => l0 == r0, // Ignore the description string
+            (Self::General(_), Self::General(_)) => true,
+            (_, _) => false,
         }
     }
 }
 
-impl std::error::Error for UtxoAlgebraError {}
+pub type UtxoResult<T> = std::result::Result<T, UtxoAlgebraError>;

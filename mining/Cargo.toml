@@ -1,1 +1,41 @@
-﻿
+[package]
+name = "jio-mining"
+description = "Jio mining"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-addresses.workspace = true
+jio-consensus-core.workspace = true
+jio-consensusmanager.workspace = true
+jio-core.workspace = true
+jio-hashes.workspace = true
+jio-mining-errors.workspace = true
+jio-muhash.workspace = true
+jio-txscript.workspace = true
+jio-utils.workspace = true
+
+futures-util.workspace = true
+itertools.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+rand.workspace = true
+serde.workspace = true
+smallvec.workspace = true
+sweep-bptree = "0.4.1"
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "signal"] }
+
+[dev-dependencies]
+jio-txscript.workspace = true
+criterion.workspace = true
+secp256k1.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false

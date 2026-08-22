@@ -1,1 +1,65 @@
-﻿
+[package]
+name = "jiopad"
+description = "Jio full node daemon"
+keywords = ["jio", "blockdag"]
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "jiopad_lib"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+jio-alloc.workspace = true # This changes the global allocator for all of the next dependencies so should be kept first
+
+jio-addresses.workspace = true
+jio-addressmanager.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-consensus.workspace = true
+jio-consensusmanager.workspace = true
+jio-core.workspace = true
+jio-database.workspace = true
+jio-grpc-server.workspace = true
+jio-hashes.workspace = true
+jio-index-processor.workspace = true
+jio-mining.workspace = true
+jio-notify.workspace = true
+jio-p2p-flows.workspace = true
+jio-perf-monitor.workspace = true
+jio-rpc-core.workspace = true
+jio-rpc-service.workspace = true
+jio-txscript.workspace = true
+jio-utils.workspace = true
+jio-utils-tower.workspace = true
+jio-utxoindex.workspace = true
+jio-wrpc-server.workspace = true
+
+async-channel.workspace = true
+cfg-if.workspace = true
+clap.workspace = true
+dhat = { workspace = true, optional = true }
+dirs.workspace = true
+futures-util.workspace = true
+log.workspace = true
+num_cpus.workspace = true
+rand.workspace = true
+rayon.workspace = true
+serde.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt", "macros", "rt-multi-thread"] }
+workflow-log.workspace = true
+
+toml = "0.8.10"
+serde_with = "3.7.0"
+
+[features]
+heap = ["dhat", "jio-alloc/heap"]
+devnet-prealloc = ["jio-consensus/devnet-prealloc"]
+semaphore-trace = ["jio-utils/semaphore-trace"]

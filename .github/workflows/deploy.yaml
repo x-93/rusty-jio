@@ -1,178 +1,204 @@
-name: Deployment & Release
-
+name: Build and upload assets
 on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version tag (e.g. v0.1.0)'
-        required: false
-        default: 'v0.1.0'
-
-env:
-  CARGO_TERM_COLOR: always
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  release:
+    types: [ published ]
 
 jobs:
-  build-binaries:
-    name: Build Binary (${{ matrix.target }})
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            artifact_name: jio-linux-x86_64
-            use_cross: false
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            artifact_name: jio-linux-arm64
-            use_cross: true
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            artifact_name: jio-macos-x86_64
-            use_cross: false
-          - os: macos-14
-            target: aarch64-apple-darwin
-            artifact_name: jio-macos-arm64
-            use_cross: false
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            artifact_name: jio-windows-x86_64
-            use_cross: false
-
+        # Build gnu-linux on ubuntu-18.04 and musl on ubuntu latest
+        # os: [ ubuntu-18.04, ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    name: Building, ${{ matrix.os }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Fix CRLF on Windows
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
 
-      - name: Install Rust toolchain
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo Build Outputs
+        uses: actions/cache@v3
         with:
-          targets: ${{ matrix.target }}
-
-      - name: Setup Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.target }}
-
-      - name: Install Cross (if cross-compiling)
-        if: matrix.use_cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
-
-      - name: Build release binaries
-        run: |
-          if [ "${{ matrix.use_cross }}" = "true" ]; then
-            cross build --workspace --release --target ${{ matrix.target }}
-          else
-            cargo build --workspace --release --target ${{ matrix.target }}
-          fi
-        shell: bash
-
-      - name: Package artifacts (Unix)
-        if: matrix.os != 'windows-latest'
-        run: |
-          mkdir -p staging/${{ matrix.artifact_name }}
-          cp README.md LICENSE staging/${{ matrix.artifact_name }}/ 2>/dev/null || true
-          find target/${{ matrix.target }}/release/ -maxdepth 1 -type f -executable -exec cp {} staging/${{ matrix.artifact_name }}/ \; 2>/dev/null || true
-          cd staging
-          tar -czvf ../${{ matrix.artifact_name }}.tar.gz ${{ matrix.artifact_name }}
-        shell: bash
-
-      - name: Package artifacts (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          New-Item -ItemType Directory -Force -Path staging\${{ matrix.artifact_name }}
-          Copy-Item README.md, LICENSE -Destination staging\${{ matrix.artifact_name }} -ErrorAction SilentlyContinue
-          Get-ChildItem target\${{ matrix.target }}\release\*.exe | Copy-Item -Destination staging\${{ matrix.artifact_name }}
-          Compress-Archive -Path staging\${{ matrix.artifact_name }} -DestinationPath ${{ matrix.artifact_name }}.zip
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact_name }}
           path: |
-            *.tar.gz
-            *.zip
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-  build-docker:
-    name: Build and Push Docker Image
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Cache Toolchain
+        uses: actions/cache@v4
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          path: |
+            ~/x-tools
+          key: ${{ runner.os }}-musl-${{ hashFiles('**/musl-toolchain/preset.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-musl-
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=sha,format=short
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./deploy.dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  create-release:
-    name: Create GitHub Release
-    needs: [build-binaries, build-docker]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: release-artifacts
-
-      - name: Generate Checksums
+      - name: Build on Linux
+        if: runner.os == 'Linux'
+        # We're using musl to make the binaries statically linked and portable
         run: |
-          cd release-artifacts
-          find . -type f \( -name "*.tar.gz" -o -name "*.zip" \) -exec sha256sum {} + > SHA256SUMS.txt
-          cat SHA256SUMS.txt
+          # Run build script for musl toolchain
+          source musl-toolchain/build.sh
+          
+          # Go back to the workspace
+          cd $GITHUB_WORKSPACE
+          
+          # Build for musl
+          cargo --verbose build --bin jiopad --bin rothschild --bin jio-wallet --release --target x86_64-unknown-linux-musl
+          mkdir bin || true
+          cp target/x86_64-unknown-linux-musl/release/jiopad bin/
+          cp target/x86_64-unknown-linux-musl/release/rothschild bin/
+          cp target/x86_64-unknown-linux-musl/release/jio-wallet bin/
+          archive="bin/rusty-jio-${{ github.event.release.tag_name }}-linux-musl-amd64.zip"
+          asset_name="rusty-jio-${{ github.event.release.tag_name }}-linux-musl-amd64.zip"
+          zip -r "${archive}" ./bin/*
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Build on Windows
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          cargo build --bin jiopad --release
+          cargo build --bin simpa --release
+          cargo build --bin rothschild --release
+          cargo build --bin jio-wallet --release
+          mkdir bin || true
+          cp target/release/jiopad.exe bin/
+          cp target/release/simpa.exe bin/
+          cp target/release/rothschild.exe bin/
+          cp target/release/jio-wallet.exe bin/
+          archive="bin/rusty-jio-${{ github.event.release.tag_name }}-win64.zip"
+          asset_name="rusty-jio-${{ github.event.release.tag_name }}-win64.zip"
+          powershell "Compress-Archive bin/* \"${archive}\""
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
+
+      - name: Build on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          cargo build --bin jiopad --release
+          cargo build --bin simpa --release
+          cargo build --bin rothschild --release
+          cargo build --bin jio-wallet --release
+          mkdir bin || true
+          cp target/release/jiopad bin/
+          cp target/release/simpa bin/
+          cp target/release/rothschild bin/
+          cp target/release/jio-wallet bin/
+          archive="bin/rusty-jio-${{ github.event.release.tag_name }}-osx.zip"
+          asset_name="rusty-jio-${{ github.event.release.tag_name }}-osx.zip"
+          zip -r "${archive}" ./bin/*
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            release-artifacts/**/*.tar.gz
-            release-artifacts/**/*.zip
-            release-artifacts/SHA256SUMS.txt
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "./${{ env.archive }}"
+          asset_name: "${{ env.asset_name }}"
+          asset_content_type: application/zip
+
+  build-wasm:
+    runs-on: ubuntu-latest
+    name: Building WASM32 SDK
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install llvm
+        id: install_llvm
+        continue-on-error: true
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          sudo apt-get install -y clang-15 lldb-15 lld-15 clangd-15 clang-tidy-15 clang-format-15 clang-tools-15 llvm-15-dev lld-15 lldb-15 llvm-15-tools libomp-15-dev libc++-15-dev libc++abi-15-dev libclang-common-15-dev libclang-15-dev libclang-cpp15-dev libunwind-15-dev
+          # Make Clang 15 default
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-15/bin/clang++ 100
+          sudo update-alternatives --install /usr/bin/clang clang /usr/lib/llvm-15/bin/clang 100
+          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/lib/llvm-15/bin/clang-format 100
+          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/lib/llvm-15/bin/clang-tidy 100
+          sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/lib/llvm-15/bin/run-clang-tidy 100
+          # Alias cc to clang
+          sudo update-alternatives --install /usr/bin/cc cc /usr/lib/llvm-15/bin/clang 0
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/lib/llvm-15/bin/clang++ 0
+
+      - name: Install gcc-multilib
+        # gcc-multilib allows clang to find gnu libraries properly
+        run: sudo apt install -y gcc-multilib
+
+      - name: Install stable toolchain
+        if: steps.install_llvm.outcome == 'success' && steps.install_llvm.conclusion == 'success'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      - name: Add wasm32 target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install NodeJS dependencies
+        run: npm install --global typedoc typescript
+
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build WASM32 SDK
+        run: |
+          cd wasm
+          bash build-release
+          mv release/jio-wasm32-sdk.zip ../jio-wasm32-sdk-${{ github.event.release.tag_name }}.zip
+
+          archive="jio-wasm32-sdk-${{ github.event.release.tag_name }}.zip"
+          asset_name="jio-wasm32-sdk-${{ github.event.release.tag_name }}.zip"
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
+
+      - name: Upload WASM32 SDK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "./${{ env.archive }}"
+          asset_name: "${{ env.asset_name }}"
+          asset_content_type: application/zip

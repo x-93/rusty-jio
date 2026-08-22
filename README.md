@@ -1,133 +1,418 @@
-# Rusty-Jio
 
-[![Rust](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
-[![Build & Test](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/x-93/rusty-jio)
+<h1>Jio On Rust</h1>
 
-**Rusty-Jio** is a high-throughput, low-latency **BlockDAG consensus node** and distributed network implementation written in Rust. Designed for sub-second block times and high parallel transaction capacity, Rusty-Jio leverages GHOSTDAG consensus principles, BLAKE3 cryptographic domain separation, and zero-allocation multi-limb big-integer arithmetic.
+Welcome to the Rust-based implementation of the Jio full-node and its ancillary libraries. The contained node release serves as a drop-in replacement to the established <a href="https://github.com/jionet/jiopad">Golang node</a> and to date is the recommended node software for the Jio network, introducing developers to the possibilities of Rust in the Jio network's context.
 
----
+We invite developers and blockchain enthusiasts to collaborate, test, and optimize our Rust implementation. Each line of code here is an opportunity to contribute to the open-source blockchain movement, shaping a platform designed for scalability and speed without compromising on security and decentralization.
 
-## 🌟 Key Architecture & Design Principles
+Your feedback, contributions, and issue reports will be integral to evolving this codebase and continuing its maturity as a reliable node in the Jio network.
 
+The default branch of this repository is `master` and new contributions are constantly merged into it. For a stable branch corresponding to the latest stable release please pull and compile the `stable` branch. 
+
+## Installation
+  <details>
+  <summary>Building on Linux</summary>
+  
+  1. Install general prerequisites
+
+      ```bash
+      sudo apt install curl git build-essential libssl-dev pkg-config 
+      ```
+
+  2. Install Protobuf (required for gRPC)
+  
+      ```bash
+      sudo apt install protobuf-compiler libprotobuf-dev #Required for gRPC
+      ```
+  3. Install the clang toolchain (required for RocksDB and WASM secp256k1 builds)
+
+      ```bash
+      sudo apt-get install clang-format clang-tidy \
+      clang-tools clang clangd libc++-dev \
+      libc++1 libc++abi-dev libc++abi1 \
+      libclang-dev libclang1 liblldb-dev \
+      libllvm-ocaml-dev libomp-dev libomp5 \
+      lld lldb llvm-dev llvm-runtime \
+      llvm python3-clang
+      ```
+  3. Install the [rust toolchain](https://rustup.rs/)
+     
+     If you already have rust installed, update it by running: `rustup update` 
+  4. Install wasm-pack
+      ```bash
+      cargo install wasm-pack
+      ```
+  4. Install wasm32 target
+      ```bash
+      rustup target add wasm32-unknown-unknown
+      ```      
+  5. Clone the repo
+      ```bash
+      git clone https://github.com/jionet/rusty-jio
+      cd rusty-jio
+      ```
+  </details>
+
+
+
+  <details>  
+  <summary>Building on Windows</summary>
+
+
+  1. [Install Git for Windows](https://gitforwindows.org/) or an alternative Git distribution.
+
+  2. Install [Protocol Buffers](https://github.com/protocolbuffers/protobuf/releases/download/v21.10/protoc-21.10-win64.zip) and add the `bin` directory to your `Path`
+
+  
+3. Install [LLVM-15.0.6-win64.exe](https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.6/LLVM-15.0.6-win64.exe)
+
+    Add the `bin` directory of the LLVM installation (`C:\Program Files\LLVM\bin`) to PATH
+    
+    set `LIBCLANG_PATH` environment variable to point to the `bin` directory as well
+
+    **IMPORTANT:** Due to C++ dependency configuration issues, LLVM `AR` installation on Windows may not function correctly when switching between WASM and native C++ code compilation (native `RocksDB+secp256k1` vs WASM32 builds of `secp256k1`). Unfortunately, manually setting `AR` environment variable also confuses C++ build toolchain (it should not be set for native but should be set for WASM32 targets). Currently, the best way to address this, is as follows: after installing LLVM on Windows, go to the target `bin` installation directory and copy or rename `LLVM_AR.exe` to `AR.exe`.
+  
+  4. Install the [rust toolchain](https://rustup.rs/)
+     
+     If you already have rust installed, update it by running: `rustup update` 
+  5. Install wasm-pack
+      ```bash
+      cargo install wasm-pack
+      ```
+  6. Install wasm32 target
+      ```bash
+      rustup target add wasm32-unknown-unknown
+      ```      
+  7. Clone the repo
+      ```bash
+      git clone https://github.com/jionet/rusty-jio
+      cd rusty-jio
+      ```
+ </details>      
+
+
+  <details>  
+  <summary>Building on Mac OS</summary>
+
+
+  1. Install Protobuf (required for gRPC)
+      ```bash
+      brew install protobuf
+      ```
+  2. Install llvm. 
+  
+      The default XCode installation of `llvm` does not support WASM build targets.
+To build WASM on MacOS you need to install `llvm` from homebrew (at the time of writing, the llvm version for MacOS is 16.0.1).
+      ```bash
+      brew install llvm
+      ```
+
+      **NOTE:** Homebrew can use different keg installation locations depending on your configuration. For example:
+      - `/opt/homebrew/opt/llvm` -> `/opt/homebrew/Cellar/llvm/16.0.1`
+      - `/usr/local/Cellar/llvm/16.0.1`
+
+      To determine the installation location you can use `brew list llvm` command and then modify the paths below accordingly:
+      ```bash
+      % brew list llvm
+      /usr/local/Cellar/llvm/16.0.1/bin/FileCheck
+      /usr/local/Cellar/llvm/16.0.1/bin/UnicodeNameMappingGenerator
+      ...
+      ```
+      If you have `/opt/homebrew/Cellar`, then you should be able to use `/opt/homebrew/opt/llvm`.
+
+      Add the following to your `~/.zshrc` file:
+      ```bash
+      export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+      export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+      export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+      export AR=/opt/homebrew/opt/llvm/bin/llvm-ar
+      ```
+
+      Reload the `~/.zshrc` file
+      ```bash
+      source ~/.zshrc
+      ```
+  3. Install the [rust toolchain](https://rustup.rs/)
+     
+     If you already have rust installed, update it by running: `rustup update` 
+  4. Install wasm-pack
+      ```bash
+      cargo install wasm-pack
+      ```
+  4. Install wasm32 target
+      ```bash
+      rustup target add wasm32-unknown-unknown
+      ```      
+  5. Clone the repo
+      ```bash
+      git clone https://github.com/jionet/rusty-jio
+      cd rusty-jio
+      ```
+
+ </details>   
+
+  <details>
+
+  <summary>Building WASM32 SDK</summary>
+
+  Rust WebAssembly (WASM) refers to the use of the Rust programming language to write code that can be compiled into WebAssembly, a binary instruction format that runs in web browsers and NodeJs. This allows for easy development using JavaScript and TypeScript programming languages while retaining the benefits of Rust.
+
+  WASM SDK components can be built from sources by running:
+    - `./build-release` - build a full release package (includes both release and debug builds for web and nodejs targets)
+    - `./build-docs` - build TypeScript documentation
+    - `./build-web` - release web build
+    - `./build-web-dev` - development web build
+    - `./build-nodejs` - release nodejs build
+    - `./build-nodejs-dev` - development nodejs build
+
+  IMPORTANT: do not use `dev` builds in production. They are significantly larger, slower and include debug symbols.
+
+### Requirements
+
+  - NodeJs (v20+): https://nodejs.org/en
+  - TypeDoc: https://typedoc.org/
+
+### Builds & documentation
+
+  - Release builds: https://github.com/jionet/rusty-jio/releases
+  - Developer builds: https://jio.aspectron.org/nightly/downloads/
+  - Developer TypeScript documentation: https://jio.aspectron.org/docs/
+
+  </details>
+<details>
+
+<summary>
+Jio CLI + Wallet
+</summary>
+`jio-cli` crate provides cli-driven RPC interface to the node and a
+terminal interface to the Rusty Jio Wallet runtime. These wallets are
+compatible with WASM SDK Wallet API and Jio NG projects.
+
+
+```bash
+cd cli
+cargo run --release
 ```
-┌────────────────────────────────────────────────────────┐
-│  Layer 8: Full-Node Daemon (jiod), CLI, RPC (wRPC/gRPC)│
-├────────────────────────────────────────────────────────┤
-│  Layer 7: P2P Networking, Protocol Flows & Sync Engine │
-├────────────────────────────────────────────────────────┤
-│  Layer 6: BlockDAG Consensus (GHOSTDAG, Reachability)  │
-├────────────────────────────────────────────────────────┤
-│  Layer 5: State & Indexing (UTXO Set, Virtual State)   │
-├────────────────────────────────────────────────────────┤
-│  Layer 4: Storage Engine (Database, RocksDB backend)   │
-├────────────────────────────────────────────────────────┤
-│  Layer 3: Cryptography & TxScript Engine               │
-├────────────────────────────────────────────────────────┤
-│  Layer 2: Core Domain Types (Block, Header, Tx)        │
-├────────────────────────────────────────────────────────┤
-│  Layer 1: Foundations (Math, Hashes, Utils)            │
-└────────────────────────────────────────────────────────┘
+
+</details>
+
+
+
+<details>
+
+<summary>
+Local Web Wallet
+</summary>
+
+Run an http server inside of `wallet/wasm/web` folder. If you don't have once, you can use the following:
+
+```bash
+cd wallet/wasm/web
+cargo install basic-http-server
+basic-http-server
 ```
+The *basic-http-server* will serve on port 4000 by default, so open your web browser and load http://localhost:4000
 
-* **Pure BLAKE3 Domain Separation**: Eliminates cross-protocol type-confusion attacks via zero-overhead `new_derive_key` domain separation.
-* **Zero-Allocation Fixed-Width Math**: High-performance multi-limb [`Uint128`, `Uint192`, `Uint256`] arithmetic optimized for difficulty adjustment algorithms (DAA) and Proof-of-Work target evaluations.
-* **Modular Workspace**: Cleanly isolated crates enabling independent reuse across node daemons, lightweight SPV clients, mining software, and WebAssembly (WASM) browser wallets.
+The framework is compatible with all major desktop and mobile browsers.
 
----
 
-## 📦 Implemented Crates
+</details>
 
-### 1. `jio-math` (`math/`)
-* **Multi-Precision Arithmetic Engine**: Fast `[u64; N]` multi-limb big integer generation via `construct_uint!(Name, Limbs)`.
-* **Types**: [`Uint128`](math/src/uint.rs), [`Uint192`](math/src/uint.rs), and [`Uint256`](math/src/uint.rs).
-* **Operations**: Multi-limb addition, subtraction, multiplication with carry/borrow propagation (`carrying_add`, `borrowing_sub`, `carrying_mul`), bit shifts across limb boundaries, and float (`f64`) conversions for dynamic difficulty adjustment.
-* **WASM / JS Interop**: Direct conversions to/from JavaScript `BigInt` and hex parsing.
 
-### 2. `jio-hashes` (`crypto/hashes/`)
-* **Domain-Separated BLAKE3 Engine**: Native initialization vectors generated from cryptographically isolated context strings:
-  * `TransactionHash` (`"TransactionHash"`)
-  * `TransactionID` (`"TransactionID"`) — Malleability-proof transaction identifier
-  * `TransactionSigningHash` (`"TransactionSigningHash"`) — Sighash calculations for signature verification
-  * `BlockHash` (`"BlockHash"`)
-  * `ProofOfWorkHash` (`"ProofOfWorkHash"`)
-  * `MerkleBranchHash` (`"MerkleBranchHash"`)
-  * `MuHashElementHash` / `MuHashFinalizeHash`
-  * `PersonalMessageSigningHash` (`"PersonalMessageSigningHash"`)
-* **`Hash` Type (`[u8; 32]`)**:
-  * Optimized 64-bit word iterator (`to_le_u64`, `from_le_u64`, `iter_le_u64`) for fast SipHash operations in hash tables.
-  * Native serialization support for `Borsh`, `Serde`, `Hex`, and `WASM`.
+## Running the node
 
-### 3. `jio-utils` (`utils/`)
-* **Utilities & Memory Management**:
-  * Fast SIMD hex formatting via `faster-hex` (`ToHex`, `FromHex` traits).
-  * In-memory object size estimation via `MemSizeEstimator`.
-  * Macro helpers for fixed-length byte reference serialization.
+  **Start a mainnet node**
 
----
-
-## 📁 Repository Structure
-
-```
-rusty-jio/
-├── math/              # Big integer arithmetic & precision math (jio-math)
-├── crypto/
-│   ├── hashes/        # BLAKE3 domain-separated hashing (jio-hashes)
-│   ├── addresses/     # Bech32 address encoding & prefixes
-│   ├── merkle/        # Transaction & block ID Merkle trees
-│   ├── muhash/        # Rolling UTXO set multi-set hashes
-│   └── txscript/      # Script execution & opcode engine
-├── core/              # Core domain structures (Blocks, Headers, Transactions)
-├── consensus/         # GHOSTDAG consensus, DAG reachability & PoW validation
-├── database/          # Persistent database traits and RocksDB backend
-├── indexes/           # UTXO & transaction indexers
-├── protocol/          # P2P wire protocol and networking flows
-├── rpc/               # gRPC and WebSocket RPC (wRPC) interfaces
-├── daemon/            # Full-node runner executable (jiod)
-├── wallet/            # Key generation, BIP32 derivation, and transaction building
-├── utils/             # Shared system utilities & traits (jio-utils)
-└── wasm/              # WebAssembly SDK for browser & Node.js
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-* **Rust**: Ensure you have the latest stable Rust toolchain installed (edition 2024, MSRV 1.85.0+).
   ```bash
-  rustup update stable
+  cargo run --release --bin jiopad
+  # or with UTXO-index enabled (needed when using wallets)
+  cargo run --release --bin jiopad -- --utxoindex
+  ```
+  **Start a testnet node**
+
+  ```bash
+cargo run --release --bin jiopad -- --testnet
   ```
 
-### Building the Workspace
-To build all workspace packages in release mode:
+  **Testnet 11**
+  
+  For participation in the 10BPS test network (TN11), see the following detailed [guide](docs/testnet11.md).
+
+<details>
+
+  <summary>
+Using a configuration file
+  </summary>
+
+  ```bash
+cargo run --release --bin jiopad -- --configfile /path/to/configfile.toml
+# or
+cargo run --release --bin jiopad -- -C /path/to/configfile.toml
+  ```
+  - The config file should be a list of \<CLI argument\> = \<value\> separated by newlines. 
+  - Whitespace around the `=` is fine, `arg=value` and `arg = value` are both parsed correctly.
+  - Values with special characters like `.` or `=` will require quoting the value i.e \<CLI argument\> = "\<value\>".
+  - Arguments with multiple values should be surrounded with brackets like `addpeer = ["10.0.0.1", "1.2.3.4"]`.
+
+  For example:
+  ```
+testnet = true
+utxoindex = false
+disable-upnp = true
+perf-metrics = true
+appdir = "some-dir"
+netsuffix = 11
+addpeer = ["10.0.0.1", "1.2.3.4"]
+  ```
+ Pass the `--help` flag to view all possible arguments
+
+  ```bash
+cargo run --release --bin jiopad -- --help
+  ```
+</details>
+
+<details>
+
+  <summary>
+wRPC
+  </summary>
+
+  wRPC subsystem is disabled by default in `jiopad` and can be enabled via:
+
+
+  JSON protocol:
+  ```bash
+  --rpclisten-json = <interface:port>
+  # or use the defaults for current network
+  --rpclisten-json = default
+  ```
+
+  Borsh protocol:
+  ```bash
+  --rpclisten-borsh = <interface:port>
+  # or use the defaults for current network
+  --rpclisten-borsh = default
+  ```
+
+  **Sidenote:**
+
+  Rusty Jio integrates an optional wRPC
+  subsystem. wRPC is a high-performance, platform-neutral, Rust-centric, WebSocket-framed RPC 
+  implementation that can use [Borsh](https://borsh.io/) and JSON protocol encoding.
+
+  JSON protocol messaging 
+  is similar to JSON-RPC 1.0, but differs from the specification due to server-side 
+  notifications.
+
+  [Borsh](https://borsh.io/) encoding is meant for inter-process communication. When using [Borsh](https://borsh.io/)
+  both client and server should be built from the same codebase.  
+
+  JSON protocol is based on 
+  Jio data structures and is data-structure-version agnostic. You can connect to the
+  JSON endpoint using any WebSocket library. Built-in RPC clients for JavaScript and
+  TypeScript capable of running in web browsers and Node.js are available as a part of
+  the Jio WASM framework.
+
+</details>
+
+
+
+<details>
+
+
+## Benchmarking & Testing
+
+
+<details> 
+
+<summary>Simulation framework (Simpa)</summary>
+
+Logging in `jiopad` and `simpa` can be [filtered](https://docs.rs/env_logger/0.10.0/env_logger/#filtering-results) by either:
+
+The current codebase supports a full in-process network simulation, building an actual DAG over virtual time with virtual delay and benchmarking validation time (following the simulation generation). 
+
+To see the available commands
+```bash 
+cargo run --release --bin simpa -- --help
+``` 
+
+The following command will run a simulation to produce 1000 blocks with communication delay of 2 seconds and 8 BPS (blocks per second) while attempting to fill each block with up to 200 transactions.   
+
 ```bash
-cargo build --workspace --release
+cargo run --release --bin simpa -- -t=200 -d=2 -b=8 -n=1000
 ```
 
-### Running Tests
-Execute the full unit and integration test suites:
+</details>
+
+
+
+
+<details> 
+
+<summary>Heap Profiling</summary>
+
+Heap-profiling in `jiopad` and `simpa` can be done by enabling `heap` feature and profile using the `--features` argument
+
 ```bash
-cargo test --workspace
+cargo run --bin jiopad --profile heap --features=heap
 ```
 
----
+It will produce `{bin-name}-heap.json` file in the root of the workdir, that can be inspected by the [dhat-viewer](https://github.com/unofficial-mirror/valgrind/tree/master/dhat)
 
-## 🛡️ Cryptographic Standards
+</details>
 
-| Component | Standard / Algorithm |
-| :--- | :--- |
-| **Cryptographic Hashing** | BLAKE3 (Domain Separated via `derive_key`) |
-| **Proof-of-Work Evaluation** | $Hash_{256} \le Target_{256}$ |
-| **Serialization** | Borsh (Binary) & Serde (JSON / Hex) |
-| **Hex Encoding** | SIMD AVX2 / NEON accelerated `faster-hex` |
 
----
+<details> 
 
-## 📄 License
+<summary>Tests</summary>
 
-Licensed under either of:
-* Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](LICENSE) or http://opensource.org/licenses/MIT)
 
-at your option.
+**Run unit and most integration tests**
+
+```bash
+cd rusty-jio
+cargo test --release
+// or install nextest and run
+```
+
+
+
+**Using nextest**
+
+```bash
+cd rusty-jio
+cargo nextest run --release
+```
+
+
+
+</details>
+
+
+<details> 
+
+<summary>Benchmarks</summary>
+
+```bash
+cd rusty-jio
+cargo bench
+```
+
+</details>
+
+<details> 
+
+<summary>Logging</summary>
+
+Logging in `jiopad` and `simpa` can be [filtered](https://docs.rs/env_logger/0.10.0/env_logger/#filtering-results) by either:
+
+1. Defining the environment variable `RUST_LOG`
+2. Adding the --loglevel argument like in the following example:
+
+    ```
+    (cargo run --bin jiopad -- --loglevel info,jio_rpc_core=trace,jio_grpc_core=trace,consensus=trace,jio_core=trace) 2>&1 | tee ~/rusty-jio.log
+    ```
+    In this command we set the `loglevel` to `INFO`.
+
+</details>
+

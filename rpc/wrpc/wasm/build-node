@@ -1,1 +1,3 @@
-﻿
+#!/bin/bash
+
+wasm-pack build --target nodejs --out-name jio-rpc --out-dir nodejs/jio-rpc --features wasm32-sdk

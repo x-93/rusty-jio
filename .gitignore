@@ -1,9 +1,16 @@
-# Rust build artifacts
-target/
-**/target/
-**/*.rs.bk
-*.pdb
-
-# OS artifacts
+target
+web-root
+**/.idea/
+/rust-toolchain
+/.vscode/
+**/db-*
+/testing/integration/testdata/dags_for_json_tests/goref-mainnet
+/testing/integration/testdata/dags_for_json_tests/goref-1.6M-tx-10K-blocks
+analyzer-target
 .DS_Store
-Thumbs.db
+*.code-workspace
+/setup
+testing/integration/perflogs*
+Servers.toml
+release
+package-sizes.js

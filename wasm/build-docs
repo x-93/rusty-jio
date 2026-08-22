@@ -1,1 +1,28 @@
-﻿
+#!/bin/bash
+set -e
+
+./build-web $@
+
+if [ "$1" == "--keygen" ]; then
+    echo "building keygen"
+    typedoc --name "Jio WASM32 SDK - Key Generation" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio-keygen ./build/docs/jio-keygen.ts
+elif [ "$1" == "--rpc" ]; then
+    echo "building rpc"
+    typedoc --name "Jio WASM32 SDK - RPC" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio-rpc ./build/docs/jio-rpc.ts
+elif [ "$1" == "--core" ]; then
+    echo "building core"
+    typedoc --name "Jio WASM32 SDK - Core" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio-core ./build/docs/jio-core.ts
+elif [ "$1" == "--sdk" ]; then
+    echo "building full"
+    typedoc --name "Jio WASM32 SDK" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio ./build/docs/jio.ts
+else
+    echo "building keygen"
+    typedoc --name "Jio WASM32 SDK - Key Generation" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio-keygen ./build/docs/jio-keygen.ts
+    echo "building rpc"
+    typedoc --name "Jio WASM32 SDK - RPC" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio-rpc ./build/docs/jio-rpc.ts
+    echo "building core"
+    typedoc --name "Jio WASM32 SDK - Core" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio-core ./build/docs/jio-core.ts
+    echo "building full"
+    typedoc --name "Jio WASM32 SDK" --sourceLinkExternal --readme ./README.md --options ./build/docs/ --out ./docs/jio ./build/docs/jio.ts
+
+fi

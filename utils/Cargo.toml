@@ -1,6 +1,6 @@
 [package]
 name = "jio-utils"
-description = "Jio utility functions"
+description = "Jio utilities"
 rust-version.workspace = true
 version.workspace = true
 edition.workspace = true
@@ -9,12 +9,47 @@ include.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[build-dependencies]
+duct = "0.13.7"
+
 [dependencies]
-faster-hex = { workspace = true, features = ["alloc"] }
-serde = { workspace = true, optional = true }
-serde_json = { workspace = true, optional = true }
+arc-swap.workspace = true
+async-channel.workspace = true
+borsh.workspace = true
+cfg-if.workspace = true
+event-listener.workspace = true
+faster-hex.workspace = true
+ipnet.workspace = true
+itertools.workspace = true
+log.workspace = true
+num_cpus.workspace = true
+once_cell.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+sha2.workspace = true
+smallvec.workspace = true
+sysinfo.workspace = true
+thiserror.workspace = true
+triggered.workspace = true
+uuid.workspace = true
+wasm-bindgen.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+mac_address.workspace = true
+rlimit.workspace = true
+
+[dev-dependencies]
+bincode.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+futures-util.workspace = true
+tokio = { workspace = true, features = ["rt", "time", "macros"] }
+criterion.workspace = true
+rand.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false
 
 [features]
-default = ["std", "serde"]
-std = ["faster-hex/std"]
-serde = ["dep:serde", "dep:serde_json"]
+semaphore-trace = []

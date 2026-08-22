@@ -1,1 +1,39 @@
-﻿
+[package]
+name = "jio-consensus-wasm"
+description = "Jio consensus core WASM bindings"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[features]
+wasm32-sdk = []
+wasm32-types = []
+
+[dependencies]
+jio-consensus-core.workspace = true
+jio-consensus-client.workspace = true
+jio-addresses.workspace = true
+jio-txscript.workspace = true
+jio-hashes.workspace = true
+jio-utils.workspace = true
+
+cfg-if.workspace = true
+faster-hex.workspace = true
+js-sys.workspace = true
+rand.workspace = true
+secp256k1.workspace = true
+serde_json.workspace = true
+serde-wasm-bindgen.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+wasm-bindgen.workspace = true
+
+workflow-wasm.workspace = true
+workflow-log.workspace = true
+
+[lints]
+workspace = true

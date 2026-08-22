@@ -1,1 +1,38 @@
-﻿
+[package]
+name = "jio-index-processor"
+description = "Jio index processor"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-consensusmanager.workspace = true
+jio-core.workspace = true
+jio-database.workspace = true
+jio-hashes.workspace = true
+jio-index-core.workspace = true
+jio-notify.workspace = true
+jio-utils.workspace = true
+jio-utxoindex.workspace = true
+
+async-channel.workspace = true
+async-trait.workspace = true
+derive_more.workspace = true
+futures.workspace = true
+log.workspace = true
+paste.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = [ "rt-multi-thread", "macros", "signal" ]}
+triggered.workspace = true
+
+[dev-dependencies]
+jio-consensus.workspace = true
+parking_lot.workspace = true
+tokio = { workspace = true, features = ["rt", "macros"] }
+rand = {workspace = true,  features = [ "small_rng" ]}

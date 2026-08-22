@@ -7,33 +7,28 @@ use std::hash::{BuildHasher, Hasher};
 
 pub use jio_hashes::Hash;
 
+pub mod acceptance_data;
+pub mod api;
 pub mod block;
+pub mod blockhash;
+pub mod blockstatus;
 pub mod coinbase;
 pub mod config;
 pub mod constants;
+pub mod daa_score_timestamp;
+pub mod errors;
 pub mod hashing;
 pub mod header;
+pub mod mass;
 pub mod merkle;
 pub mod muhash;
 pub mod network;
+pub mod pruning;
 pub mod sign;
 pub mod subnets;
+pub mod trusted;
 pub mod tx;
 pub mod utxo;
-
-pub use block::{Block, BlockArc, BlockTemplate, MutableBlock};
-pub use coinbase::{CoinbaseData, create_coinbase_transaction};
-pub use config::{Bps, GenesisBlock, Params};
-pub use header::Header;
-pub use merkle::{calc_merkle_root, calc_merkle_root_from_transactions, calc_tx_ids_merkle_root};
-pub use muhash::MuHash;
-pub use network::{NetworkId, NetworkType};
-pub use subnets::SubnetworkId;
-pub use tx::{
-    ScriptPublicKey, ScriptVec, Transaction, TransactionArc, TransactionId, TransactionInput,
-    TransactionOutpoint, TransactionOutput,
-};
-pub use utxo::{UtxoCollection, UtxoDiff, UtxoEntry, UtxoView};
 
 /// Integer type for accumulated PoW of blue blocks. We expect no more than
 /// 2^128 work in a single block (btc has ~2^80), and no more than 2^64

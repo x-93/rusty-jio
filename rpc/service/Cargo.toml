@@ -1,1 +1,36 @@
-﻿
+[package]
+name = "jio-rpc-service"
+description = "Jio RPC service"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-addresses.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-consensusmanager.workspace = true
+jio-core.workspace = true
+jio-hashes.workspace = true
+jio-index-core.workspace = true
+jio-math.workspace = true
+jio-mining.workspace = true
+jio-notify.workspace = true
+jio-p2p-flows.workspace = true
+jio-p2p-lib.workspace = true
+jio-perf-monitor.workspace = true
+jio-rpc-core.workspace = true
+jio-txscript.workspace = true
+jio-utils.workspace = true
+jio-utils-tower.workspace = true
+jio-utxoindex.workspace = true
+
+async-trait.workspace = true
+log.workspace = true
+tokio.workspace = true
+triggered.workspace = true
+workflow-rpc.workspace = true

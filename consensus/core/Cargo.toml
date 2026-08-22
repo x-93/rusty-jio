@@ -9,28 +9,50 @@ include.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[features]
+devnet-prealloc = []
+wasm32-sdk = []
+default = []
+
 [dependencies]
-jio-math = { workspace = true, features = ["serde", "borsh"] }
-jio-utils = { workspace = true, features = ["serde"] }
-jio-hashes = { workspace = true, features = ["serde"] }
+async-trait.workspace = true
 borsh.workspace = true
-faster-hex = { workspace = true, features = ["alloc"] }
-serde = { workspace = true, features = ["derive"] }
-wasm-bindgen = { workspace = true, optional = true }
-workflow-wasm = { workspace = true, optional = true }
+cfg-if.workspace = true
+faster-hex.workspace = true
+futures-util.workspace = true
+getrandom.workspace = true
+itertools.workspace = true
+js-sys.workspace = true
+jio-addresses.workspace = true
+jio-core.workspace = true
+jio-hashes.workspace = true
+jio-math.workspace = true
+jio-merkle.workspace = true
+jio-muhash.workspace = true
+jio-txscript-errors.workspace = true
+jio-utils.workspace = true
+rand.workspace = true
+secp256k1.workspace = true
+serde_json.workspace = true
+serde-wasm-bindgen.workspace = true
+serde.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
+wasm-bindgen.workspace = true
+workflow-core.workspace = true
+workflow-log.workspace = true
+workflow-serializer.workspace = true
+workflow-wasm.workspace = true
 
 [dev-dependencies]
-serde_json.workspace = true
+criterion.workspace = true
+bincode.workspace = true
+wasm-bindgen-test.workspace = true
+web-sys.workspace = true
 
-[features]
-default = ["std"]
-std = [
-    "jio-math/default",
-    "jio-utils/std",
-    "jio-hashes/std",
-    "borsh/std",
-    "faster-hex/std",
-    "serde/std",
-]
-serde = ["jio-hashes/serde", "jio-utils/serde"]
-wasm = ["dep:wasm-bindgen", "dep:workflow-wasm", "jio-math/wasm"]
+[[bench]]
+name = "serde_benchmark"
+harness = false
+
+[lints]
+workspace = true

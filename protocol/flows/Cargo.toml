@@ -1,1 +1,38 @@
-﻿
+[package]
+name = "jio-p2p-flows"
+description = "Jio p2p flows"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-core.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-p2p-lib.workspace = true
+jio-utils.workspace = true
+jio-utils-tower.workspace = true
+jio-hashes.workspace = true
+jio-muhash.workspace = true
+jio-connectionmanager.workspace = true
+jio-addressmanager.workspace = true
+jio-consensusmanager.workspace = true
+jio-mining.workspace = true
+jio-notify.workspace = true
+
+async-trait.workspace = true
+futures = { workspace = true, features = ["alloc"] }
+indexmap.workspace = true
+itertools.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "signal"] }
+tokio-stream = { workspace = true, features = ["net"] }
+uuid = { workspace = true, features = ["v4", "fast-rng"] }
+chrono.workspace = true
