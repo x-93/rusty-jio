@@ -44,8 +44,8 @@ WORKDIR /app
 # Copy compiled artifacts from builder stage
 COPY --from=builder /usr/src/rusty-jio/target/release/ /app/bin/
 
-# Default Ports: P2P, gRPC, wRPC, Metrics
-EXPOSE 16111 16110 17110 2112
+# Default Ports: P2P (29111), gRPC RPC (29110), wRPC (29112), Metrics (29113)
+EXPOSE 29111 29110 29112 29113
 
 VOLUME ["/app/data"]
 
