@@ -415,6 +415,97 @@ macro_rules! construct_uint {
                 fmt::Debug::fmt(self, f)
             }
         }
+
+        #[cfg(feature = "borsh")]
+        impl borsh::BorshSerialize for $name {
+            fn serialize<W: borsh::io::Write>(&self, writer: &mut W) -> borsh::io::Result<()> {
+                for limb in self.0.iter() {
+                    borsh::BorshSerialize::serialize(limb, writer)?;
+                }
+                Ok(())
+            }
+        }
+
+        #[cfg(feature = "borsh")]
+        impl borsh::BorshDeserialize for $name {
+            fn deserialize_reader<R: borsh::io::Read>(reader: &mut R) -> borsh::io::Result<Self> {
+                let mut limbs = [0u64; $n_words];
+                for limb in limbs.iter_mut() {
+                    *limb = borsh::BorshDeserialize::deserialize_reader(reader)?;
+                }
+                Ok(Self(limbs))
+            }
+        }
+
+        #[cfg(feature = "serde")]
+        impl serde::Serialize for $name {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                if serializer.is_human_readable() {
+                    let mut s = String::with_capacity($n_words * 16);
+                    for &limb in self.0.iter().rev() {
+                        use std::fmt::Write;
+                        write!(&mut s, "{:016x}", limb).unwrap();
+                    }
+                    serializer.serialize_str(&s)
+                } else {
+                    serializer.serialize_bytes(&self.to_le_bytes())
+                }
+            }
+        }
+
+        #[cfg(feature = "serde")]
+        impl<'de> serde::Deserialize<'de> for $name {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
+                if deserializer.is_human_readable() {
+                    let s = String::deserialize(deserializer)?;
+                    let hex_str = s.trim_start_matches("0x").trim_start_matches("0X");
+                    let expected_len: usize = $n_words * 16;
+                    let pad_len = expected_len.saturating_sub(hex_str.len());
+                    let mut full_hex = "0".repeat(pad_len) + hex_str;
+                    if full_hex.len() > expected_len {
+                        full_hex = full_hex[full_hex.len() - expected_len..].to_string();
+                    }
+                    let mut limbs = [0u64; $n_words];
+                    for (i, chunk) in full_hex.as_bytes().chunks(16).rev().enumerate() {
+                        let chunk_str =
+                            std::str::from_utf8(chunk).map_err(serde::de::Error::custom)?;
+                        limbs[i] =
+                            u64::from_str_radix(chunk_str, 16).map_err(serde::de::Error::custom)?;
+                    }
+                    Ok(Self(limbs))
+                } else {
+                    struct BytesVisitor;
+                    impl<'de> serde::de::Visitor<'de> for BytesVisitor {
+                        type Value = $name;
+                        fn expecting(
+                            &self,
+                            formatter: &mut std::fmt::Formatter,
+                        ) -> std::fmt::Result {
+                            formatter.write_str(concat!(
+                                "a ",
+                                stringify!($n_words * 8),
+                                "-byte array"
+                            ))
+                        }
+                        fn visit_bytes<E: serde::de::Error>(self, v: &[u8]) -> Result<$name, E> {
+                            if v.len() != $n_words * 8 {
+                                return Err(serde::de::Error::invalid_length(v.len(), &self));
+                            }
+                            let mut bytes = [0u8; $n_words * 8];
+                            bytes.copy_from_slice(v);
+                            Ok($name::from_le_bytes(bytes))
+                        }
+                    }
+                    deserializer.deserialize_bytes(BytesVisitor)
+                }
+            }
+        }
     };
 }
 

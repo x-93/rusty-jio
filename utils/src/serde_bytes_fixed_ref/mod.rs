@@ -27,7 +27,7 @@ macro_rules! serde_impl_deser_fixed_bytes_ref {
                 D: serde::Deserializer<'de>,
             {
                 if deserializer.is_human_readable() {
-                    let s = String::deserialize(deserializer)?;
+                    let s = <String as serde::Deserialize>::deserialize(deserializer)?;
                     $crate::hex::FromHex::from_hex(&s).map_err(serde::de::Error::custom)
                 } else {
                     struct BytesVisitor;

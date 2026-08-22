@@ -27,6 +27,6 @@ name = "bench"
 harness = false
 
 [features]
-default = ["std"]
+default = ["std", "serde"]
 std = ["blake3/std", "faster-hex/std", "jio-utils/std", "borsh/std"]
 serde = ["dep:serde", "jio-utils/serde"]

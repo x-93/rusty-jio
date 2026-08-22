@@ -10,10 +10,11 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-faster-hex.workspace = true
+faster-hex = { workspace = true, features = ["alloc"] }
 serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
 
 [features]
-default = ["std"]
+default = ["std", "serde"]
 std = ["faster-hex/std"]
-serde = ["dep:serde"]
+serde = ["dep:serde", "dep:serde_json"]

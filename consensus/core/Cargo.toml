@@ -1,1 +1,36 @@
-﻿
+[package]
+name = "jio-consensus-core"
+description = "Jio consensus core"
+rust-version.workspace = true
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-math = { workspace = true, features = ["serde", "borsh"] }
+jio-utils = { workspace = true, features = ["serde"] }
+jio-hashes = { workspace = true, features = ["serde"] }
+borsh.workspace = true
+faster-hex = { workspace = true, features = ["alloc"] }
+serde = { workspace = true, features = ["derive"] }
+wasm-bindgen = { workspace = true, optional = true }
+workflow-wasm = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json.workspace = true
+
+[features]
+default = ["std"]
+std = [
+    "jio-math/default",
+    "jio-utils/std",
+    "jio-hashes/std",
+    "borsh/std",
+    "faster-hex/std",
+    "serde/std",
+]
+serde = ["jio-hashes/serde", "jio-utils/serde"]
+wasm = ["dep:wasm-bindgen", "dep:workflow-wasm", "jio-math/wasm"]

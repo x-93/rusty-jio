@@ -4,6 +4,7 @@ members = [
     "math",
     "utils",
     "crypto/hashes",
+    "consensus/core",
 ]
 
 [workspace.package]

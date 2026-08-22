@@ -10,6 +10,7 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+borsh = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true, optional = true }
 js-sys = { workspace = true, optional = true }
@@ -22,6 +23,7 @@ name = "bench"
 harness = false
 
 [features]
-default = []
+default = ["borsh", "serde"]
+borsh = ["dep:borsh", "borsh/std"]
 serde = ["dep:serde"]
 wasm = ["dep:wasm-bindgen", "dep:js-sys"]

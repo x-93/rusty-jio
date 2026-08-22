@@ -53,10 +53,52 @@ impl From<u64> for Uint128 {
     }
 }
 
+impl From<u32> for Uint128 {
+    #[inline(always)]
+    fn from(val: u32) -> Self {
+        Self::from_u64(val as u64)
+    }
+}
+
+impl From<i32> for Uint128 {
+    #[inline(always)]
+    fn from(val: i32) -> Self {
+        Self::from_u64(val as u64)
+    }
+}
+
 impl From<u64> for Uint192 {
     #[inline(always)]
     fn from(val: u64) -> Self {
         Self::from_u64(val)
+    }
+}
+
+impl From<u32> for Uint192 {
+    #[inline(always)]
+    fn from(val: u32) -> Self {
+        Self::from_u64(val as u64)
+    }
+}
+
+impl From<i32> for Uint192 {
+    #[inline(always)]
+    fn from(val: i32) -> Self {
+        Self::from_u64(val as u64)
+    }
+}
+
+impl From<u32> for Uint256 {
+    #[inline(always)]
+    fn from(val: u32) -> Self {
+        Self::from_u64(val as u64)
+    }
+}
+
+impl From<i32> for Uint256 {
+    #[inline(always)]
+    fn from(val: i32) -> Self {
+        Self::from_u64(val as u64)
     }
 }
 
