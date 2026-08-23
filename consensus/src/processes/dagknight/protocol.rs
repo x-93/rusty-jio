@@ -1,15 +1,12 @@
 use std::{
     collections::HashMap,
-    sync::{
-        atomic::{AtomicU64, Ordering},
-        Arc,
-    },
+    sync::{atomic::Ordering, Arc},
 };
 
 use itertools::Itertools;
 use parking_lot::RwLock;
 
-use jio_consensus_core::KType;
+use jio_consensus_core::BlueWorkType;
 use jio_core::debug;
 use jio_hashes::Hash;
 
@@ -157,7 +154,7 @@ impl<
         }
 
         for cb in self.reachability_service.default_backward_chain_iterator(start) {
-            if self.reachability_service.is_chain_ancestor_of_all(cb, &parents[1..]) {
+            if parents[1..].iter().all(|&p| self.reachability_service.is_chain_ancestor_of(cb, p)) {
                 return cb;
             }
         }

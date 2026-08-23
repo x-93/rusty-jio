@@ -1,4 +1,4 @@
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
 
 use jio_consensus_core::KType;

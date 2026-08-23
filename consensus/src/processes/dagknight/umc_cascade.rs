@@ -5,7 +5,7 @@ use jio_hashes::Hash;
 use jio_math::int::SignedInteger;
 
 use crate::model::services::reachability::ReachabilityService;
-use super::appendable_segment_tree_api::{bucket_for_score, AppendableSegmentTreeApi, Bucket};
+use super::appendable_segment_tree_api::AppendableSegmentTreeApi;
 use super::appendable_segment_tree_impl::AppendableSegmentTree;
 
 type SignedWork = SignedInteger<BlueWorkType>;
@@ -105,7 +105,7 @@ impl CascadeMaintainer {
 
     pub fn add_red(&mut self, block: BlockWithWork, reachability: &impl ReachabilityService) {
         self.red_work += block.work;
-        let sub_delta = SignedWork::from(0u64) - SignedWork::from(block.work);
+        let sub_delta = SignedWork::from(BlueWorkType::ZERO) - SignedWork::from(block.work);
 
         for c_idx in 0..self.blues_chains_decomposition.len() {
             for (p_idx, &b_hash) in self.blues_chains_decomposition[c_idx].iter().enumerate() {
@@ -128,7 +128,7 @@ impl CascadeMaintainer {
                     self.flip_count += 1;
                     self.negative_blue_work += leaf.work;
                     // Delta to ancestors is -2 * work
-                    let delta = SignedWork::from(0u64) - SignedWork::from(leaf.work * 2u64);
+                    let delta = SignedWork::from(BlueWorkType::ZERO) - SignedWork::from(leaf.work * 2u64);
                     self.propagate_to_ancestors(leaf.hash, delta, reachability);
                 }
 
@@ -169,7 +169,7 @@ impl CascadeMaintainer {
     }
 
     pub fn is_valid(&self) -> bool {
-        self.virtual_score() >= SignedWork::from(0u64)
+        self.virtual_score() >= SignedWork::from(BlueWorkType::ZERO)
     }
 
     pub fn flip_count(&self) -> u64 {

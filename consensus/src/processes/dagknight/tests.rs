@@ -113,20 +113,29 @@ impl ReachabilityService for MockReachability {
     fn is_chain_ancestor_of(&self, _descendant: Hash, _ancestor: Hash) -> bool {
         false
     }
+    fn is_dag_ancestor_of_result(&self, ancestor: Hash, descendant: Hash) -> crate::processes::reachability::Result<bool> {
+        Ok(self.is_dag_ancestor_of(ancestor, descendant))
+    }
     fn is_dag_ancestor_of(&self, ancestor: Hash, descendant: Hash) -> bool {
         ancestor.as_bytes()[0] < descendant.as_bytes()[0]
     }
-    fn is_dag_ancestor_of_any(&self, _ancestor: Hash, _descendants: &mut impl Iterator<Item = Hash>) -> bool {
-        false
+    fn is_dag_ancestor_of_any(&self, ancestor: Hash, descendants: &mut impl Iterator<Item = Hash>) -> bool {
+        descendants.any(|d| self.is_dag_ancestor_of(ancestor, d))
+    }
+    fn is_any_dag_ancestor(&self, list: &mut impl Iterator<Item = Hash>, queried: Hash) -> bool {
+        list.any(|a| self.is_dag_ancestor_of(a, queried))
+    }
+    fn is_any_dag_ancestor_result(&self, list: &mut impl Iterator<Item = Hash>, queried: Hash) -> crate::processes::reachability::Result<bool> {
+        Ok(self.is_any_dag_ancestor(list, queried))
     }
     fn get_next_chain_ancestor(&self, _descendant: Hash, _ancestor: Hash) -> Hash {
         Hash::default()
     }
-    fn default_backward_chain_iterator<'a>(&self, _start: Hash) -> Box<dyn Iterator<Item = Hash> + 'a> {
-        Box::new(std::iter::empty())
+    fn get_chain_parent(&self, _this: Hash) -> Hash {
+        Hash::default()
     }
-    fn is_chain_ancestor_of_all(&self, _ancestor: Hash, _descendants: &[Hash]) -> bool {
-        false
+    fn has_reachability_data(&self, _this: Hash) -> bool {
+        true
     }
 }
 

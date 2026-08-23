@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use parking_lot::RwLock;
 
-use jio_consensus_core::{BlockHashSet, KType};
+use jio_consensus_core::{blockhash::BlockHashExtensions, BlockHashSet, KType};
 use jio_hashes::Hash;
 
 use crate::{
@@ -10,7 +10,6 @@ use crate::{
         services::reachability::{MTReachabilityService, ReachabilityService},
         stores::{
             dagknight::{DagknightStore, DagknightStoreReader},
-            ghostdag::GhostdagData,
             headers::HeaderStoreReader,
             reachability::ReachabilityStoreReader,
             relations::RelationsStoreReader,
@@ -18,7 +17,6 @@ use crate::{
     },
     processes::{
         dagknight::{manager::ConflictZoneManager, GroupMetadata},
-        ghostdag::ordering::SortableBlock,
         reachability::relations::FutureIntersectRelations,
     },
 };

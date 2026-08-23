@@ -22,7 +22,7 @@ impl ScoreZero for i64 {
     }
 }
 
-impl<T: Copy + PartialOrd + Default> ScoreZero for jio_math::int::SignedInteger<T> {
+impl<T: Copy + PartialOrd + Default + PartialEq<u64>> ScoreZero for jio_math::int::SignedInteger<T> {
     fn zero() -> Self {
         jio_math::int::SignedInteger::from(T::default())
     }

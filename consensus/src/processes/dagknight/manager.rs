@@ -1,13 +1,12 @@
 use std::{
-    cmp::Reverse,
-    collections::{BinaryHeap, HashMap, VecDeque},
+    collections::{HashMap, VecDeque},
     sync::{Arc, OnceLock},
 };
 
 use parking_lot::{Mutex, RwLock};
 
 use jio_consensus_core::{
-    blockhash::{self, BlockHashExtensions, BlockHashes},
+    blockhash::BlockHashExtensions,
     BlockHashMap, BlockHashSet, BlueWorkType, HashMapCustomHasher, HashKTypeMap, KType,
 };
 use jio_database::prelude::StoreError;
@@ -255,7 +254,7 @@ impl<C: DagknightStore + DagknightStoreReader, O: HeaderStoreReader, D: Relation
 
     fn check_blue_candidate_with_chain_block(
         &self,
-        new_block_data: &GhostdagData,
+        _new_block_data: &GhostdagData,
         chain_block: &ChainBlock,
         blue_candidate: Hash,
         candidate_blues_anticone_sizes: &mut BlockHashMap<KType>,

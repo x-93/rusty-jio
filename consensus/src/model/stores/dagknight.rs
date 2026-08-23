@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, fmt, sync::Arc};
+use std::{collections::HashMap, fmt, sync::Arc};
 
 use jio_consensus_core::KType;
 use jio_database::{

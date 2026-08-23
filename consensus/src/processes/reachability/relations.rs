@@ -45,7 +45,7 @@ impl<T: RelationsStoreReader, U: ReachabilityService> RelationsStoreReader for F
             .copied()
             .filter(|&child| self.reachability_service.is_dag_ancestor_of(self.root, child))
             .collect();
-        Ok(ReadLock::new(filtered_children))
+        Ok(filtered_children.into())
     }
 
     fn has(&self, hash: Hash) -> Result<bool, StoreError> {

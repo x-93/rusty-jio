@@ -548,6 +548,72 @@ macro_rules! construct_uint {
             }
         }
 
+        impl core::ops::AddAssign<$name> for $name {
+            #[inline]
+            fn add_assign(&mut self, rhs: $name) {
+                *self = *self + rhs;
+            }
+        }
+
+        impl core::ops::AddAssign<u64> for $name {
+            #[inline]
+            fn add_assign(&mut self, rhs: u64) {
+                *self = *self + rhs;
+            }
+        }
+
+        impl core::ops::Sub<u64> for $name {
+            type Output = $name;
+
+            #[inline]
+            #[track_caller]
+            fn sub(self, other: u64) -> $name {
+                self - $name::from_u64(other)
+            }
+        }
+
+        impl core::ops::SubAssign<$name> for $name {
+            #[inline]
+            fn sub_assign(&mut self, rhs: $name) {
+                *self = *self - rhs;
+            }
+        }
+
+        impl core::ops::SubAssign<u64> for $name {
+            #[inline]
+            fn sub_assign(&mut self, rhs: u64) {
+                *self = *self - $name::from_u64(rhs);
+            }
+        }
+
+        impl core::ops::MulAssign<$name> for $name {
+            #[inline]
+            fn mul_assign(&mut self, rhs: $name) {
+                *self = *self * rhs;
+            }
+        }
+
+        impl core::ops::MulAssign<u64> for $name {
+            #[inline]
+            fn mul_assign(&mut self, rhs: u64) {
+                *self = *self * rhs;
+            }
+        }
+
+        impl core::ops::DivAssign<$name> for $name {
+            #[inline]
+            fn div_assign(&mut self, rhs: $name) {
+                *self = *self / rhs;
+            }
+        }
+
+        impl core::ops::DivAssign<u64> for $name {
+            #[inline]
+            fn div_assign(&mut self, rhs: u64) {
+                *self = *self / rhs;
+            }
+        }
+
         impl core::ops::Mul<$name> for $name {
             type Output = $name;
 
