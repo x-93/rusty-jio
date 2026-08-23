@@ -290,30 +290,7 @@ impl From<NetworkId> for Params {
 }
 
 pub const MAINNET_PARAMS: Params = Params {
-    dns_seeders: &[
-        // This DNS seeder is run by Denis Mashkevich
-        "mainnet-dnsseed-1.jionet.org",
-        // This DNS seeder is run by Denis Mashkevich
-        "mainnet-dnsseed-2.jionet.org",
-        // This DNS seeder is run by Constantine Bytensky
-        "dnsseed.cbytensky.org",
-        // This DNS seeder is run by Georges Künzli
-        "seeder1.jiopad.net",
-        // This DNS seeder is run by Georges Künzli
-        "seeder2.jiopad.net",
-        // This DNS seeder is run by Georges Künzli
-        "seeder3.jiopad.net",
-        // This DNS seeder is run by Georges Künzli
-        "seeder4.jiopad.net",
-        // This DNS seeder is run by Tim
-        "jiopadns.jiocalc.net",
-        // This DNS seeder is run by supertypo
-        "n-mainnet.jio.ws",
-        // This DNS seeder is run by -gerri-
-        "dnsseeder-jio-mainnet.x-con.at",
-        // This DNS seeder is run by H@H
-        "ns-mainnet.jio-dnsseeder.net",
-    ],
+    dns_seeders: &[],
     net: NetworkId::new(NetworkType::Mainnet),
     genesis: GENESIS,
     ghostdag_k: LEGACY_DEFAULT_GHOSTDAG_K,
@@ -361,7 +338,7 @@ pub const MAINNET_PARAMS: Params = Params {
     // The network was down for three days shortly after launch
     // Three days in seconds = 3 * 24 * 60 * 60 = 259200
     deflationary_phase_daa_score: 15778800 - 259200,
-    pre_deflationary_phase_base_subsidy: 50000000000,
+    pre_deflationary_phase_base_subsidy: 36580233773,
     coinbase_maturity: 100,
     skip_proof_of_work: false,
     max_block_level: 225,
@@ -369,14 +346,7 @@ pub const MAINNET_PARAMS: Params = Params {
 };
 
 pub const TESTNET_PARAMS: Params = Params {
-    dns_seeders: &[
-        // This DNS seeder is run by Tiram
-        "seeder1-testnet.jiopad.net",
-        // This DNS seeder is run by -gerri-
-        "dnsseeder-jio-testnet.x-con.at",
-        // This DNS seeder is run by H@H
-        "ns-testnet10.jio-dnsseeder.net",
-    ],
+    dns_seeders: &[],
     net: NetworkId::with_suffix(NetworkType::Testnet, 10),
     genesis: TESTNET_GENESIS,
     ghostdag_k: LEGACY_DEFAULT_GHOSTDAG_K,
@@ -424,7 +394,7 @@ pub const TESTNET_PARAMS: Params = Params {
     // The network was down for three days shortly after launch
     // Three days in seconds = 3 * 24 * 60 * 60 = 259200
     deflationary_phase_daa_score: 15778800 - 259200,
-    pre_deflationary_phase_base_subsidy: 50000000000,
+    pre_deflationary_phase_base_subsidy: 36580233773,
     coinbase_maturity: 100,
     skip_proof_of_work: false,
     max_block_level: 250,
@@ -432,16 +402,7 @@ pub const TESTNET_PARAMS: Params = Params {
 };
 
 pub const TESTNET11_PARAMS: Params = Params {
-    dns_seeders: &[
-        // This DNS seeder is run by Tiram
-        "seeder1-testnet-11.jiopad.net",
-        // This DNS seeder is run by supertypo
-        "n-testnet-11.jio.ws",
-        // This DNS seeder is run by -gerri-
-        "dnsseeder-jio-testnet11.x-con.at",
-        // This DNS seeder is run by H@H
-        "ns-testnet11.jio-dnsseeder.net",
-    ],
+    dns_seeders: &[],
     net: NetworkId::with_suffix(NetworkType::Testnet, 11),
     genesis: TESTNET11_GENESIS,
     legacy_timestamp_deviation_tolerance: LEGACY_TIMESTAMP_DEVIATION_TOLERANCE,
@@ -593,7 +554,7 @@ pub const DEVNET_PARAMS: Params = Params {
     // The network was down for three days shortly after launch
     // Three days in seconds = 3 * 24 * 60 * 60 = 259200
     deflationary_phase_daa_score: 15778800 - 259200,
-    pre_deflationary_phase_base_subsidy: 50000000000,
+    pre_deflationary_phase_base_subsidy: 36580233773,
     coinbase_maturity: 100,
     skip_proof_of_work: false,
     max_block_level: 250,

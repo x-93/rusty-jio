@@ -41,7 +41,7 @@ enum ColoringState {
     Pending,
 }
 
-enum ColoringOutput {
+pub(crate) enum ColoringOutput {
     Blue(KType, BlockHashMap<KType>),
     Red,
 }
