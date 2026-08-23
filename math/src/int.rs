@@ -42,6 +42,45 @@ impl<T: Copy> SignedInteger<T> {
     }
 }
 
+impl<T: Sub<Output = T> + Add<Output = T> + Ord> Add for SignedInteger<T> {
+    type Output = Self;
+    #[inline]
+    #[track_caller]
+    fn add(self, other: Self) -> Self::Output {
+        match (self.negative, other.negative) {
+            (false, false) | (true, true) => Self { negative: self.negative, abs: self.abs + other.abs },
+            (false, true) => {
+                if self.abs >= other.abs {
+                    Self { negative: false, abs: self.abs - other.abs }
+                } else {
+                    Self { negative: true, abs: other.abs - self.abs }
+                }
+            }
+            (true, false) => {
+                if self.abs > other.abs {
+                    Self { negative: true, abs: self.abs - other.abs }
+                } else {
+                    Self { negative: false, abs: other.abs - self.abs }
+                }
+            }
+        }
+    }
+}
+
+impl<T: Sub<Output = T> + Add<Output = T> + Ord + Copy> core::ops::AddAssign for SignedInteger<T> {
+    #[inline]
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
+    }
+}
+
+impl<T: Sub<Output = T> + Add<Output = T> + Ord + Copy> core::ops::SubAssign for SignedInteger<T> {
+    #[inline]
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = *self - rhs;
+    }
+}
+
 impl<T: Sub<Output = T> + Add<Output = T> + Ord> Sub for SignedInteger<T> {
     type Output = Self;
     #[inline]
