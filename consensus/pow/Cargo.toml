@@ -1,0 +1,18 @@
+[package]
+name = "jio-pow"
+description = "Jio proof-of-work (kHeavyHash)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-consensus-core = { workspace = true }
+jio-hashes = { workspace = true }
+jio-math = { workspace = true }
+jio-utils = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
