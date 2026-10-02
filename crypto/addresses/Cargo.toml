@@ -1,0 +1,24 @@
+[package]
+name = "jio-addresses"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+borsh = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+thiserror = { workspace = true }
+smallvec = { workspace = true }
+jio-hashes = { workspace = true }
+jio-utils = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+
+[features]
+default = ["borsh", "serde"]
+borsh = ["dep:borsh"]
+serde = ["dep:serde"]

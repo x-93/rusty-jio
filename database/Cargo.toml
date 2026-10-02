@@ -1,0 +1,25 @@
+[package]
+name = "jio-database"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-core = { workspace = true }
+jio-utils = { workspace = true }
+borsh = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+parking_lot = { workspace = true }
+smallvec = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.10"
+proptest = { workspace = true }
+
+[features]
+default = []
+rocksdb = []

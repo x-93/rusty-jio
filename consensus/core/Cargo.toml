@@ -1,0 +1,33 @@
+[package]
+name = "jio-consensus-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-math = { workspace = true }
+jio-utils = { workspace = true }
+jio-hashes = { workspace = true }
+jio-addresses = { workspace = true }
+jio-merkle = { workspace = true }
+jio-muhash = { workspace = true }
+jio-txscript = { workspace = true }
+borsh = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+thiserror = { workspace = true }
+smallvec = { workspace = true }
+parking_lot = { workspace = true }
+async-trait = { workspace = true }
+secp256k1 = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+serde_json = { workspace = true }
+
+[features]
+default = ["borsh", "serde"]
+borsh = ["dep:borsh"]
+serde = ["dep:serde"]

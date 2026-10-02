@@ -1,0 +1,86 @@
+[workspace]
+resolver = "2"
+members = [
+    "core",
+    "math",
+    "utils",
+    "metrics/core",
+    "crypto/hashes",
+    "crypto/addresses",
+    "crypto/merkle",
+    "crypto/muhash",
+    "crypto/txscript",
+    "crypto/txscript/errors",
+    "consensus/core",
+    "database",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97.0"
+authors = ["The Rusty-Jio Developers"]
+license = "ISC"
+repository = "https://github.com/rusty-jio/rusty-jio"
+
+[workspace.dependencies]
+# Internal workspace crates
+jio-core = { path = "core" }
+jio-math = { path = "math" }
+jio-utils = { path = "utils" }
+jio-metrics-core = { path = "metrics/core" }
+jio-hashes = { path = "crypto/hashes" }
+jio-addresses = { path = "crypto/addresses" }
+jio-merkle = { path = "crypto/merkle" }
+jio-muhash = { path = "crypto/muhash" }
+jio-txscript = { path = "crypto/txscript" }
+jio-txscript-errors = { path = "crypto/txscript/errors" }
+jio-consensus-core = { path = "consensus/core" }
+jio-database = { path = "database" }
+
+# Serialization
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc", "std", "rc"] }
+serde_json = "1.0"
+borsh = { version = "1.5", features = ["derive"] }
+
+# Cryptography & Hashing
+blake3 = "=1.5.4"
+blake2b_simd = "1.0"
+sha2 = "0.10"
+secp256k1 = { version = "0.29", features = ["global-context", "rand-std", "recovery"] }
+
+# Async runtime & Concurrency
+tokio = { version = "1.39", features = ["full"] }
+parking_lot = "0.12"
+async-trait = "0.1"
+crossbeam-channel = "0.5"
+
+# Error handling & Utilities
+thiserror = "1.0"
+once_cell = "1.20"
+smallvec = { version = "1.13", features = ["serde"] }
+itertools = "0.13"
+faster-hex = "0.10"
+malachite-base = "0.4"
+malachite-nz = "0.4"
+
+# WASM & Web bindings
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+workflow-core = "0.19"
+workflow-wasm = "0.19"
+serde-wasm-bindgen = "0.6"
+
+# Testing & Benchmarking
+proptest = "1.5"
+rand = "0.8"
+rand_chacha = "0.3"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 1

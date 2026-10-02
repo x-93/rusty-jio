@@ -1,0 +1,14 @@
+C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\deps\thiserror-db14d461d1cde10c.d: C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\lib.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\aserror.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\display.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\var.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\private.rs C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\build\thiserror-42f530eec5f4f683\out/private.rs
+
+C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\deps\libthiserror-db14d461d1cde10c.rlib: C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\lib.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\aserror.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\display.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\var.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\private.rs C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\build\thiserror-42f530eec5f4f683\out/private.rs
+
+C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\deps\libthiserror-db14d461d1cde10c.rmeta: C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\lib.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\aserror.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\display.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\var.rs C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\private.rs C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\build\thiserror-42f530eec5f4f683\out/private.rs
+
+C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\lib.rs:
+C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\aserror.rs:
+C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\display.rs:
+C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\var.rs:
+C:\Users\LAKSHITA\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.21\src\private.rs:
+C:\Users\LAKSHITA\Desktop\rusty-jio\target\release\build\thiserror-42f530eec5f4f683\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\LAKSHITA\\Desktop\\rusty-jio\\target\\release\\build\\thiserror-42f530eec5f4f683\\out

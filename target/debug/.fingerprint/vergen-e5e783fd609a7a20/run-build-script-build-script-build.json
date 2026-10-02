@@ -1,0 +1,1 @@
+{"rustc":3720210673988096810,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[12502612576409552250,"build_script_build",false,11387768271982323780]],"local":[{"RerunIfChanged":{"output":"debug\\build\\vergen-e5e783fd609a7a20\\output","paths":["build.rs"]}}],"rustflags":[],"config":0,"compile_kind":0}

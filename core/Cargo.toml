@@ -1,0 +1,23 @@
+[package]
+name = "jio-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+tokio = { workspace = true }
+tokio-util = "0.7"
+parking_lot = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+
+[features]
+default = ["serde"]
+serde = ["dep:serde"]

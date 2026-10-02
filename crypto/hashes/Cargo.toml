@@ -1,0 +1,30 @@
+[package]
+name = "jio-hashes"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+blake3 = { workspace = true }
+blake2b_simd = { workspace = true }
+sha2 = { workspace = true }
+once_cell = { workspace = true }
+borsh = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+thiserror = { workspace = true }
+jio-math = { workspace = true }
+jio-utils = { workspace = true }
+faster-hex = { workspace = true }
+wasm-bindgen = { workspace = true }
+workflow-wasm = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+
+[features]
+default = ["borsh", "serde"]
+borsh = ["dep:borsh"]
+serde = ["dep:serde"]
