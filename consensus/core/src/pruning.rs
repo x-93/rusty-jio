@@ -1,18 +1,21 @@
-//! Pruning data structures and proofs.
-
-use std::sync::Arc;
+use crate::{
+    header::Header,
+    trusted::{TrustedGhostdagData, TrustedHeader},
+};
 use jio_hashes::Hash;
-use super::header::Header;
+use std::sync::Arc;
 
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct PruningPointProof {
-    pub headers: Vec<Vec<Arc<Header>>>,
-}
+pub type PruningPointProof = Vec<Vec<Arc<Header>>>;
 
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub type PruningPointsList = Vec<Arc<Header>>;
+
 pub struct PruningPointTrustedData {
-    pub pruning_point: Arc<Header>,
+    /// The pruning point anticone from virtual PoV
     pub anticone: Vec<Hash>,
+
+    /// Union of DAA window data required to verify blocks in the future of the pruning point
+    pub daa_window_blocks: Vec<TrustedHeader>,
+
+    /// Union of GHOSTDAG data required to verify blocks in the future of the pruning point
+    pub ghostdag_blocks: Vec<TrustedGhostdagData>,
 }

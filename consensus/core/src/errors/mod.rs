@@ -8,6 +8,8 @@ pub mod sync;
 pub mod traversal;
 pub mod tx;
 
-pub use block::BlockError;
-pub use consensus::RuleError;
-pub use tx::TxError;
+pub use block::{BlockError, BlockProcessResult};
+pub use coinbase::CoinbaseResult;
+pub use consensus::{ConsensusError, ConsensusResult, RuleError};
+pub use pruning::PruningImportResult;
+pub use tx::{TxError, TxResult};

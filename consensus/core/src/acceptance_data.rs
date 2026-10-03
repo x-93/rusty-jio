@@ -1,10 +1,18 @@
-//! AcceptanceData recording transactions merged and accepted per block.
+use jio_hashes::Hash;
+use serde::{Deserialize, Serialize};
 
-use super::tx::TransactionId;
+use crate::tx::TransactionId;
 
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "borsh", derive(borsh::BorshSerialize, borsh::BorshDeserialize))]
-pub struct AcceptanceData {
-    pub accepted_transactions: Vec<TransactionId>,
+pub type AcceptanceData = Vec<MergesetBlockAcceptanceData>;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MergesetBlockAcceptanceData {
+    pub block_hash: Hash,
+    pub accepted_transactions: Vec<AcceptedTxEntry>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AcceptedTxEntry {
+    pub transaction_id: TransactionId,
+    pub index_within_block: u32,
 }

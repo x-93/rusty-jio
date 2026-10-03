@@ -1,17 +1,17 @@
 use super::HasherExtensions;
 use crate::header::Header;
-use jio_hashes::{BlockHash, Hash, HasherBase};
+use jio_hashes::{Hash, HasherBase};
 
 /// Returns the header hash using the provided nonce+timestamp instead of those in the header.
 #[inline]
 pub fn hash_override_nonce_time(header: &Header, nonce: u64, timestamp: u64) -> Hash {
-    let mut hasher = BlockHash::new();
-    hasher.update(header.version.to_le_bytes()).write_len(header.parents_by_level.len());
+    let mut hasher = jio_hashes::BlockHash::new();
+    hasher.update(header.version.to_le_bytes()).write_len(header.parents_by_level.len()); // Write the number of parent levels
 
     // Write parents at each level
-    for level in &header.parents_by_level {
+    header.parents_by_level.iter().for_each(|level| {
         hasher.write_var_array(level);
-    }
+    });
 
     // Write all header fields
     hasher
@@ -37,7 +37,7 @@ pub fn hash(header: &Header) -> Hash {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::BlueWorkType;
+    use crate::{blockhash, BlueWorkType};
 
     #[test]
     fn test_header_hashing() {
@@ -55,7 +55,7 @@ mod tests {
             0,
             Default::default(),
         );
-        assert_ne!(Hash::default(), header.hash);
+        assert_ne!(blockhash::NONE, header.hash);
     }
 
     #[test]
@@ -64,10 +64,10 @@ mod tests {
             vec![(0.into(), vec![0, 0, 0, 0, 0, 0, 0, 0]), (123456.into(), vec![3, 0, 0, 0, 0, 0, 0, 0, 1, 226, 64])];
 
         for test in tests {
-            let mut hasher = BlockHash::new();
+            let mut hasher = jio_hashes::BlockHash::new();
             hasher.write_blue_work(test.0);
 
-            let mut hasher2 = BlockHash::new();
+            let mut hasher2 = jio_hashes::BlockHash::new();
             hasher2.update(test.1);
             assert_eq!(hasher.finalize(), hasher2.finalize())
         }

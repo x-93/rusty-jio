@@ -1,0 +1,2 @@
+wasm_bindgen::__rt::WasmPtr<wasm_bindgen::__rt::WasmRefCell<script_public_key::ScriptPublicKey>>
+wasm_bindgen::JsValue: From<wasm_bindgen::__rt::WasmPtr<wasm_bindgen::__rt::WasmRefCell<script_public_key::ScriptPublicKey>>>

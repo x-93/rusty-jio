@@ -7,3 +7,5 @@ pub enum PruningError {
     #[error("Pruning point violation: block is below pruning depth")]
     BelowPruningDepth,
 }
+
+pub type PruningImportResult<T> = Result<T, PruningError>;

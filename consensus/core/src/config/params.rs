@@ -17,6 +17,10 @@ pub struct Params {
     pub coinbase_maturity: u64,
     pub pruning_depth: u64,
     pub finality_depth: u64,
+    pub mass_per_tx_byte: u64,
+    pub mass_per_script_pub_key_byte: u64,
+    pub mass_per_sig_op: u64,
+    pub storage_mass_parameter: u64,
 }
 
 impl Params {
@@ -38,6 +42,10 @@ impl Params {
             coinbase_maturity: 100,
             pruning_depth: 185_798,
             finality_depth: 86_400,
+            mass_per_tx_byte: 1,
+            mass_per_script_pub_key_byte: 10,
+            mass_per_sig_op: 1000,
+            storage_mass_parameter: crate::constants::STORAGE_MASS_PARAMETER,
         }
     }
 
@@ -55,6 +63,10 @@ impl Params {
             coinbase_maturity: 100,
             pruning_depth: 185_798,
             finality_depth: 86_400,
+            mass_per_tx_byte: 1,
+            mass_per_script_pub_key_byte: 10,
+            mass_per_sig_op: 1000,
+            storage_mass_parameter: crate::constants::STORAGE_MASS_PARAMETER,
         }
     }
 
@@ -72,6 +84,10 @@ impl Params {
             coinbase_maturity: 10,
             pruning_depth: 1000,
             finality_depth: 500,
+            mass_per_tx_byte: 1,
+            mass_per_script_pub_key_byte: 10,
+            mass_per_sig_op: 1000,
+            storage_mass_parameter: crate::constants::STORAGE_MASS_PARAMETER,
         }
     }
 
@@ -89,6 +105,10 @@ impl Params {
             coinbase_maturity: 100,
             pruning_depth: 185_798,
             finality_depth: 86_400,
+            mass_per_tx_byte: 1,
+            mass_per_script_pub_key_byte: 10,
+            mass_per_sig_op: 1000,
+            storage_mass_parameter: crate::constants::STORAGE_MASS_PARAMETER,
         }
     }
 }

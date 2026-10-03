@@ -41,5 +41,5 @@ pub fn deserialize<'de, D, const N: usize>(deserializer: D) -> Result<[u8; N], D
 where
     D: Deserializer<'de>,
 {
-    deserializer.deserialize_bytes(FixedByteArrayVisitor::<N>)
+    deserializer.deserialize_tuple(N, FixedByteArrayVisitor::<N>)
 }

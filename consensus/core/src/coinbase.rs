@@ -1,39 +1,40 @@
-//! Coinbase payload builder, miner data, and block subsidy decay calculations.
+use crate::tx::{ScriptPublicKey, Transaction};
+use serde::{Deserialize, Serialize};
 
-use super::tx::ScriptPublicKey;
-
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "borsh", derive(borsh::BorshSerialize, borsh::BorshDeserialize))]
-pub struct MinerData {
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub struct MinerData<T: AsRef<[u8]> = Vec<u8>> {
     pub script_public_key: ScriptPublicKey,
-    pub extra_data: Vec<u8>,
+    pub extra_data: T,
 }
 
-impl MinerData {
-    pub fn new(script_public_key: ScriptPublicKey, extra_data: Vec<u8>) -> Self {
+impl<T: AsRef<[u8]>> MinerData<T> {
+    pub fn new(script_public_key: ScriptPublicKey, extra_data: T) -> Self {
         Self { script_public_key, extra_data }
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "borsh", derive(borsh::BorshSerialize, borsh::BorshDeserialize))]
-pub struct CoinbaseData {
+#[derive(PartialEq, Eq, Debug)]
+pub struct CoinbaseData<T: AsRef<[u8]> = Vec<u8>> {
     pub blue_score: u64,
     pub subsidy: u64,
-    pub miner_data: MinerData,
+    pub miner_data: MinerData<T>,
 }
 
-/// Calculates the block subsidy (in Sompi) given the DAA score.
-pub fn calc_block_subsidy(daa_score: u64, _target_bps: u64) -> u64 {
-    // 50 Jio Coins initial base reward = 50 * 10^8 Sompi per second
-    let base_reward = 50 * 100_000_000;
-    // Halving interval: every 31_536_000 DAA score (~1 year at 1 BPS)
-    let halvings = daa_score / 31_536_000;
-    if halvings >= 64 {
-        0
-    } else {
-        base_reward >> halvings
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct BlockRewardData {
+    pub subsidy: u64,
+    pub total_fees: u64,
+    pub script_public_key: ScriptPublicKey,
+}
+
+impl BlockRewardData {
+    pub fn new(subsidy: u64, total_fees: u64, script_public_key: ScriptPublicKey) -> Self {
+        Self { subsidy, total_fees, script_public_key }
     }
+}
+
+/// Holds a coinbase transaction along with meta-data obtained during creation
+pub struct CoinbaseTransactionTemplate {
+    pub tx: Transaction,
+    pub has_red_reward: bool, // Does the last output contain reward for red blocks
 }

@@ -11,3 +11,6 @@ pub enum BlockError {
     #[error("Merkle root mismatch: expected {0}, got {1}")]
     MerkleRootMismatch(jio_hashes::Hash, jio_hashes::Hash),
 }
+
+pub use super::consensus::RuleError;
+pub type BlockProcessResult<T> = Result<T, RuleError>;

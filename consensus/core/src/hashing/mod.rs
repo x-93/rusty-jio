@@ -6,8 +6,6 @@ pub mod sighash;
 pub mod sighash_type;
 pub mod tx;
 
-pub use sighash_type::SigHashType;
-
 pub trait HasherExtensions {
     /// Writes the len as u64 little endian bytes
     fn write_len(&mut self, len: usize) -> &mut Self;
@@ -28,7 +26,7 @@ pub trait HasherExtensions {
     fn write_u64(&mut self, element: u64) -> &mut Self;
 
     /// Writes blue work as big endian bytes w/o the leading zeros
-    /// (emulates bigint.bytes() in the kaspad golang ref)
+    /// (emulates bigint.bytes() in the jiopad golang ref)
     fn write_blue_work(&mut self, work: BlueWorkType) -> &mut Self;
 
     /// Writes the number of bytes followed by the bytes themselves
@@ -46,30 +44,30 @@ const _: usize = u64::MAX as usize - usize::MAX;
 impl<T: HasherBase> HasherExtensions for T {
     #[inline(always)]
     fn write_len(&mut self, len: usize) -> &mut Self {
-        self.update(&(len as u64).to_le_bytes())
+        self.update((len as u64).to_le_bytes())
     }
 
     #[inline(always)]
     fn write_bool(&mut self, element: bool) -> &mut Self {
-        self.update(if element { &[1u8] } else { &[0u8] })
+        self.update(if element { [1u8] } else { [0u8] })
     }
 
     fn write_u8(&mut self, element: u8) -> &mut Self {
-        self.update(&element.to_le_bytes())
+        self.update(element.to_le_bytes())
     }
 
     fn write_u16(&mut self, element: u16) -> &mut Self {
-        self.update(&element.to_le_bytes())
+        self.update(element.to_le_bytes())
     }
 
     #[inline(always)]
     fn write_u32(&mut self, element: u32) -> &mut Self {
-        self.update(&element.to_le_bytes())
+        self.update(element.to_le_bytes())
     }
 
     #[inline(always)]
     fn write_u64(&mut self, element: u64) -> &mut Self {
-        self.update(&element.to_le_bytes())
+        self.update(element.to_le_bytes())
     }
 
     #[inline(always)]
@@ -89,7 +87,7 @@ impl<T: HasherBase> HasherExtensions for T {
     fn write_var_array<D: AsRef<[u8]>>(&mut self, arr: &[D]) -> &mut Self {
         self.write_len(arr.len());
         for d in arr {
-            self.update(d.as_ref());
+            self.update(d);
         }
         self
     }

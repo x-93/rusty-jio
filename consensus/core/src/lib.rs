@@ -35,9 +35,6 @@ pub mod utxo;
 /// overall blocks, so 2^192 is definitely a justified upper-bound.
 pub type BlueWorkType = jio_math::Uint192;
 
-pub const MAX_WORK_LEVEL: BlockLevel = 128;
-pub type BlockLevel = u8;
-
 /// The type used to represent the GHOSTDAG K parameter
 pub type KType = u16;
 
@@ -121,6 +118,8 @@ impl BuildHasher for BlockHasher {
         Self(0)
     }
 }
+
+pub type BlockLevel = u8;
 
 #[cfg(test)]
 mod tests {

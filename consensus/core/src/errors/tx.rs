@@ -17,3 +17,5 @@ pub enum TxError {
     #[error("Script execution failed: {0}")]
     ScriptFailed(String),
 }
+
+pub type TxResult<T> = Result<T, TxError>;

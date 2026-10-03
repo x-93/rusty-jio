@@ -15,7 +15,7 @@ pub const SOMPI_PER_JIO: u64 = 100_000_000;
 /// The parameter for scaling inverse JIO value to mass units (KIP-0009)
 pub const STORAGE_MASS_PARAMETER: u64 = SOMPI_PER_JIO * 10_000;
 
-/// MaxSompi is the maximum transaction amount allowed in sompi.
+/// MaxSompi is the maximum transaction amount allowed in sompi (21B JIO).
 pub const MAX_SOMPI: u64 = 21_000_000_000 * SOMPI_PER_JIO;
 
 // MAX_TX_IN_SEQUENCE_NUM is the maximum sequence number the sequence field
