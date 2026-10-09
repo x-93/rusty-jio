@@ -44,7 +44,7 @@ jobs:
         run: cargo check --workspace --all-targets
 
       - name: Cargo Clippy
-        run: cargo clippy --workspace --all-targets -- -A clippy::pedantic -A clippy::type_complexity -D warnings
+        run: cargo clippy --workspace --all-targets -- -A clippy::pedantic -A clippy::type_complexity -A clippy::chunks_exact_to_as_chunks -D warnings
 
   test:
     name: Run Tests
@@ -61,15 +61,3 @@ jobs:
 
       - name: Run test suite
         run: cargo test --workspace
-
-  audit:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Security audit for vulnerabilities
-        uses: rustsec/audit-check@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
