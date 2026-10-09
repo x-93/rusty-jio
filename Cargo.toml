@@ -1,0 +1,75 @@
+[workspace]
+resolver = "2"
+members = [
+    "cli",
+    "components/addressmanager",
+    "components/connectionmanager",
+    "components/consensusmanager",
+    "consensus",
+    "consensus/client",
+    "consensus/core",
+    "consensus/notify",
+    "consensus/pow",
+    "consensus/wasm",
+    "core",
+    "crypto/addresses",
+    "crypto/hashes",
+    "crypto/merkle",
+    "crypto/muhash",
+    "crypto/txscript",
+    "crypto/txscript/errors",
+    "daemon",
+    "database",
+    "indexes/core",
+    "indexes/processor",
+    "indexes/utxoindex",
+    "jiopad",
+    "math",
+    "metrics/core",
+    "metrics/perf_monitor",
+    "mining",
+    "mining/errors",
+    "notify",
+    "protocol/flows",
+    "protocol/p2p",
+    "rothschild",
+    "rpc/core",
+    "rpc/grpc/client",
+    "rpc/grpc/core",
+    "rpc/grpc/server",
+    "rpc/macros",
+    "rpc/service",
+    "rpc/wrpc/client",
+    "rpc/wrpc/examples/simple_client",
+    "rpc/wrpc/examples/subscriber",
+    "rpc/wrpc/proxy",
+    "rpc/wrpc/server",
+    "rpc/wrpc/wasm",
+    "simpa",
+    "testing/integration",
+    "utils",
+    "utils/alloc",
+    "utils/tower",
+    "wallet/bip32",
+    "wallet/core",
+    "wallet/keys",
+    "wallet/macros",
+    "wallet/native",
+    "wallet/pskt",
+    "wallet/wasm",
+    "wasm",
+    "wasm/core",
+]
+
+
+[workspace.package]
+version = "0.1.0"
+authors = ["jio developers"]
+license = "ISC"
+edition = "2021"
+repository = "https://github.com/jio/jio"
+
+[workspace.dependencies]
+blake2b_simd = "1.0"
+sha2 = "0.10"
+once_cell = "1.19"

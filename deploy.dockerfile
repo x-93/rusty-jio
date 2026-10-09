@@ -1,0 +1,10 @@
+FROM rust:1.80 as builder
+WORKDIR /app
+COPY . .
+RUN cargo build --release -p jiopad
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /app/target/release/jiopad /usr/local/bin/jiopad
+EXPOSE 16110 16111
+ENTRYPOINT ["/usr/local/bin/jiopad"]

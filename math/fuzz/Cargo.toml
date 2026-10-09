@@ -1,0 +1,25 @@
+[package]
+name = "jio-math-fuzz"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-math = { path = ".." }
+num-bigint = "0.4"
+num-traits = "0.2"
+arbitrary = { version = "1.3", features = ["derive"] }
+
+[[bin]]
+name = "u128_fuzz"
+path = "fuzz_targets/u128.rs"
+
+[[bin]]
+name = "u192_fuzz"
+path = "fuzz_targets/u192.rs"
+
+[[bin]]
+name = "u256_fuzz"
+path = "fuzz_targets/u256.rs"

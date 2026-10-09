@@ -1,0 +1,18 @@
+[package]
+name = "jio-muhash"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+jio-hashes = { path = "../hashes" }
+serde = { version = "1.0", features = ["derive"], optional = true }
+borsh = { version = "1.5", features = ["derive"], optional = true }
+thiserror = "1.0"
+
+[features]
+default = ["serde", "borsh"]
+serde = ["dep:serde"]
+borsh = ["dep:borsh"]

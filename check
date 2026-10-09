@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+echo "Running cargo check and clippy..."
+cargo check --workspace --all-targets
+cargo clippy --workspace --all-targets -- -D warnings

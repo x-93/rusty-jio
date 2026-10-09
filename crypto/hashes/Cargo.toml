@@ -1,0 +1,23 @@
+[package]
+name = "jio-hashes"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+blake2b_simd = { workspace = true }
+sha2 = { workspace = true }
+once_cell = { workspace = true }
+blake3 = "1.5"
+borsh = { version = "1.5", features = ["derive", "unstable__schema"] }
+serde = { version = "1.0", features = ["derive"] }
+faster-hex = "0.10"
+
+[build-dependencies]
+cc = { version = "1.0", optional = true }
+
+[features]
+default = []
+asm = ["dep:cc"]

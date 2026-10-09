@@ -1,0 +1,2 @@
+﻿// jio script
+export default {};
