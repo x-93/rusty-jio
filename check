@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 set -e
-echo "Running cargo check and clippy..."
+
+echo -e "\n[1/4] Checking code formatting (rustfmt)..."
+cargo fmt --all -- --check
+
+echo -e "\n[2/4] Running cargo check on all targets..."
 cargo check --workspace --all-targets
-cargo clippy --workspace --all-targets -- -D warnings
+
+echo -e "\n[3/4] Running clippy (clean lints)..."
+cargo clippy --workspace --all-targets -- -A clippy::pedantic -D warnings
+
+echo -e "\n[4/4] Running cargo audit..."
+if command -v cargo-audit &> /dev/null; then
+    cargo audit
+else
+    echo "cargo-audit is not installed. To install: cargo install cargo-audit"
+fi
+
+echo -e "\nAll checks completed successfully!"
