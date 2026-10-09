@@ -157,22 +157,16 @@ impl FromStr for Address {
 // Low-level Polymod & Bech32 encoding
 // -----------------------------------------------------------------------------
 
-const GENERATOR: [u64; 5] = [
-    0x98f2bc8e61,
-    0x79b76d99e2,
-    0xf33e5fb3c4,
-    0xae2eabe2a8,
-    0x1e4f43e470,
-];
+const GENERATOR: [u64; 5] = [0x98f2bc8e61, 0x79b76d99e2, 0xf33e5fb3c4, 0xae2eabe2a8, 0x1e4f43e470];
 
 fn polymod(values: impl Iterator<Item = u8>) -> u64 {
     let mut chk: u64 = 1;
     for val in values {
         let top = (chk >> 35) as usize;
         chk = ((chk & 0x07ffffffff) << 5) ^ (val as u64);
-        for i in 0..5 {
+        for (i, &g) in GENERATOR.iter().enumerate() {
             if ((top >> i) & 1) == 1 {
-                chk ^= GENERATOR[i];
+                chk ^= g;
             }
         }
     }
@@ -180,10 +174,7 @@ fn polymod(values: impl Iterator<Item = u8>) -> u64 {
 }
 
 fn prefix_expand(prefix: &str) -> impl Iterator<Item = u8> + '_ {
-    prefix
-        .bytes()
-        .map(|b| b & 0x1f)
-        .chain(std::iter::once(0))
+    prefix.bytes().map(|b| b & 0x1f).chain(std::iter::once(0))
 }
 
 pub fn convert_bits(data: &[u8], from: u32, to: u32, pad: bool) -> Result<Vec<u8>, AddressError> {
@@ -228,7 +219,7 @@ pub fn encode_address(prefix: &str, version: u8, payload: &[u8]) -> String {
     let checksum = polymod(
         prefix_expand(prefix)
             .chain(words.iter().copied())
-            .chain(std::iter::repeat(0).take(8)),
+            .chain(std::iter::repeat_n(0, 8)),
     );
 
     let mut result = String::with_capacity(prefix.len() + 1 + words.len() + 8);

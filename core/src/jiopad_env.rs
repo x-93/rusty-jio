@@ -32,18 +32,14 @@ impl JiopadEnv {
 
     /// Detect current hardware environment, operating system paths, and configuration overrides.
     pub fn detect() -> Self {
-        let logical_cores = std::thread::available_parallelism()
-            .map(|n| n.get())
-            .unwrap_or(4);
+        let logical_cores = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
 
         let mut sys = sysinfo::System::new();
         sys.refresh_cpu();
         let physical_cores = sys.physical_core_count().unwrap_or(logical_cores);
 
         // Core limits override
-        let core_limit = env::var("JIO_CORE_LIMIT")
-            .ok()
-            .and_then(|s| s.parse::<usize>().ok());
+        let core_limit = env::var("JIO_CORE_LIMIT").ok().and_then(|s| s.parse::<usize>().ok());
 
         // Worker thread count override
         let worker_threads = env::var("JIO_MAX_THREADS")

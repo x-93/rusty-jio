@@ -1,3 +1,5 @@
+#![allow(clippy::chunks_exact_to_as_chunks)]
+
 mod hashers;
 mod pow_hashers;
 
@@ -13,7 +15,9 @@ pub use hashers::*;
 pub use pow_hashers::*;
 
 // TODO: Check if we use hash more as an array of u64 or of bytes and change the default accordingly
-#[derive(Eq, Clone, Copy, Default, PartialOrd, Ord, Serialize, Deserialize, BorshSerialize, BorshDeserialize, BorshSchema)]
+#[derive(
+    Eq, Clone, Copy, Default, PartialOrd, Ord, Serialize, Deserialize, BorshSerialize, BorshDeserialize, BorshSchema,
+)]
 pub struct Hash([u8; HASH_SIZE]);
 
 impl Hash {
@@ -37,19 +41,25 @@ impl Hash {
     #[inline(always)]
     pub fn to_le_u64(self) -> [u64; 4] {
         let mut out = [0u64; 4];
-        out.iter_mut().zip(self.iter_le_u64()).for_each(|(out, word)| *out = word);
+        out.iter_mut()
+            .zip(self.iter_le_u64())
+            .for_each(|(out, word)| *out = word);
         out
     }
 
     #[inline(always)]
     pub fn iter_le_u64(&self) -> impl ExactSizeIterator<Item = u64> + '_ {
-        self.0.chunks_exact(8).map(|chunk| u64::from_le_bytes(chunk.try_into().unwrap()))
+        self.0
+            .chunks_exact(8)
+            .map(|chunk| u64::from_le_bytes(chunk.try_into().unwrap()))
     }
 
     #[inline(always)]
     pub fn from_le_u64(arr: [u64; 4]) -> Self {
         let mut ret = [0; HASH_SIZE];
-        ret.chunks_exact_mut(8).zip(arr.iter()).for_each(|(bytes, word)| bytes.copy_from_slice(&word.to_le_bytes()));
+        ret.chunks_exact_mut(8)
+            .zip(arr.iter())
+            .for_each(|(bytes, word)| bytes.copy_from_slice(&word.to_le_bytes()));
         Self(ret)
     }
 

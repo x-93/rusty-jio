@@ -55,9 +55,7 @@ pub fn open_db_with_cf(
         .map(|&name| ColumnFamilyDescriptor::new(name, Options::default()))
         .collect();
 
-    let db = Arc::new(
-        DB::open_cf_descriptors(&opts, db_path.to_str().unwrap(), cf_descriptors).unwrap(),
-    );
+    let db = Arc::new(DB::open_cf_descriptors(&opts, db_path.to_str().unwrap(), cf_descriptors).unwrap());
     db
 }
 

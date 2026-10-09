@@ -5,10 +5,7 @@ use crate::standard::{verify_schnorr_signature, TxScriptError};
 
 /// Construct an M-of-N multisig script:
 /// `OP_{m} <pubkey_1> <pubkey_2> ... <pubkey_n> OP_{n} OP_CHECKMULTISIG`
-pub fn pay_to_multisig_script(
-    required_sigs: usize,
-    pubkeys: &[&[u8]],
-) -> Result<Vec<u8>, TxScriptError> {
+pub fn pay_to_multisig_script(required_sigs: usize, pubkeys: &[&[u8]]) -> Result<Vec<u8>, TxScriptError> {
     if required_sigs == 0 || required_sigs > pubkeys.len() || pubkeys.len() > 16 {
         return Err(TxScriptError::NonStandardScript);
     }
@@ -30,12 +27,7 @@ pub fn pay_to_multisig_script(
 }
 
 /// Verify an M-of-N multisig given a set of signatures, public keys, and sighash digest.
-pub fn eval_multisig(
-    required_sigs: usize,
-    pubkeys: &[&[u8]],
-    signatures: &[&[u8]],
-    sighash: &[u8; 32],
-) -> bool {
+pub fn eval_multisig(required_sigs: usize, pubkeys: &[&[u8]], signatures: &[&[u8]], sighash: &[u8; 32]) -> bool {
     if signatures.len() < required_sigs {
         return false;
     }

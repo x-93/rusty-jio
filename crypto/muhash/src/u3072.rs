@@ -50,8 +50,8 @@ impl<'de> serde::Deserialize<'de> for Num3072 {
                 A: serde::de::SeqAccess<'de>,
             {
                 let mut limbs = [0u64; LIMBS];
-                for i in 0..LIMBS {
-                    limbs[i] = seq
+                for (i, limb) in limbs.iter_mut().enumerate() {
+                    *limb = seq
                         .next_element()?
                         .ok_or_else(|| serde::de::Error::invalid_length(i, &self))?;
                 }
@@ -107,9 +107,7 @@ impl Num3072 {
         for i in 0..LIMBS {
             let mut carry = 0u128;
             for j in 0..LIMBS {
-                let prod = (self.0[i] as u128) * (rhs.0[j] as u128)
-                    + (wide[i + j] as u128)
-                    + carry;
+                let prod = (self.0[i] as u128) * (rhs.0[j] as u128) + (wide[i + j] as u128) + carry;
                 wide[i + j] = prod as u64;
                 carry = prod >> 64;
             }
@@ -161,7 +159,7 @@ impl Num3072 {
         while offset < BYTES {
             let mut hasher = MuHashElementHash::new();
             hasher.update(data);
-            hasher.update(&nonce.to_le_bytes());
+            hasher.update(nonce.to_le_bytes());
             let hash = hasher.finalize();
             let chunk_len = 32.min(BYTES - offset);
             bytes[offset..offset + chunk_len].copy_from_slice(&hash.as_bytes()[..chunk_len]);
@@ -207,9 +205,9 @@ fn reduce_wide(mut wide: [u64; LIMBS * 2]) -> [u64; LIMBS] {
 
     while carry > 0 {
         let mut add_carry = carry * (C as u128);
-        for i in 0..LIMBS {
-            let sum = (wide[i] as u128) + add_carry;
-            wide[i] = sum as u64;
+        for item in wide.iter_mut().take(LIMBS) {
+            let sum = (*item as u128) + add_carry;
+            *item = sum as u64;
             add_carry = sum >> 64;
             if add_carry == 0 {
                 break;
@@ -268,7 +266,7 @@ impl MuHash {
     pub fn finalize(&self) -> Hash {
         let bytes = self.acc.to_bytes_le();
         let mut hasher = MuHashFinalizeHash::new();
-        hasher.update(&bytes);
+        hasher.update(bytes);
         hasher.finalize()
     }
 }

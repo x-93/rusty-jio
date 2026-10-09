@@ -15,7 +15,7 @@ pub fn calc_merkle_root(leaves: &[Hash]) -> Hash {
 
     let mut current_level = leaves.to_vec();
     while current_level.len() > 1 {
-        let mut next_level = Vec::with_capacity((current_level.len() + 1) / 2);
+        let mut next_level = Vec::with_capacity(current_level.len().div_ceil(2));
         for chunk in current_level.chunks(2) {
             let left = chunk[0];
             let right = if chunk.len() > 1 { chunk[1] } else { left };
@@ -48,7 +48,7 @@ impl MerkleTree {
         levels.push(current_level.clone());
 
         while current_level.len() > 1 {
-            let mut next_level = Vec::with_capacity((current_level.len() + 1) / 2);
+            let mut next_level = Vec::with_capacity(current_level.len().div_ceil(2));
             for chunk in current_level.chunks(2) {
                 let left = chunk[0];
                 let right = if chunk.len() > 1 { chunk[1] } else { left };
@@ -65,7 +65,11 @@ impl MerkleTree {
     }
 
     pub fn root(&self) -> Hash {
-        self.levels.last().and_then(|lvl| lvl.first()).copied().unwrap_or(ZERO_HASH)
+        self.levels
+            .last()
+            .and_then(|lvl| lvl.first())
+            .copied()
+            .unwrap_or(ZERO_HASH)
     }
 
     pub fn generate_proof(&self, leaf_index: usize) -> Option<MerkleProof> {

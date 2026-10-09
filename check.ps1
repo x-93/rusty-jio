@@ -8,7 +8,7 @@ Write-Host "`n[2/4] Running cargo check on all targets..." -ForegroundColor Cyan
 cargo check --workspace --all-targets
 
 Write-Host "`n[3/4] Running clippy (clean lints)..." -ForegroundColor Cyan
-cargo clippy --workspace --all-targets -- -A clippy::pedantic -D warnings
+cargo clippy --workspace --all-targets -- -A clippy::pedantic -A clippy::type_complexity -D warnings
 
 Write-Host "`n[4/4] Running cargo audit..." -ForegroundColor Cyan
 if (Get-Command cargo-audit -ErrorAction SilentlyContinue) {

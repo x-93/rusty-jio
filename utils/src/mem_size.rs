@@ -25,9 +25,22 @@ macro_rules! impl_mem_size_primitive {
 }
 
 impl_mem_size_primitive!(
-    u8, u16, u32, u64, u128, usize,
-    i8, i16, i32, i64, i128, isize,
-    bool, f32, f64, ()
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    usize,
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize,
+    bool,
+    f32,
+    f64,
+    ()
 );
 
 impl<T: MemSize, const N: usize> MemSize for [T; N] {
@@ -77,7 +90,10 @@ impl<K: MemSize, V: MemSize> MemSize for HashMap<K, V> {
     fn mem_size(&self) -> usize {
         size_of::<Self>()
             + (self.capacity() * (size_of::<K>() + size_of::<V>() + size_of::<usize>()))
-            + self.iter().map(|(k, v)| (k.mem_size() - size_of::<K>()) + (v.mem_size() - size_of::<V>())).sum::<usize>()
+            + self
+                .iter()
+                .map(|(k, v)| (k.mem_size() - size_of::<K>()) + (v.mem_size() - size_of::<V>()))
+                .sum::<usize>()
     }
 }
 

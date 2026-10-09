@@ -26,15 +26,16 @@ impl Matrix {
         let mut buf = [0u8; MATRIX_SIZE * MATRIX_SIZE / 2];
         reader.fill(&mut buf);
 
-        for i in 0..MATRIX_SIZE {
-            for j in 0..MATRIX_SIZE {
-                let byte_idx = (i * MATRIX_SIZE + j) / 2;
-                let nibble = if (i * MATRIX_SIZE + j) % 2 == 0 {
+        for (i, row) in rows.iter_mut().enumerate() {
+            for (j, cell) in row.iter_mut().enumerate() {
+                let idx = i * MATRIX_SIZE + j;
+                let byte_idx = idx / 2;
+                let nibble = if idx.is_multiple_of(2) {
                     buf[byte_idx] & 0x0F
                 } else {
                     (buf[byte_idx] >> 4) & 0x0F
                 };
-                rows[i][j] = nibble;
+                *cell = nibble;
             }
         }
         Self { rows }
@@ -50,12 +51,12 @@ impl Matrix {
         }
 
         let mut res_nibbles = [0u8; MATRIX_SIZE];
-        for i in 0..MATRIX_SIZE {
+        for (i, res) in res_nibbles.iter_mut().enumerate() {
             let mut sum = 0u32;
-            for j in 0..MATRIX_SIZE {
-                sum += (self.rows[i][j] as u32) * (vec_nibbles[j] as u32);
+            for (j, &vec_val) in vec_nibbles.iter().enumerate() {
+                sum += (self.rows[i][j] as u32) * (vec_val as u32);
             }
-            res_nibbles[i] = (sum & 0x0F) as u8;
+            *res = (sum & 0x0F) as u8;
         }
 
         let mut out = [0u8; 32];

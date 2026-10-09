@@ -63,12 +63,7 @@ where
     }
 
     /// Add an item to the key-set.
-    pub fn write(
-        &self,
-        mut writer: impl DbWriter,
-        key: TKey,
-        item: TItem,
-    ) -> Result<(), StoreError>
+    pub fn write(&self, mut writer: impl DbWriter, key: TKey, item: TItem) -> Result<(), StoreError>
     where
         TKey: AsRef<[u8]>,
         TItem: Serialize,
@@ -89,12 +84,7 @@ where
     }
 
     /// Remove an item from the key-set.
-    pub fn delete(
-        &self,
-        mut writer: impl DbWriter,
-        key: TKey,
-        item: TItem,
-    ) -> Result<(), StoreError>
+    pub fn delete(&self, mut writer: impl DbWriter, key: TKey, item: TItem) -> Result<(), StoreError>
     where
         TKey: AsRef<[u8]>,
         TItem: Serialize,
@@ -133,10 +123,9 @@ where
         read_opts.set_iterate_range(rocksdb::PrefixRange(key_prefix.as_slice()));
 
         let mut items = HashSet::new();
-        let iter = self.db.iterator_opt(
-            IteratorMode::From(&key_prefix, Direction::Forward),
-            read_opts,
-        );
+        let iter = self
+            .db
+            .iterator_opt(IteratorMode::From(&key_prefix, Direction::Forward), read_opts);
 
         for res in iter {
             let (raw_key, _) = res?;
@@ -147,15 +136,12 @@ where
             }
         }
 
-        self.cache
-            .insert(key, Arc::new(RwLock::new(items.clone())));
+        self.cache.insert(key, Arc::new(RwLock::new(items.clone())));
         Ok(items)
     }
 
     /// Iterator over raw key-set entries.
-    pub fn raw_iterator(
-        &self,
-    ) -> impl Iterator<Item = Result<Box<[u8]>, Box<dyn Error>>> + '_ {
+    pub fn raw_iterator(&self) -> impl Iterator<Item = Result<Box<[u8]>, Box<dyn Error>>> + '_ {
         let db_key = DbKey::prefix_only(&self.prefix);
         let mut read_opts = ReadOptions::default();
         read_opts.set_iterate_range(rocksdb::PrefixRange(db_key.as_ref()));

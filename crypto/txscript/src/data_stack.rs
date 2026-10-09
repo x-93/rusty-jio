@@ -39,7 +39,10 @@ impl DataStack {
     }
 
     pub fn peek(&self) -> Result<&[u8], StackError> {
-        self.items.last().map(|v| v.as_slice()).ok_or(StackError::StackUnderflow)
+        self.items
+            .last()
+            .map(|v| v.as_slice())
+            .ok_or(StackError::StackUnderflow)
     }
 
     pub fn peek_mut(&mut self) -> Result<&mut Vec<u8>, StackError> {

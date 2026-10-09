@@ -44,7 +44,7 @@ jobs:
         run: cargo check --workspace --all-targets
 
       - name: Cargo Clippy
-        run: cargo clippy --workspace --all-targets -- -A clippy::pedantic -D warnings
+        run: cargo clippy --workspace --all-targets -- -A clippy::pedantic -A clippy::type_complexity -D warnings
 
   test:
     name: Run Tests

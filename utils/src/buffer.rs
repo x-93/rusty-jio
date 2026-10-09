@@ -19,10 +19,7 @@ impl<const N: usize> Default for ZeroBuffer<N> {
 
 impl<const N: usize> ZeroBuffer<N> {
     pub const fn new() -> Self {
-        Self {
-            data: [0u8; N],
-            len: 0,
-        }
+        Self { data: [0u8; N], len: 0 }
     }
 
     pub fn capacity(&self) -> usize {

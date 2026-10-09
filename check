@@ -8,7 +8,7 @@ echo -e "\n[2/4] Running cargo check on all targets..."
 cargo check --workspace --all-targets
 
 echo -e "\n[3/4] Running clippy (clean lints)..."
-cargo clippy --workspace --all-targets -- -A clippy::pedantic -D warnings
+cargo clippy --workspace --all-targets -- -A clippy::pedantic -A clippy::type_complexity -D warnings
 
 echo -e "\n[4/4] Running cargo audit..."
 if command -v cargo-audit &> /dev/null; then

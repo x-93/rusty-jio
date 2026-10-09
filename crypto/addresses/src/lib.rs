@@ -2,4 +2,4 @@
 
 pub mod bech32;
 
-pub use bech32::{Address, AddressError, Prefix, Version, decode_address, encode_address};
+pub use bech32::{decode_address, encode_address, Address, AddressError, Prefix, Version};

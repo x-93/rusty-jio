@@ -94,10 +94,7 @@ pub fn classify_script(script: &[u8]) -> ScriptClass {
 }
 
 /// Extract recipient address from a standard script public key.
-pub fn extract_script_pub_key_address(
-    script: &[u8],
-    prefix: Prefix,
-) -> Result<Address, TxScriptError> {
+pub fn extract_script_pub_key_address(script: &[u8], prefix: Prefix) -> Result<Address, TxScriptError> {
     match classify_script(script) {
         ScriptClass::PubKey => {
             let pubkey = &script[1..33];
@@ -105,13 +102,11 @@ pub fn extract_script_pub_key_address(
         }
         ScriptClass::PubKeyECDSA => {
             let pubkey = &script[1..34];
-            Address::new(prefix, Version::PubKeyECDSA, pubkey)
-                .map_err(|_| TxScriptError::InvalidPublicKey)
+            Address::new(prefix, Version::PubKeyECDSA, pubkey).map_err(|_| TxScriptError::InvalidPublicKey)
         }
         ScriptClass::ScriptHash => {
             let hash = &script[2..34];
-            Address::new(prefix, Version::ScriptHash, hash)
-                .map_err(|_| TxScriptError::InvalidPublicKey)
+            Address::new(prefix, Version::ScriptHash, hash).map_err(|_| TxScriptError::InvalidPublicKey)
         }
         _ => Err(TxScriptError::NonStandardScript),
     }
@@ -127,10 +122,8 @@ pub fn verify_schnorr_signature(
         return Ok(false);
     }
     let secp = Secp256k1::verification_only();
-    let pubkey = XOnlyPublicKey::from_slice(pubkey_bytes)
-        .map_err(|_| TxScriptError::InvalidPublicKey)?;
-    let sig = SchnorrSignature::from_slice(sig_bytes)
-        .map_err(|_| TxScriptError::InvalidSignature)?;
+    let pubkey = XOnlyPublicKey::from_slice(pubkey_bytes).map_err(|_| TxScriptError::InvalidPublicKey)?;
+    let sig = SchnorrSignature::from_slice(sig_bytes).map_err(|_| TxScriptError::InvalidSignature)?;
     let msg = Message::from_digest(*sighash);
     Ok(secp.verify_schnorr(&sig, &msg, &pubkey).is_ok())
 }
@@ -231,17 +224,20 @@ impl<'a> Engine<'a> {
                     self.stack.push_i64(val);
                 }
                 0x61 => {} // OP_NOP
-                0x69 => {  // OP_VERIFY
+                0x69 => {
+                    // OP_VERIFY
                     if !self.stack.pop_bool()? {
                         return Err(TxScriptError::VerifyFailed);
                     }
                 }
                 0x6a => return Err(TxScriptError::OpReturnExecuted),
-                0x6d => {  // OP_2DROP
+                0x6d => {
+                    // OP_2DROP
                     self.stack.drop()?;
                     self.stack.drop()?;
                 }
-                0x6e => {  // OP_2DUP
+                0x6e => {
+                    // OP_2DUP
                     let len = self.stack.len();
                     if len < 2 {
                         return Err(StackError::StackUnderflow.into());
@@ -255,56 +251,67 @@ impl<'a> Engine<'a> {
                 0x78 => self.stack.over()?,
                 0x7c => self.stack.swap()?,
                 0x7b => self.stack.rot()?,
-                0x87 => {  // OP_EQUAL
+                0x87 => {
+                    // OP_EQUAL
                     let a = self.stack.pop()?;
                     let b = self.stack.pop()?;
                     self.stack.push_bool(a == b);
                 }
-                0x88 => {  // OP_EQUALVERIFY
+                0x88 => {
+                    // OP_EQUALVERIFY
                     let a = self.stack.pop()?;
                     let b = self.stack.pop()?;
                     if a != b {
                         return Err(TxScriptError::VerifyFailed);
                     }
                 }
-                0x8b => {  // OP_1ADD
+                0x8b => {
+                    // OP_1ADD
                     let v = self.stack.pop_i64()?;
                     self.stack.push_i64(v + 1);
                 }
-                0x8c => {  // OP_1SUB
+                0x8c => {
+                    // OP_1SUB
                     let v = self.stack.pop_i64()?;
                     self.stack.push_i64(v - 1);
                 }
-                0x8f => {  // OP_NEGATE
+                0x8f => {
+                    // OP_NEGATE
                     let v = self.stack.pop_i64()?;
                     self.stack.push_i64(-v);
                 }
-                0x91 => {  // OP_NOT
+                0x91 => {
+                    // OP_NOT
                     let v = self.stack.pop_bool()?;
                     self.stack.push_bool(!v);
                 }
-                0x93 => {  // OP_ADD
+                0x93 => {
+                    // OP_ADD
                     let b = self.stack.pop_i64()?;
                     let a = self.stack.pop_i64()?;
                     self.stack.push_i64(a + b);
                 }
-                0x94 => {  // OP_SUB
+                0x94 => {
+                    // OP_SUB
                     let b = self.stack.pop_i64()?;
                     let a = self.stack.pop_i64()?;
                     self.stack.push_i64(a - b);
                 }
-                0xaa => {  // OP_BLAKE2B
+                0xaa => {
+                    // OP_BLAKE2B
                     let data = self.stack.pop()?;
                     let hash = jio_hashes::TransactionHash::hash(&data);
                     self.stack.push(hash.as_bytes().to_vec());
                 }
-                0xac => {  // OP_CHECKSIG
+                0xac => {
+                    // OP_CHECKSIG
                     let pubkey = self.stack.pop()?;
                     let sig = self.stack.pop()?;
                     let ok = verify_schnorr_signature(&pubkey, &sig, &self.sighash.as_bytes())?;
                     self.stack.push_bool(ok);
                 }
-                0xad => {  // OP_CHECKSIGVERIFY
+                0xad => {
+                    // OP_CHECKSIGVERIFY
                     let pubkey = self.stack.pop()?;
                     let sig = self.stack.pop()?;
                     let ok = verify_schnorr_signature(&pubkey, &sig, &self.sighash.as_bytes())?;
