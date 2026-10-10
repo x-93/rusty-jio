@@ -9,9 +9,6 @@ pub struct DaaScoreTimestamp {
 
 impl DaaScoreTimestamp {
     pub const fn new(daa_score: u64, timestamp: u64) -> Self {
-        Self {
-            daa_score,
-            timestamp,
-        }
+        Self { daa_score, timestamp }
     }
 }

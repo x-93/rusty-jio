@@ -6,7 +6,9 @@ use std::str::FromStr;
 
 pub const SUBNETWORK_ID_SIZE: usize = 20;
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct SubnetworkId([u8; SUBNETWORK_ID_SIZE]);
 
 impl SubnetworkId {
@@ -64,13 +66,11 @@ impl SubnetworkId {
 
 pub const SUBNETWORK_ID_NATIVE: SubnetworkId = SubnetworkId([0; SUBNETWORK_ID_SIZE]);
 
-pub const SUBNETWORK_ID_COINBASE: SubnetworkId = SubnetworkId([
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-]);
+pub const SUBNETWORK_ID_COINBASE: SubnetworkId =
+    SubnetworkId([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
-pub const SUBNETWORK_ID_REGISTRY: SubnetworkId = SubnetworkId([
-    2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-]);
+pub const SUBNETWORK_ID_REGISTRY: SubnetworkId =
+    SubnetworkId([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
 impl AsRef<[u8]> for SubnetworkId {
     fn as_ref(&self) -> &[u8] {

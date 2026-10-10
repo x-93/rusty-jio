@@ -5,8 +5,8 @@ use jio_utils::mem_size::MemSizeEstimator;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display, Formatter};
 
-pub use script_public_key::*;
 use crate::subnets::{SubnetworkId, SUBNETWORK_ID_COINBASE};
+pub use script_public_key::*;
 
 pub use jio_hashes::Hash as TransactionId;
 
@@ -124,12 +124,7 @@ pub struct UtxoEntry {
 }
 
 impl UtxoEntry {
-    pub fn new(
-        amount: u64,
-        script_public_key: ScriptPublicKey,
-        block_daa_score: u64,
-        is_coinbase: bool,
-    ) -> Self {
+    pub fn new(amount: u64, script_public_key: ScriptPublicKey, block_daa_score: u64, is_coinbase: bool) -> Self {
         Self {
             amount,
             script_public_key,
@@ -217,8 +212,16 @@ impl Debug for Transaction {
 impl MemSizeEstimator for Transaction {
     fn estimate_mem_bytes(&self) -> usize {
         size_of::<Self>()
-            + self.inputs.iter().map(TransactionInput::estimate_mem_bytes).sum::<usize>()
-            + self.outputs.iter().map(TransactionOutput::estimate_mem_bytes).sum::<usize>()
+            + self
+                .inputs
+                .iter()
+                .map(TransactionInput::estimate_mem_bytes)
+                .sum::<usize>()
+            + self
+                .outputs
+                .iter()
+                .map(TransactionOutput::estimate_mem_bytes)
+                .sum::<usize>()
             + self.payload.capacity()
     }
 }

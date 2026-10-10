@@ -6,9 +6,9 @@ use jio_consensus_core::config::constants::consensus::MAX_DIFFICULTY_TARGET;
 use jio_consensus_core::hashing;
 use jio_consensus_core::header::Header;
 use jio_consensus_core::BlueWorkType;
-pub use matrix::{calculate_pow, Matrix, MATRIX_SIZE};
 use jio_hashes::Hash;
 use jio_math::{Uint192, Uint256};
+pub use matrix::{calculate_pow, Matrix, MATRIX_SIZE};
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq, Eq)]

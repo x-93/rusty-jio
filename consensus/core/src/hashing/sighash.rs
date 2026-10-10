@@ -2,11 +2,7 @@ use super::sighash_type::SigHashType;
 use crate::tx::Transaction;
 use jio_hashes::{Hash, TransactionSigningHash};
 
-pub fn calc_schnorr_signature_hash(
-    tx: &Transaction,
-    input_index: usize,
-    hash_type: SigHashType,
-) -> Hash {
+pub fn calc_schnorr_signature_hash(tx: &Transaction, input_index: usize, hash_type: SigHashType) -> Hash {
     let mut hasher = TransactionSigningHash::new();
     hasher.update(tx.version.to_le_bytes());
     hasher.update([hash_type.to_u8()]);
