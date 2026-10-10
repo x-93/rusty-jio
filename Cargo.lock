@@ -648,6 +648,7 @@ version = "0.1.0"
 name = "jio-consensus-pow"
 version = "0.1.0"
 dependencies = [
+ "blake3",
  "jio-consensus-core",
  "jio-hashes",
  "jio-math",

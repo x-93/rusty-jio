@@ -1,3 +1,9 @@
-﻿//! Module implementation.
+use crate::coinbase::MinerData;
 
-// Types and logic definitions for args.rs
+pub struct TransactionValidationBatchArgs {
+    pub block_daa_score: u64,
+}
+
+pub struct BuildBlockTemplateArgs {
+    pub miner_data: MinerData,
+}

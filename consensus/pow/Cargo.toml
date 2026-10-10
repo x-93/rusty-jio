@@ -10,6 +10,7 @@ repository.workspace = true
 jio-hashes = { path = "../../crypto/hashes" }
 jio-consensus-core = { path = "../core" }
 jio-math = { path = "../../math" }
+blake3 = "1.8"
 thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 smallvec = "1.13"

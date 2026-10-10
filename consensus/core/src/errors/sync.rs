@@ -1,3 +1,10 @@
-﻿//! Module implementation.
+use thiserror::Error;
 
-// Types and logic definitions for sync.rs
+#[derive(Error, Debug, PartialEq, Eq, Clone)]
+pub enum SyncError {
+    #[error("sync negotiation failed: {0}")]
+    NegotiationFailed(String),
+
+    #[error("sync error: {0}")]
+    Other(String),
+}

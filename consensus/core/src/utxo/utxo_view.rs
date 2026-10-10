@@ -1,3 +1,11 @@
-﻿//! Module implementation.
+use crate::tx::{TransactionOutpoint, UtxoEntry};
 
-// Types and logic definitions for utxo_view.rs
+pub trait UtxoView {
+    fn get(&self, outpoint: &TransactionOutpoint) -> Option<UtxoEntry>;
+}
+
+impl UtxoView for super::utxo_collection::UtxoCollection {
+    fn get(&self, outpoint: &TransactionOutpoint) -> Option<UtxoEntry> {
+        self.get(outpoint).cloned()
+    }
+}

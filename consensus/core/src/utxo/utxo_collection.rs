@@ -1,3 +1,14 @@
-﻿//! Module implementation.
+use crate::tx::{TransactionOutpoint, UtxoEntry};
+use std::collections::HashMap;
 
-// Types and logic definitions for utxo_collection.rs
+pub type UtxoCollection = HashMap<TransactionOutpoint, UtxoEntry>;
+
+pub trait UtxoCollectionExtensions {
+    fn contains_outpoint(&self, outpoint: &TransactionOutpoint) -> bool;
+}
+
+impl UtxoCollectionExtensions for UtxoCollection {
+    fn contains_outpoint(&self, outpoint: &TransactionOutpoint) -> bool {
+        self.contains_key(outpoint)
+    }
+}
