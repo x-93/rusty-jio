@@ -44,6 +44,7 @@ h2 = "0.3"
 
 [build-dependencies]
 tonic-build = { version = "0.9.1", features = ["prost"] }
+protoc-bin-vendored.workspace = true
 
 [dev-dependencies]
 hex = "0.4.3"

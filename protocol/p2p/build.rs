@@ -1,4 +1,7 @@
 fn main() {
+    if std::env::var("PROTOC").is_err() {
+        std::env::set_var("PROTOC", protoc_bin_vendored::protoc_bin_path().unwrap());
+    }
     let proto_files = &["./proto/messages.proto", "./proto/p2p.proto"];
     let dirs = &["./proto"];
 

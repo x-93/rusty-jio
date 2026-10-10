@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
     "core",
     "wallet/core",
@@ -112,37 +113,38 @@ tempfile = "3.3"
 blake2b_simd = "1"
 sha2 = "0.10"
 serde = { version = "1", features = ["derive", "rc"] }
-serde_json = "1.0.91"
-serde-wasm-bindgen = "0.4.5"
+serde_json = "1.0"
+serde-wasm-bindgen = "0.4"
 futures-util = { version = "0.3", default-features = false, features = [
     "alloc",
 ] }
 futures = { version = "0.3" }
 bincode = { version = "1", default-features = false }
 tokio = { version = "1", features = ["sync","rt-multi-thread"] }
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+wasm-bindgen = "0.2"
 criterion = { version = "0.4", default-features = false }
-indexmap = "1.9.1"
+indexmap = "1.9"
 parking_lot = "0.12"
-smallvec = { version = "1.10.0", features = ["serde"] }
+smallvec = { version = "1.10", features = ["serde"] }
 borsh = { version = "0.9.1", features = ["rc"] } # please keep this fixed
-async-std = { version = "1.12.0", features = ['attributes'] }
-async-channel = "1.8.0"
-clap = { version = "4.0.23", features = ["derive", "string","cargo"] }
-derive_more = { version = "0.99" }
+async-std = { version = "1.12", features = ['attributes'] }
+async-channel = "1.8"
+clap = { version = "4", features = ["derive", "string","cargo"] }
+derive_more = "0.99"
 log = "0.4"
-cfg-if = "1.0.0"
+cfg-if = "1.0"
 rocksdb = "0.19"
-num_cpus = "1.15.0"
-async-trait = "0.1.57"
-paste = "1.0.11"
-regex = "1.6.0"
-pad = "0.1.6"
-convert_case = "0.5.0"
-wasm-bindgen-futures="0.4.33"
-js-sys = "0.3.56"
-getrandom = { version = "0.2.8", features = ["js"] }
-uuid = { version = "1.2.2", features = ["v4", "fast-rng"] }
+num_cpus = "1.15"
+async-trait = "0.1"
+paste = "1.0"
+regex = "1"
+pad = "0.1"
+convert_case = "0.5"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
+uuid = { version = "1", features = ["v4", "fast-rng"] }
+protoc-bin-vendored = "3.3.0"
 
 # bip32 dependencies
 rand_core = { version = "0.6", features = ["std"] }
