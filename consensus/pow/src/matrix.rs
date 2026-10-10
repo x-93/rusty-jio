@@ -25,7 +25,7 @@ impl Matrix {
             for (j, cell) in row.iter_mut().enumerate() {
                 let idx = i * MATRIX_SIZE + j;
                 let byte_idx = idx / 2;
-                let nibble = if idx % 2 == 0 {
+                let nibble = if idx.is_multiple_of(2) {
                     buf[byte_idx] & 0x0F
                 } else {
                     (buf[byte_idx] >> 4) & 0x0F

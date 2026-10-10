@@ -79,6 +79,11 @@ impl Display for ScriptPublicKey {
 
 impl MemSizeEstimator for ScriptPublicKey {
     fn estimate_mem_bytes(&self) -> usize {
-        size_of::<Self>() + self.script.spilled().then_some(self.script.capacity()).unwrap_or(0)
+        let extra = if self.script.spilled() {
+            self.script.capacity()
+        } else {
+            0
+        };
+        size_of::<Self>() + extra
     }
 }

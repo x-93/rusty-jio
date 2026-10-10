@@ -105,10 +105,10 @@ impl FromStr for SubnetworkId {
             return Err(SubnetworkHexError);
         }
         let mut bytes = [0u8; SUBNETWORK_ID_SIZE];
-        for i in 0..SUBNETWORK_ID_SIZE {
+        for (i, byte) in bytes.iter_mut().enumerate() {
             let high = char_to_hex(s.as_bytes()[i * 2])?;
             let low = char_to_hex(s.as_bytes()[i * 2 + 1])?;
-            bytes[i] = (high << 4) | low;
+            *byte = (high << 4) | low;
         }
         Ok(Self(bytes))
     }

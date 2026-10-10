@@ -48,11 +48,9 @@ impl MassCalculator {
     }
 
     pub fn calc_storage_mass(&self, output_value: u64) -> u64 {
-        if output_value == 0 {
-            self.storage_mass_parameter
-        } else {
-            self.storage_mass_parameter / output_value
-        }
+        self.storage_mass_parameter
+            .checked_div(output_value)
+            .unwrap_or(self.storage_mass_parameter)
     }
 
     pub fn calc_overall_mass(&self, tx: &Transaction) -> u64 {

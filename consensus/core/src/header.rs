@@ -5,7 +5,7 @@ use jio_utils::mem_size::MemSizeEstimator;
 use serde::{Deserialize, Serialize};
 
 /// @category Consensus
-#[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Header {
     /// Cached hash
@@ -87,26 +87,6 @@ impl Header {
             daa_score: 0,
             bits: 0,
             blue_work: BlueWorkType::ZERO,
-            blue_score: 0,
-            pruning_point: Default::default(),
-        }
-    }
-}
-
-impl Default for Header {
-    fn default() -> Self {
-        Self {
-            hash: Default::default(),
-            version: 0,
-            parents_by_level: vec![],
-            hash_merkle_root: Default::default(),
-            accepted_id_merkle_root: Default::default(),
-            utxo_commitment: Default::default(),
-            timestamp: 0,
-            bits: 0,
-            nonce: 0,
-            daa_score: 0,
-            blue_work: Default::default(),
             blue_score: 0,
             pruning_point: Default::default(),
         }
