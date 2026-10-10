@@ -25,7 +25,7 @@ impl Matrix {
             for (j, cell) in row.iter_mut().enumerate() {
                 let idx = i * MATRIX_SIZE + j;
                 let byte_idx = idx / 2;
-                let nibble = if idx.is_multiple_of(2) {
+                let nibble = if idx % 2 == 0 {
                     buf[byte_idx] & 0x0F
                 } else {
                     (buf[byte_idx] >> 4) & 0x0F
@@ -62,6 +62,27 @@ impl Matrix {
     }
 }
 
+/// Calculate the matrix PoW hash for a given matrix, pre_pow_hash, and nonce.
+pub fn calculate_pow(matrix: &Matrix, pre_pow_hash: Hash, nonce: u64) -> Hash {
+    // Stage 1: hash pre_pow_hash + nonce
+    let mut h1 = Blake3Hasher::new();
+    h1.update(b"JioPoWStage1");
+    h1.update(pre_pow_hash.as_ref());
+    h1.update(&nonce.to_le_bytes());
+    let v = *h1.finalize().as_bytes();
+
+    // Stage 2: matrix multiplication
+    let mv = matrix.multiply_vector(&v);
+
+    // Stage 3: final Blake3 digest
+    let mut h2 = Blake3Hasher::new();
+    h2.update(b"JioPoWStage2");
+    h2.update(&mv);
+    h2.update(pre_pow_hash.as_ref());
+    h2.update(&nonce.to_le_bytes());
+    Hash::from_bytes(*h2.finalize().as_bytes())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -73,5 +94,14 @@ mod tests {
         let vector = [0x55u8; 32];
         let result = matrix.multiply_vector(&vector);
         assert_ne!(result, [0u8; 32]);
+    }
+
+    #[test]
+    fn test_calculate_pow() {
+        let seed = Hash::from_u64_word(9999);
+        let matrix = Matrix::generate(seed);
+        let h1 = calculate_pow(&matrix, seed, 1);
+        let h2 = calculate_pow(&matrix, seed, 2);
+        assert_ne!(h1, h2);
     }
 }

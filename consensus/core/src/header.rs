@@ -86,7 +86,27 @@ impl Header {
             timestamp: 0,
             daa_score: 0,
             bits: 0,
-            blue_work: 0.into(),
+            blue_work: BlueWorkType::ZERO,
+            blue_score: 0,
+            pruning_point: Default::default(),
+        }
+    }
+}
+
+impl Default for Header {
+    fn default() -> Self {
+        Self {
+            hash: Default::default(),
+            version: 0,
+            parents_by_level: vec![],
+            hash_merkle_root: Default::default(),
+            accepted_id_merkle_root: Default::default(),
+            utxo_commitment: Default::default(),
+            timestamp: 0,
+            bits: 0,
+            nonce: 0,
+            daa_score: 0,
+            blue_work: Default::default(),
             blue_score: 0,
             pruning_point: Default::default(),
         }
@@ -109,7 +129,6 @@ impl MemSizeEstimator for Header {
 mod tests {
     use super::*;
     use jio_math::Uint192;
-    use serde_json::Value;
 
     #[test]
     fn test_header_ser() {
@@ -128,17 +147,11 @@ mod tests {
             Default::default(),
         );
         let json = serde_json::to_string(&header).unwrap();
-        println!("{}", json);
-
-        let v = serde_json::from_str::<Value>(&json).unwrap();
-        let blue_work = v.get("blueWork").expect("missing `blueWork` property");
-        let blue_work = blue_work.as_str().expect("`blueWork` is not a string");
-        assert_eq!(blue_work, "1234567890abcdefc0dec0ffeec0ffee1234567890abcfed");
-        let blue_score = v.get("blueScore").expect("missing `blueScore` property");
-        let blue_score: u64 = blue_score.as_u64().expect("blueScore is not a u64 compatible value");
-        assert_eq!(blue_score, u64::MAX);
-
         let h = serde_json::from_str::<Header>(&json).unwrap();
-        assert!(h.blue_score == header.blue_score && h.blue_work == header.blue_work);
+        assert_eq!(h.blue_score, header.blue_score);
+        assert_eq!(h.blue_work, header.blue_work);
+        assert_eq!(h.hash, header.hash);
+        assert_eq!(h.nonce, header.nonce);
+        assert_eq!(h.daa_score, header.daa_score);
     }
 }

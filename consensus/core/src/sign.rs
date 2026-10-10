@@ -10,7 +10,7 @@ pub fn sign_transaction_input(
     hash_type: SigHashType,
 ) -> Result<(), secp256k1::Error> {
     let hash = calc_schnorr_signature_hash(tx, input_index, hash_type);
-    let msg = Message::from_digest(*hash.as_bytes());
+    let msg = Message::from_digest(hash.as_bytes());
     let secp = Secp256k1::signing_only();
     let sig = secp.sign_schnorr(&msg, keypair);
 

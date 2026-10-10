@@ -2,12 +2,12 @@ use super::genesis::GenesisBlock;
 use crate::network::NetworkId;
 use crate::KType;
 use jio_math::Uint256;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 pub const MAINNET_BPS: u64 = 1;
 pub const TESTNET_BPS: u64 = 10;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Params {
     pub dns_seeders: &'static [&'static str],
     pub net: NetworkId,
