@@ -1,23 +1,46 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Debug)]
 pub enum BlockStatus {
-    StatusInvalid = 0,
-    StatusHeaderOnly = 1,
-    StatusUTXOValid = 2,
-    StatusDisqualifiedFromChain = 3,
+    /// StatusInvalid indicates that the block is invalid.
+    StatusInvalid,
+
+    /// StatusUTXOValid indicates the block is valid from any UTXO related aspects and has passed all the other validations as well.
+    StatusUTXOValid,
+
+    /// StatusUTXOPendingVerification indicates that the block is pending verification against its past UTXO-Set, either
+    /// because it was not yet verified since the block was never in the selected parent chain, or if the
+    /// block violates finality.
+    StatusUTXOPendingVerification,
+
+    /// StatusDisqualifiedFromChain indicates that the block is not eligible to be a selected parent.
+    StatusDisqualifiedFromChain,
+
+    /// StatusHeaderOnly indicates that the block transactions are not held (pruned or wasn't added yet)
+    StatusHeaderOnly,
 }
 
 impl BlockStatus {
-    pub fn is_header_only(&self) -> bool {
-        matches!(self, BlockStatus::StatusHeaderOnly)
+    pub fn has_block_header(self) -> bool {
+        matches!(
+            self,
+            Self::StatusHeaderOnly | Self::StatusUTXOValid | Self::StatusUTXOPendingVerification | Self::StatusDisqualifiedFromChain
+        )
     }
 
-    pub fn is_valid(&self) -> bool {
-        matches!(self, BlockStatus::StatusUTXOValid)
+    pub fn is_header_only(self) -> bool {
+        self == Self::StatusHeaderOnly
     }
 
-    pub fn has_block_body(&self) -> bool {
-        !self.is_header_only()
+    pub fn has_block_body(self) -> bool {
+        matches!(self, Self::StatusUTXOValid | Self::StatusUTXOPendingVerification | Self::StatusDisqualifiedFromChain)
+    }
+
+    pub fn is_utxo_valid_or_pending(self) -> bool {
+        matches!(self, Self::StatusUTXOValid | Self::StatusUTXOPendingVerification)
+    }
+
+    pub fn is_valid(self) -> bool {
+        self != BlockStatus::StatusInvalid
     }
 }

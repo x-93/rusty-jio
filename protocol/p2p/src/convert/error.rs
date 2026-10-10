@@ -1,3 +1,22 @@
-﻿//! Module implementation.
+use thiserror::Error;
 
-// Types and logic definitions for error.rs
+#[derive(Clone, Debug, Error)]
+pub enum ConversionError {
+    #[error("General p2p conversion error")]
+    General,
+
+    #[error("Optional field is None while expected to be Some")]
+    NoneValue,
+
+    #[error("IP has illegal length {0}")]
+    IllegalIPLength(usize),
+
+    #[error("Bytes size mismatch error {0}")]
+    ArrayBytesSizeError(#[from] std::array::TryFromSliceError),
+
+    #[error("Bytes size mismatch error {0}")]
+    UintBytesSizeError(#[from] jio_math::uint::TryFromSliceError),
+
+    #[error("Integer parsing error: {0}")]
+    IntCastingError(#[from] std::num::TryFromIntError),
+}

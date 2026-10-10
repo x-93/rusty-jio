@@ -1,3 +1,5 @@
-﻿//! Module implementation.
-
-// Types and logic definitions for connection_event.rs
+#[derive(Clone, Copy, Debug)]
+pub enum ConnectionEvent {
+    Connected,
+    Disconnected,
+}

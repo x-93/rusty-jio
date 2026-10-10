@@ -1,3 +1,9 @@
-﻿//! Module implementation.
+use crate::Notification;
+use jio_notify::{collector::CollectorFrom, converter::ConverterFrom};
 
-// Types and logic definitions for collector.rs
+pub type RpcCoreConverter = ConverterFrom<Notification, Notification>;
+
+/// A rpc_core notification collector providing a simple pass-through.
+/// No conversion occurs since both source and target data are of
+/// type [`Notification`].
+pub type RpcCoreCollector = CollectorFrom<RpcCoreConverter>;

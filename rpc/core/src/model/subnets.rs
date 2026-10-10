@@ -1,3 +1,1 @@
-﻿//! Module implementation.
-
-// Types and logic definitions for subnets.rs
+pub type RpcSubnetworkId = jio_consensus_core::subnets::SubnetworkId;

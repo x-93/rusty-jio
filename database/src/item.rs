@@ -15,11 +15,7 @@ pub struct CachedDbItem<T> {
 
 impl<T> CachedDbItem<T> {
     pub fn new(db: Arc<DB>, key: Vec<u8>) -> Self {
-        Self {
-            db,
-            key,
-            cached_item: Arc::new(RwLock::new(None)),
-        }
+        Self { db, key, cached_item: Arc::new(RwLock::new(None)) }
     }
 
     pub fn read(&self) -> Result<T, StoreError>

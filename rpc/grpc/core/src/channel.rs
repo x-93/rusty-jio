@@ -1,3 +1,4 @@
-﻿//! Module implementation.
+use jio_rpc_core::Notification;
+use jio_utils::channel::Channel;
 
-// Types and logic definitions for channel.rs
+pub type NotificationChannel = Channel<Notification>;

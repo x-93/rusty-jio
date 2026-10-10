@@ -1,93 +1,92 @@
-name: Deploy & Release
-
+name: Build and upload assets
 on:
-  push:
-    tags:
-      - "v*.*.*"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  packages: write
+  release:
+    types: [ published ]
 
 jobs:
-  build-binaries:
-    name: Build (${{ matrix.os }})
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: jio-jiopad-linux-x86_64
-            binary_path: target/release/jio-jiopad
-          - os: windows-latest
-            artifact_name: jio-jiopad-windows-x86_64.exe
-            binary_path: target/release/jio-jiopad.exe
-          - os: macos-latest
-            artifact_name: jio-jiopad-macos-x86_64
-            binary_path: target/release/jio-jiopad
-
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    name: Building, ${{ matrix.os }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Fix CRLF on Windows
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
 
-      - name: Install Rust toolchain
+      - name: Checkout sources
+        uses: actions/checkout@v3
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache dependencies and build artifacts
-        uses: Swatinem/rust-cache@v2
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build Release Binary
-        run: cargo build --release -p jio-jiopad
+      - name: Build on Linux
+        if: runner.os == 'Linux'
+        run: |
+          cargo build --bin jiopad --release
+          cargo build --bin simpa --release
+          mkdir bin || true
+          cp target/release/jiopad bin/
+          cp target/release/simpa bin/
+          archive="bin/rusty-jio-${{ github.event.release.tag_name }}-linux.zip"
+          asset_name="rusty-jio-${{ github.event.release.tag_name }}-linux.zip"
+          zip -r "${archive}" ./bin/*
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
 
-      - name: Package binary
+      - name: Build on Windows
+        if: runner.os == 'Windows'
         shell: bash
         run: |
-          mkdir -p dist
-          cp "${{ matrix.binary_path }}" "dist/${{ matrix.artifact_name }}"
+          cargo build --bin jiopad --release
+          cargo build --bin simpa --release
+          mkdir bin || true
+          cp target/release/jiopad.exe bin/
+          cp target/release/simpa.exe bin/
+          archive="bin/rusty-jio-${{ github.event.release.tag_name }}-win64.zip"
+          asset_name="rusty-jio-${{ github.event.release.tag_name }}-win64.zip"
+          powershell "Compress-Archive bin/* \"${archive}\""
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Build on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          cargo build --bin jiopad --release
+          cargo build --bin simpa --release
+          mkdir bin || true
+          cp target/release/jiopad bin/
+          cp target/release/simpa bin/
+          archive="bin/rusty-jio-${{ github.event.release.tag_name }}-osx.zip"
+          asset_name="rusty-jio-${{ github.event.release.tag_name }}-osx.zip"
+          zip -r "${archive}" ./bin/*
+          echo "archive=${archive}" >> $GITHUB_ENV
+          echo "asset_name=${asset_name}" >> $GITHUB_ENV
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ${{ matrix.artifact_name }}
-          path: dist/${{ matrix.artifact_name }}
-
-  release:
-    name: Publish GitHub Release
-    needs: [build-binaries]
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all built artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: release-artifacts
-          merge-multiple: true
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release-artifacts/*
-          generate_release_notes: true
-
-  docker:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./deploy.dockerfile
-          push: false
-          tags: jio/jiopad:latest
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "./${{ env.archive }}"
+          asset_name: "${{ env.asset_name }}"
+          asset_content_type: application/zip

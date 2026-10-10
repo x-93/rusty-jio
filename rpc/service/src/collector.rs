@@ -1,3 +1,6 @@
-﻿//! Module implementation.
+use crate::converter::{consensus::ConsensusConverter, index::IndexConverter};
+use jio_notify::collector::CollectorFrom;
 
-// Types and logic definitions for collector.rs
+pub(crate) type CollectorFromConsensus = CollectorFrom<ConsensusConverter>;
+
+pub(crate) type CollectorFromIndex = CollectorFrom<IndexConverter>;

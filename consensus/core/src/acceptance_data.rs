@@ -1,4 +1,4 @@
-﻿use jio_hashes::Hash;
+use jio_hashes::Hash;
 use serde::{Deserialize, Serialize};
 
 use crate::tx::TransactionId;

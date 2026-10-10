@@ -1,11 +1,7 @@
-extern crate alloc;
-extern crate core;
-extern crate self as consensus_core;
-
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasher, Hasher};
 
-pub use jio_hashes::Hash;
+use jio_hashes::Hash;
 
 pub mod acceptance_data;
 pub mod api;
@@ -15,17 +11,17 @@ pub mod blockstatus;
 pub mod coinbase;
 pub mod config;
 pub mod constants;
-pub mod daa_score_timestamp;
 pub mod errors;
 pub mod hashing;
 pub mod header;
 pub mod mass;
 pub mod merkle;
 pub mod muhash;
-pub mod network;
+pub mod networktype;
 pub mod pruning;
 pub mod sign;
 pub mod subnets;
+pub mod sync_info;
 pub mod trusted;
 pub mod tx;
 pub mod utxo;
@@ -78,7 +74,6 @@ impl HashMapCustomHasher for BlockHashSet {
     }
 }
 
-#[derive(Default, Debug)]
 pub struct ChainPath {
     pub added: Vec<Hash>,
     pub removed: Vec<Hash>,

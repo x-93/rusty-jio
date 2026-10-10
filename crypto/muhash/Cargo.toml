@@ -1,18 +1,25 @@
 [package]
 name = "jio-muhash"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
-jio-hashes = { path = "../hashes" }
-serde = { version = "1.0", features = ["derive"], optional = true }
-borsh = { version = "1.5", features = ["derive"], optional = true }
-thiserror = "1.0"
+jio-math.workspace = true
+jio-hashes.workspace = true
+rand_chacha.workspace = true
+serde.workspace = true
 
-[features]
-default = ["serde", "borsh"]
-serde = ["dep:serde"]
-borsh = ["dep:borsh"]
+# For the exhuative tests, should only be enabled with release
+rayon = { workspace = true, optional = true }
+
+[dev-dependencies]
+criterion.workspace = true
+rand.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false
+

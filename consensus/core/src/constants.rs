@@ -1,4 +1,4 @@
-﻿/// BLOCK_VERSION represents the current block version
+/// BLOCK_VERSION represents the current block version
 pub const BLOCK_VERSION: u16 = 1;
 
 /// TX_VERSION is the current latest supported transaction version.
@@ -11,9 +11,6 @@ pub const MAX_SCRIPT_PUBLIC_KEY_VERSION: u16 = 0;
 
 /// SompiPerJio is the number of sompi in one jio (1 KAS).
 pub const SOMPI_PER_JIO: u64 = 100_000_000;
-
-/// The parameter for scaling inverse KAS value to mass units (KIP-0009)
-pub const STORAGE_MASS_PARAMETER: u64 = SOMPI_PER_JIO * 10_000;
 
 /// MaxSompi is the maximum transaction amount allowed in sompi.
 pub const MAX_SOMPI: u64 = 29_000_000_000 * SOMPI_PER_JIO;

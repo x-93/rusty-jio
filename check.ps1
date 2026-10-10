@@ -1,21 +1,21 @@
-#!/usr/bin/env pwsh
-$ErrorActionPreference = "Stop"
+cargo fmt --all
+cargo clippy
 
-Write-Host "`n[1/4] Checking code formatting (rustfmt)..." -ForegroundColor Cyan
-cargo fmt --all -- --check
+$crates = @(
+  "jio-wrpc-wasm",
+  "jio-wallet-cli-wasm",
+  "jio-wasm"
+)
 
-Write-Host "`n[2/4] Running cargo check on all targets..." -ForegroundColor Cyan
-cargo check --workspace --all-targets
-
-Write-Host "`n[3/4] Running clippy (clean lints)..." -ForegroundColor Cyan
-cargo clippy --workspace --all-targets -- -A clippy::pedantic -A clippy::type_complexity -A clippy::chunks_exact_to_as_chunks -D warnings
-
-Write-Host "`n[4/4] Running cargo audit..." -ForegroundColor Cyan
-if (Get-Command cargo-audit -ErrorAction SilentlyContinue) {
-    cargo audit
-} else {
-    Write-Host "cargo-audit is not installed. To run security audit locally, install it via:" -ForegroundColor Yellow
-    Write-Host "cargo install cargo-audit" -ForegroundColor White
+$env:AR="llvm-ar"
+foreach ($crate in $crates)
+{
+  Write-Output "`ncargo clippy -p $crate --target wasm32-unknown-unknown"
+  cargo clippy -p $crate --target wasm32-unknown-unknown
+  $status=$LASTEXITCODE
+  if($status -ne 0) {
+    Write-Output "`n--> wasm32 check of $crate failed`n"
+    break
+  }
 }
-
-Write-Host "`nAll checks completed successfully!" -ForegroundColor Green
+$env:AR=""

@@ -1,3 +1,5 @@
-﻿//! Module implementation.
+use crate::notification::Notification;
+use jio_notify::{collector::CollectorFrom, converter::ConverterFrom};
 
-// Types and logic definitions for collector.rs
+pub type ConsensusConverter = ConverterFrom<Notification, Notification>;
+pub type ConsensusCollector = CollectorFrom<ConsensusConverter>;

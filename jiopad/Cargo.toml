@@ -1,9 +1,41 @@
 [package]
-name = "jio-jiopad"
+name = "jiopad"
+description = "Jio full node daemon"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
+jio-hashes.workspace = true
+jio-core.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus.workspace = true
+jio-consensus-notify.workspace = true
+jio-database.workspace = true
+jio-index-processor.workspace = true
+jio-utxoindex.workspace = true
+jio-rpc-core.workspace = true
+jio-rpc-service.workspace = true
+jio-grpc-server.workspace = true
+jio-wrpc-server.workspace = true
+jio-p2p-flows.workspace = true
+jio-mining.workspace = true
+jio-addressmanager.workspace = true
+jio-consensusmanager.workspace = true
+
+async-channel.workspace = true
+thiserror.workspace = true
+futures-util.workspace = true
+rand.workspace = true
+rayon.workspace = true
+tempfile.workspace = true
+tokio = { workspace = true, features = ["rt", "macros", "rt-multi-thread"] }
+clap.workspace = true
+log.workspace = true
+workflow-log.workspace = true
+# rand_distr = "0.4"
+# num-format = "0.4"
+dirs = "4.0"
+num_cpus.workspace = true

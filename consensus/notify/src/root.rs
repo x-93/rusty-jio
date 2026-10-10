@@ -1,3 +1,4 @@
-﻿//! Module implementation.
+use crate::notification::Notification;
+use jio_notify::root::Root;
 
-// Types and logic definitions for root.rs
+pub type ConsensusNotificationRoot = Root<Notification>;

@@ -1,9 +1,34 @@
 [package]
-name = "jio-indexes-processor"
+name = "jio-index-processor"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
+jio-hashes.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-core.workspace = true
+jio-utils.workspace = true
+jio-notify.workspace = true
+jio-index-core.workspace = true
+jio-utxoindex.workspace = true
+jio-consensusmanager.workspace = true
+
+thiserror.workspace = true
+async-channel.workspace = true
+async-trait = "0.1.57"
+log.workspace = true
+futures = "0.3.25"
+triggered = "0.1"
+derive_more.workspace = true
+paste = "1.0.11"
+tokio = { version = "1.21.2", features = [ "rt-multi-thread", "macros", "signal" ]}
+
+[dev-dependencies]
+jio-consensus.workspace = true
+parking_lot.workspace = true
+tokio = { workspace = true, features = ["rt", "macros"] }
+rand = {workspace = true,  features = [ "small_rng" ]}

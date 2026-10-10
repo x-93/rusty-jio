@@ -1,3 +1,4 @@
-﻿//! Module implementation.
+use crate::notification::Notification;
+use jio_notify::{connection::ChannelConnection, notifier::Notifier};
 
-// Types and logic definitions for notifier.rs
+pub type ConsensusNotifier = Notifier<Notification, ChannelConnection<Notification>>;

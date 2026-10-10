@@ -1,9 +1,27 @@
 [package]
-name = "jio-rpc-wrpc-server"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-repository.workspace = true
+name = "jio-wrpc-server"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
+async-trait.workspace = true
+borsh = { workspace = true, features = ["rc"] }
+jio-consensus-core.workspace = true
+futures.workspace = true
+jio-core.workspace = true
+jio-notify.workspace = true
+jio-rpc-core.workspace = true
+jio-rpc-service.workspace = true
+jio-rpc-macros.workspace = true
+jio-utils.workspace = true
+paste.workspace = true
+serde = { workspace = true, features = ["rc"] }
+thiserror.workspace = true
+tokio.workspace = true
+workflow-core.workspace = true
+workflow-log.workspace = true
+workflow-rpc.workspace = true
+num_cpus.workspace = true

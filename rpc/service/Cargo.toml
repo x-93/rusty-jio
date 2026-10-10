@@ -1,9 +1,27 @@
 [package]
 name = "jio-rpc-service"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
+jio-rpc-core.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-hashes.workspace = true
+jio-core.workspace = true
+jio-utils.workspace = true
+jio-notify.workspace = true
+jio-index-core.workspace = true
+jio-txscript.workspace = true
+jio-consensusmanager.workspace = true
+jio-mining.workspace = true
+jio-addresses.workspace = true
+jio-p2p-flows.workspace = true
+jio-math.workspace = true
+jio-utxoindex.workspace = true
+log.workspace = true
+
+async-trait = "0.1.57"

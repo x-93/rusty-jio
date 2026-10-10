@@ -1,199 +1,117 @@
-//! Proof-of-Work hash algorithms for the Jio network.
-//!
-//! Includes the memory-dependent JioHashV1 mining algorithm and header hashing helpers.
-
 use crate::Hash;
-use blake3::Hasher as Blake3Hasher;
-
-// -----------------------------------------------------------------------------
-// JioHashV1 reference memory-mixing mining algorithm implementation
-// -----------------------------------------------------------------------------
-
-const DOMAIN: &[u8] = b"JioHashV1";
-pub const JIOHASH_V1_SCRATCHPAD_SIZE: usize = 1024 * 1024;
-pub const JIOHASH_V1_BLOCK_SIZE: usize = 64;
-pub const JIOHASH_V1_BLOCK_COUNT: usize = JIOHASH_V1_SCRATCHPAD_SIZE / JIOHASH_V1_BLOCK_SIZE;
-pub const JIOHASH_V1_ITERATIONS: u32 = 64;
-pub const JIOHASH_V1_OUTPUT_SIZE: usize = 32;
-
-const STAGE_SEED: u8 = 0x01;
-const STAGE_MIX: u8 = 0x02;
-const STAGE_MUTATE: u8 = 0x03;
-const STAGE_FINAL: u8 = 0x04;
-const STAGE_INIT: u8 = 0x10;
 
 #[derive(Clone)]
-pub struct JioHashV1 {
-    pow_hash: Hash,
-    seed: [u8; 32],
-    nonce: u64,
-    scratchpad: Vec<u8>,
-}
+pub struct PowHash([u64; 25]);
 
-impl std::fmt::Debug for JioHashV1 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("JioHashV1")
-            .field("pow_hash", &self.pow_hash)
-            .field("seed", &self.seed)
-            .field("nonce", &self.nonce)
-            .field("scratchpad_len", &self.scratchpad.len())
-            .finish()
-    }
-}
+#[derive(Clone)]
+pub struct KHeavyHash;
 
-impl JioHashV1 {
-    pub fn new(pow_hash: Hash, nonce: u64) -> Self {
-        let seed = derive_seed(pow_hash, nonce);
-        let scratchpad = initialize_scratchpad(&seed);
-        Self {
-            pow_hash,
-            seed,
-            nonce,
-            scratchpad,
+impl PowHash {
+    // The initial state of `cSHAKE256("ProofOfWorkHash")`
+    // [10] -> 1123092876221303310 ^ 0x04(padding byte) = 1123092876221303306
+    // [16] -> 10306167911662716186 ^ 0x8000000000000000(final padding) = 1082795874807940378
+    #[rustfmt::skip]
+    const INITIAL_STATE: [u64; 25] = [
+        1242148031264380989, 3008272977830772284, 2188519011337848018, 1992179434288343456, 8876506674959887717,
+        5399642050693751366, 1745875063082670864, 8605242046444978844, 17936695144567157056, 3343109343542796272,
+        1123092876221303306, 4963925045340115282, 17037383077651887893, 16629644495023626889, 12833675776649114147,
+        3784524041015224902, 1082795874807940378, 13952716920571277634, 13411128033953605860, 15060696040649351053,
+        9928834659948351306, 5237849264682708699, 12825353012139217522, 6706187291358897596, 196324915476054915,
+    ];
+    #[inline]
+    pub fn new(pre_pow_hash: Hash, timestamp: u64) -> Self {
+        let mut start = Self::INITIAL_STATE;
+        for (pre_pow_word, state_word) in pre_pow_hash.iter_le_u64().zip(start.iter_mut()) {
+            *state_word ^= pre_pow_word;
         }
+        start[4] ^= timestamp;
+        Self(start)
     }
 
-    pub fn finalize(mut self) -> Hash {
-        let final_state = self.mix();
-        finalize_hash(self.pow_hash, self.seed, final_state, self.nonce)
+    #[inline(always)]
+    pub fn finalize_with_nonce(mut self, nonce: u64) -> Hash {
+        self.0[9] ^= nonce;
+        keccak256::f1600(&mut self.0);
+        Hash::from_le_u64(self.0[..4].try_into().unwrap())
     }
+}
 
-    fn mix(&mut self) -> [u8; 32] {
-        let mut state = self.seed;
-        for iteration in 0..JIOHASH_V1_ITERATIONS {
-            let index = calculate_scratchpad_index(&state);
-            let offset = index * JIOHASH_V1_BLOCK_SIZE;
-            let mut memory_block = [0u8; JIOHASH_V1_BLOCK_SIZE];
-            memory_block.copy_from_slice(&self.scratchpad[offset..offset + JIOHASH_V1_BLOCK_SIZE]);
-            state = mix_state(state, memory_block, iteration);
-            mutate_scratchpad(&mut self.scratchpad, index, &state);
+impl KHeavyHash {
+    // The initial state of `cSHAKE256("HeavyHash")`
+    // [4] -> 16654558671554924254 ^ 0x04(padding byte) = 16654558671554924250
+    // [16] -> 9793466274154320918 ^ 0x8000000000000000(final padding) = 570094237299545110
+    #[rustfmt::skip]
+    const INITIAL_STATE: [u64; 25] = [
+        4239941492252378377, 8746723911537738262, 8796936657246353646, 1272090201925444760, 16654558671554924250,
+        8270816933120786537, 13907396207649043898, 6782861118970774626, 9239690602118867528, 11582319943599406348,
+        17596056728278508070, 15212962468105129023, 7812475424661425213, 3370482334374859748, 5690099369266491460,
+        8596393687355028144, 570094237299545110, 9119540418498120711, 16901969272480492857, 13372017233735502424,
+        14372891883993151831, 5171152063242093102, 10573107899694386186, 6096431547456407061, 1592359455985097269,
+    ];
+    #[inline]
+    pub fn hash(in_hash: Hash) -> Hash {
+        let mut state = Self::INITIAL_STATE;
+        for (pre_pow_word, state_word) in in_hash.iter_le_u64().zip(state.iter_mut()) {
+            *state_word ^= pre_pow_word;
         }
-        state
-    }
-
-    pub fn seed(&self) -> [u8; 32] {
-        self.seed
-    }
-
-    pub fn pow_hash(&self) -> Hash {
-        self.pow_hash
-    }
-
-    pub fn nonce(&self) -> u64 {
-        self.nonce
+        keccak256::f1600(&mut state);
+        Hash::from_le_u64(state[..4].try_into().unwrap())
     }
 }
 
-pub fn hash_header(header: &[u8]) -> Hash {
-    let mut hasher = Blake3Hasher::new();
-    hasher.update(DOMAIN);
-    hasher.update(header);
-    Hash::from_bytes(*hasher.finalize().as_bytes())
-}
-
-pub fn hash(pow_hash: Hash, nonce: u64) -> Hash {
-    JioHashV1::new(pow_hash, nonce).finalize()
-}
-
-fn derive_seed(pow_hash: Hash, nonce: u64) -> [u8; 32] {
-    let mut hasher = Blake3Hasher::new();
-    hasher.update(DOMAIN);
-    hasher.update(&[STAGE_SEED]);
-    hasher.update(pow_hash.as_ref());
-    hasher.update(&nonce.to_le_bytes());
-    *hasher.finalize().as_bytes()
-}
-
-fn initialize_scratchpad(seed: &[u8; 32]) -> Vec<u8> {
-    let mut scratchpad = vec![0u8; JIOHASH_V1_SCRATCHPAD_SIZE];
-    for index in 0..JIOHASH_V1_BLOCK_COUNT {
-        let block = initialize_scratchpad_block(seed, index as u32);
-        let offset = index * JIOHASH_V1_BLOCK_SIZE;
-        scratchpad[offset..offset + JIOHASH_V1_BLOCK_SIZE].copy_from_slice(&block);
+mod keccak256 {
+    #[cfg(any(not(target_arch = "x86_64"), feature = "no-asm", target_os = "windows"))]
+    #[inline(always)]
+    pub(super) fn f1600(state: &mut [u64; 25]) {
+        keccak::f1600(state);
     }
-    scratchpad
-}
 
-fn initialize_scratchpad_block(seed: &[u8; 32], index: u32) -> [u8; JIOHASH_V1_BLOCK_SIZE] {
-    let mut hasher = Blake3Hasher::new();
-    hasher.update(DOMAIN);
-    hasher.update(&[STAGE_INIT]);
-    hasher.update(seed);
-    hasher.update(&index.to_le_bytes());
-    let mut output = [0u8; JIOHASH_V1_BLOCK_SIZE];
-    let mut reader = hasher.finalize_xof();
-    reader.fill(&mut output);
-    output
-}
-
-#[inline(always)]
-fn calculate_scratchpad_index(state: &[u8; 32]) -> usize {
-    let value = u32::from_le_bytes([state[0], state[1], state[2], state[3]]);
-    (value as usize) % JIOHASH_V1_BLOCK_COUNT
-}
-
-fn mix_state(state: [u8; 32], memory_block: [u8; JIOHASH_V1_BLOCK_SIZE], iteration: u32) -> [u8; 32] {
-    let mut hasher = Blake3Hasher::new();
-    hasher.update(DOMAIN);
-    hasher.update(&[STAGE_MIX]);
-    hasher.update(&state);
-    hasher.update(&memory_block);
-    hasher.update(&iteration.to_le_bytes());
-    *hasher.finalize().as_bytes()
-}
-
-fn mutate_scratchpad(scratchpad: &mut [u8], index: usize, state: &[u8; 32]) {
-    let mut hasher = Blake3Hasher::new();
-    hasher.update(DOMAIN);
-    hasher.update(&[STAGE_MUTATE]);
-    hasher.update(state);
-    let mut mutation = [0u8; JIOHASH_V1_BLOCK_SIZE];
-    let mut reader = hasher.finalize_xof();
-    reader.fill(&mut mutation);
-    let offset = index * JIOHASH_V1_BLOCK_SIZE;
-    let block = &mut scratchpad[offset..offset + JIOHASH_V1_BLOCK_SIZE];
-    for (byte, mask) in block.iter_mut().zip(mutation) {
-        *byte ^= mask;
+    #[cfg(all(target_arch = "x86_64", not(feature = "no-asm"), not(target_os = "windows")))]
+    #[inline(always)]
+    pub(super) fn f1600(state: &mut [u64; 25]) {
+        extern "C" {
+            fn KeccakF1600(state: &mut [u64; 25]);
+        }
+        unsafe { KeccakF1600(state) }
     }
-}
-
-fn finalize_hash(pow_hash: Hash, seed: [u8; 32], final_state: [u8; 32], nonce: u64) -> Hash {
-    let mut hasher = Blake3Hasher::new();
-    hasher.update(DOMAIN);
-    hasher.update(&[STAGE_FINAL]);
-    hasher.update(pow_hash.as_ref());
-    hasher.update(&seed);
-    hasher.update(&final_state);
-    hasher.update(&nonce.to_le_bytes());
-    Hash::from_bytes(*hasher.finalize().as_bytes())
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{KHeavyHash, PowHash};
+    use crate::Hash;
+    use sha3::digest::{ExtendableOutput, Update, XofReader};
+    use sha3::{CShake256, CShake256Core};
+
+    const PROOF_OF_WORK_DOMAIN: &[u8] = b"ProofOfWorkHash";
+    const HEAVY_HASH_DOMAIN: &[u8] = b"HeavyHash";
 
     #[test]
-    fn test_jiohash_v1_determinism() {
-        let pow_hash = Hash::from_u64_word(123456);
-        let nonce = 42;
-        let h1 = hash(pow_hash, nonce);
-        let h2 = hash(pow_hash, nonce);
-        assert_eq!(h1, h2);
-        assert_ne!(h1, Hash::default());
+    fn test_pow_hash() {
+        let timestamp: u64 = 5435345234;
+        let nonce: u64 = 432432432;
+        let pre_pow_hash = Hash([42; 32]);
+        let hasher = PowHash::new(pre_pow_hash, timestamp);
+        let hash1 = hasher.finalize_with_nonce(nonce);
+
+        let hasher = CShake256::from_core(CShake256Core::new(PROOF_OF_WORK_DOMAIN))
+            .chain(pre_pow_hash.0)
+            .chain(timestamp.to_le_bytes())
+            .chain([0u8; 32])
+            .chain(nonce.to_le_bytes());
+        let mut hash2 = [0u8; 32];
+        hasher.finalize_xof().read(&mut hash2);
+        assert_eq!(Hash(hash2), hash1);
     }
 
     #[test]
-    fn test_jiohash_v1_different_nonces() {
-        let pow_hash = Hash::from_u64_word(123456);
-        let h1 = hash(pow_hash, 1);
-        let h2 = hash(pow_hash, 2);
-        assert_ne!(h1, h2);
-    }
+    fn test_heavy_hash() {
+        let val = Hash([42; 32]);
+        let hash1 = KHeavyHash::hash(val);
 
-    #[test]
-    fn test_hash_header() {
-        let header = b"test header bytes for jio pow";
-        let h = hash_header(header);
-        assert_ne!(h, Hash::default());
+        let hasher = CShake256::from_core(CShake256Core::new(HEAVY_HASH_DOMAIN)).chain(val.0);
+        let mut hash2 = [0u8; 32];
+        hasher.finalize_xof().read(&mut hash2);
+        assert_eq!(Hash(hash2), hash1);
     }
 }

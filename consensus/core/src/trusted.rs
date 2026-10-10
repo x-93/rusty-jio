@@ -1,4 +1,4 @@
-﻿use crate::{block::Block, header::Header, BlockHashMap, BlueWorkType, KType};
+use crate::{block::Block, header::Header, BlockHashMap, BlueWorkType, KType};
 use jio_hashes::Hash;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;

@@ -1,7 +1,7 @@
-﻿{
-  "name": "jio-wasm",
-  "version": "0.1.0",
-  "description": "jio WebAssembly bindings",
-  "main": "index.js",
-  "license": "ISC"
+{
+    "name" : "jio-rpc-client-example",
+    "version" : "1.0.0",
+    "dependencies": {
+        "websocket" : "1.0.34"
+    }
 }

@@ -1,1 +1,2 @@
-﻿# jio file
+[toolchain]
+channel = "nightly"

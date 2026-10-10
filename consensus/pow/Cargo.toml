@@ -1,16 +1,20 @@
 [package]
-name = "jio-consensus-pow"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-repository.workspace = true
+name = "jio-pow"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-jio-hashes = { path = "../../crypto/hashes" }
-jio-consensus-core = { path = "../core" }
-jio-math = { path = "../../math" }
-blake3 = "1.8"
-thiserror = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-smallvec = "1.13"
+jio-hashes.workspace = true
+jio-math.workspace = true
+jio-consensus-core.workspace = true
+
+
+[dev-dependencies]
+criterion.workspace = true
+
+
+[[bench]]
+name = "bench"
+harness = false

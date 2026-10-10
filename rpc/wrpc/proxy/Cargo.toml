@@ -1,9 +1,19 @@
 [package]
-name = "jio-rpc-wrpc-proxy"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-repository.workspace = true
+name = "jio-wrpc-proxy"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
+jio-consensus-core.workspace = true
+jio-rpc-core.workspace = true
+jio-grpc-client.workspace = true
+jio-wrpc-server.workspace = true
+tokio.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+workflow-core.workspace = true
+workflow-rpc.workspace = true
+workflow-log.workspace = true
+async-trait.workspace = true
+jio-rpc-macros.workspace = true
+num_cpus.workspace = true

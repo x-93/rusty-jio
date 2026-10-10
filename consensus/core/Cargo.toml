@@ -1,26 +1,25 @@
 [package]
 name = "jio-consensus-core"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
-jio-hashes = { path = "../../crypto/hashes" }
-jio-math = { path = "../../math" }
-jio-merkle = { path = "../../crypto/merkle" }
-jio-muhash = { path = "../../crypto/muhash" }
-jio-utils = { path = "../../utils" }
-jio-addresses = { path = "../../crypto/addresses" }
-serde = { version = "1.0", features = ["derive"] }
-borsh = { version = "1.5", features = ["derive"] }
-thiserror = "1.0"
-smallvec = { version = "1.13", features = ["serde"] }
-secp256k1 = { version = "0.29", features = ["alloc", "global-context", "rand-std", "serde"] }
-itertools = "0.13"
-parking_lot = "0.12"
-arc-swap = "1.7"
-
-[dev-dependencies]
-serde_json = "1.0"
+jio-hashes.workspace = true
+jio-muhash.workspace = true
+jio-merkle.workspace = true
+jio-math.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+faster-hex.workspace = true
+smallvec.workspace = true
+borsh.workspace = true
+secp256k1 = { version = "0.24", features = ["global-context", "rand-std"] }
+futures-util.workspace = true
+itertools.workspace = true
+cfg-if.workspace = true
+jio-addresses.workspace = true
+getrandom.workspace = true
+jio-txscript-errors.workspace = true

@@ -1,7 +1,0 @@
-﻿{
-  "name": "jio-wasm",
-  "version": "0.1.0",
-  "description": "jio WebAssembly bindings",
-  "main": "index.js",
-  "license": "ISC"
-}

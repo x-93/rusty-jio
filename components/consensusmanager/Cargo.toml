@@ -1,9 +1,19 @@
 [package]
-name = "jio-components-consensusmanager"
+name = "jio-consensusmanager"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
+jio-core.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+tokio.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+itertools.workspace = true
+rand.workspace = true
+futures-util.workspace = true
+duration-string = "0.2.0"

@@ -1,4 +1,1 @@
-# Clippy configuration for jio
-cognitive-complexity-threshold = 25
-too-many-arguments-threshold = 8
-doc-valid-idents = ["JioPad", "RustyJio", "GHOSTDAG", "UTXO"]
+too-many-arguments-threshold = 10

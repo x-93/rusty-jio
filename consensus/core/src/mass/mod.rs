@@ -1,64 +1,57 @@
-use crate::constants::STORAGE_MASS_PARAMETER;
-use crate::tx::Transaction;
+use crate::{
+    subnets::SUBNETWORK_ID_SIZE,
+    tx::{Transaction, TransactionInput, TransactionOutput},
+};
+use jio_hashes::HASH_SIZE;
 
-pub const DEFAULT_MASS_PER_TX_BYTE: u64 = 1;
-pub const DEFAULT_MASS_PER_SCRIPT_PUB_KEY_BYTE: u64 = 10;
-pub const DEFAULT_MASS_PER_SIG_OP: u64 = 1000;
+// transaction_estimated_serialized_size is the estimated size of a transaction in some
+// serialization. This has to be deterministic, but not necessarily accurate, since
+// it's only used as the size component in the transaction and block mass limit
+// calculation.
+pub fn transaction_estimated_serialized_size(tx: &Transaction) -> u64 {
+    let mut size: u64 = 0;
+    size += 2; // Tx version (u16)
+    size += 8; // Number of inputs (u64)
+    let inputs_size: u64 = tx.inputs.iter().map(transaction_input_estimated_serialized_size).sum();
+    size += inputs_size;
 
-#[derive(Clone, Copy, Debug)]
-pub struct MassCalculator {
-    pub mass_per_tx_byte: u64,
-    pub mass_per_script_pub_key_byte: u64,
-    pub mass_per_sig_op: u64,
-    pub storage_mass_parameter: u64,
+    size += 8; // number of outputs (u64)
+    let outputs_size: u64 = tx.outputs.iter().map(transaction_output_estimated_serialized_size).sum();
+    size += outputs_size;
+
+    size += 8; // lock time (u64)
+    size += SUBNETWORK_ID_SIZE as u64;
+    size += 8; // gas (u64)
+    size += HASH_SIZE as u64; // payload hash
+
+    size += 8; // length of the payload (u64)
+    size += tx.payload.len() as u64;
+    size
 }
 
-impl Default for MassCalculator {
-    fn default() -> Self {
-        Self::new(
-            DEFAULT_MASS_PER_TX_BYTE,
-            DEFAULT_MASS_PER_SCRIPT_PUB_KEY_BYTE,
-            DEFAULT_MASS_PER_SIG_OP,
-            STORAGE_MASS_PARAMETER,
-        )
-    }
+fn transaction_input_estimated_serialized_size(input: &TransactionInput) -> u64 {
+    let mut size = 0;
+    size += outpoint_estimated_serialized_size();
+
+    size += 8; // length of signature script (u64)
+    size += input.signature_script.len() as u64;
+
+    size += 8; // sequence (uint64)
+    size
 }
 
-impl MassCalculator {
-    pub fn new(
-        mass_per_tx_byte: u64,
-        mass_per_script_pub_key_byte: u64,
-        mass_per_sig_op: u64,
-        storage_mass_parameter: u64,
-    ) -> Self {
-        Self {
-            mass_per_tx_byte,
-            mass_per_script_pub_key_byte,
-            mass_per_sig_op,
-            storage_mass_parameter,
-        }
-    }
+const fn outpoint_estimated_serialized_size() -> u64 {
+    let mut size: u64 = 0;
+    size += HASH_SIZE as u64; // Previous tx ID
+    size += 4; // Index (u32)
+    size
+}
 
-    pub fn calc_compute_mass(&self, tx: &Transaction) -> u64 {
-        let mut mass = (tx.inputs.len() as u64) * 1000 + (tx.outputs.len() as u64) * 1000 + (tx.payload.len() as u64);
-        for input in &tx.inputs {
-            mass += (input.sig_op_count as u64) * self.mass_per_sig_op;
-        }
-        mass
-    }
-
-    pub fn calc_storage_mass(&self, output_value: u64) -> u64 {
-        self.storage_mass_parameter
-            .checked_div(output_value)
-            .unwrap_or(self.storage_mass_parameter)
-    }
-
-    pub fn calc_overall_mass(&self, tx: &Transaction) -> u64 {
-        let compute_mass = self.calc_compute_mass(tx);
-        let mut storage_mass = 0;
-        for output in &tx.outputs {
-            storage_mass += self.calc_storage_mass(output.value);
-        }
-        compute_mass.max(storage_mass)
-    }
+pub fn transaction_output_estimated_serialized_size(output: &TransactionOutput) -> u64 {
+    let mut size: u64 = 0;
+    size += 8; // value (u64)
+    size += 2; // output.ScriptPublicKey.Version (u16)
+    size += 8; // length of script public key (u64)
+    size += output.script_public_key.script().len() as u64;
+    size
 }

@@ -1,9 +1,16 @@
 [package]
-name = "jio-components-addressmanager"
+name = "jio-addressmanager"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
+rocksdb.workspace = true
+jio-core.workspace = true
+jio-database.workspace = true
+serde.workspace = true
+itertools.workspace = true
+rand.workspace = true
+parking_lot.workspace = true

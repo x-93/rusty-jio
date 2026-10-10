@@ -1,13 +1,9 @@
 use thiserror::Error;
 
-#[derive(Error, Debug, PartialEq, Eq, Clone)]
+#[derive(Error, Debug, Clone)]
 pub enum TraversalError {
-    #[error("past traversal reached limit: {0}")]
-    LimitExceeded(usize),
-
-    #[error("block not found during traversal: {0}")]
-    BlockNotFound(String),
-
-    #[error("traversal error: {0}")]
-    Other(String),
+    #[error("passed max allowed traversal ({0} > {0})")]
+    ReachedMaxTraversalAllowed(u64, u64),
 }
+
+pub type TraversalResult<T> = std::result::Result<T, TraversalError>;

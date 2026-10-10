@@ -1,3 +1,3 @@
-﻿//! Module implementation.
+use crate::notification::Notification;
 
-// Types and logic definitions for connection.rs
+pub type ConsensusChannelConnection = jio_notify::connection::ChannelConnection<Notification>;

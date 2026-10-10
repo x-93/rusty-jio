@@ -1,3 +1,15 @@
-﻿//! Module implementation.
+use crate::{block_template::errors::BuilderError, mempool::errors::RuleError};
+use thiserror::Error;
 
-// Types and logic definitions for errors.rs
+#[derive(Error, Debug, Clone)]
+pub enum MiningManagerError {
+    /// A consensus rule error
+    #[error(transparent)]
+    BlockTemplateBuilderError(#[from] BuilderError),
+
+    /// A mempool rule error
+    #[error(transparent)]
+    MempoolError(#[from] RuleError),
+}
+
+pub type MiningManagerResult<T> = std::result::Result<T, MiningManagerError>;

@@ -1,3 +1,3 @@
-﻿//! Module implementation.
+use jio_txscript::script_class::ScriptClass;
 
-// Types and logic definitions for script_class.rs
+pub type RpcScriptClass = ScriptClass;

@@ -1,9 +1,49 @@
 [package]
-name = "jio-protocol-p2p"
+name = "jio-p2p-lib"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
+
+[lib]
+path = "./src/lib.rs"
+
+[[bin]]
+name = "jio_p2p_client"
+path = "./src/bin/client.rs"
+
+[[bin]]
+name = "jio_p2p_server"
+path = "./src/bin/server.rs"
 
 [dependencies]
+jio-core.workspace = true
+jio-consensus-core.workspace = true
+jio-mining.workspace = true
+jio-hashes.workspace = true
+jio-math.workspace = true
+
+log.workspace = true
+thiserror.workspace = true
+parking_lot.workspace = true
+itertools.workspace = true
+uuid.workspace = true
+
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+prost = "0.11"
+ctrlc = "3.2"
+tokio = { version = "1.21.2", features = [
+    "rt-multi-thread",
+    "macros",
+    "signal",
+] }
+tokio-stream = { version = "0.1.11", features = ["net"] }
+tonic = { version = "0.9.1", features = ["tls", "gzip"] }
+h2 = "0.3"
+
+[build-dependencies]
+tonic-build = { version = "0.9.1", features = ["prost"] }
+
+[dev-dependencies]
+hex = "0.4.3"

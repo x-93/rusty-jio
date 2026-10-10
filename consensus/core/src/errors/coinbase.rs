@@ -1,13 +1,18 @@
 use thiserror::Error;
 
-#[derive(Error, Debug, PartialEq, Eq, Clone)]
+#[derive(Error, Debug, Clone)]
 pub enum CoinbaseError {
-    #[error("coinbase output value {0} exceeds allowed subsidy + fees {1}")]
-    CoinbaseTooLarge(u64, u64),
+    #[error("coinbase payload length is {0} while the minimum allowed length is {1}")]
+    PayloadLenBelowMin(usize, usize),
 
-    #[error("script public key exceeds max version")]
-    InvalidScriptPublicKeyVersion,
+    #[error("coinbase payload length is {0} while the maximum allowed length is {1}")]
+    PayloadLenAboveMax(usize, usize),
 
-    #[error("coinbase error: {0}")]
-    Other(String),
+    #[error("coinbase payload script public key length is {0} while the maximum allowed length is {1}")]
+    PayloadScriptPublicKeyLenAboveMax(usize, u8),
+
+    #[error("coinbase payload length is {0} bytes but it needs to be at least {1} bytes long in order to accommodate the script public key")]
+    PayloadCantContainScriptPublicKey(usize, usize),
 }
+
+pub type CoinbaseResult<T> = std::result::Result<T, CoinbaseError>;

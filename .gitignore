@@ -1,33 +1,10 @@
-# Rust / Cargo
-/target/
-**/*.rs.bk
-Cargo.lock.bak
-
-# Node / JS / WASM
-node_modules/
-dist/
-pkg/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# IDEs and Editors
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.project
-.settings/
-.classpath
-
-# OS generated files
+target
+web-root
+/.idea/*
+/rust-toolchain
+/.vscode/
+**/db-*
+/testing/integration/testdata/dags_for_json_tests/goref-mainnet
+/testing/integration/testdata/dags_for_json_tests/goref-1.6M-tx-10K-blocks
+analyzer-target
 .DS_Store
-Thumbs.db
-Desktop.ini
-
-# Environment files
-.env
-.env.*
-!.env.example

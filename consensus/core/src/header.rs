@@ -1,22 +1,18 @@
 use crate::{hashing, BlueWorkType};
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
 use jio_hashes::Hash;
-use jio_utils::mem_size::MemSizeEstimator;
 use serde::{Deserialize, Serialize};
 
-/// @category Consensus
-#[derive(Clone, Default, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize, BorshSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Header {
-    /// Cached hash
-    pub hash: Hash,
+    pub hash: Hash, // Cached hash
     pub version: u16,
     pub parents_by_level: Vec<Vec<Hash>>,
     pub hash_merkle_root: Hash,
     pub accepted_id_merkle_root: Hash,
     pub utxo_commitment: Hash,
-    /// Timestamp is in milliseconds
-    pub timestamp: u64,
+    pub timestamp: u64, // Timestamp is in milliseconds
     pub bits: u32,
     pub nonce: u64,
     pub daa_score: u64,
@@ -27,7 +23,7 @@ pub struct Header {
 
 impl Header {
     #[allow(clippy::too_many_arguments)]
-    pub fn new_finalized(
+    pub fn new(
         version: u16,
         parents_by_level: Vec<Vec<Hash>>,
         hash_merkle_root: Hash,
@@ -86,52 +82,9 @@ impl Header {
             timestamp: 0,
             daa_score: 0,
             bits: 0,
-            blue_work: BlueWorkType::ZERO,
+            blue_work: 0.into(),
             blue_score: 0,
             pruning_point: Default::default(),
         }
-    }
-}
-
-impl AsRef<Header> for Header {
-    fn as_ref(&self) -> &Header {
-        self
-    }
-}
-
-impl MemSizeEstimator for Header {
-    fn estimate_mem_bytes(&self) -> usize {
-        size_of::<Self>() + self.parents_by_level.iter().map(|l| l.len()).sum::<usize>() * size_of::<Hash>()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use jio_math::Uint192;
-
-    #[test]
-    fn test_header_ser() {
-        let header = Header::new_finalized(
-            1,
-            vec![vec![1.into()]],
-            Default::default(),
-            Default::default(),
-            Default::default(),
-            234,
-            23,
-            567,
-            0,
-            Uint192([0x1234567890abcfed, 0xc0dec0ffeec0ffee, 0x1234567890abcdef]),
-            u64::MAX,
-            Default::default(),
-        );
-        let json = serde_json::to_string(&header).unwrap();
-        let h = serde_json::from_str::<Header>(&json).unwrap();
-        assert_eq!(h.blue_score, header.blue_score);
-        assert_eq!(h.blue_work, header.blue_work);
-        assert_eq!(h.hash, header.hash);
-        assert_eq!(h.nonce, header.nonce);
-        assert_eq!(h.daa_score, header.daa_score);
     }
 }

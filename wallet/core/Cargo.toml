@@ -1,9 +1,29 @@
 [package]
 name = "jio-wallet-core"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-repository.workspace = true
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
+workflow-log.workspace = true
+workflow-rpc.workspace = true
+workflow-core.workspace = true
+thiserror.workspace = true
+jio-notify.workspace = true
+jio-wrpc-client.workspace = true
+jio-rpc-core.workspace = true
+jio-bip32.workspace = true
+jio-addresses.workspace = true
+hmac.workspace = true
+ripemd.workspace = true
+sha2.workspace = true
+zeroize.workspace = true
+async-trait.workspace = true
+secp256k1.workspace = true
+faster-hex.workspace = true
+wasm-bindgen.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+tokio.workspace = true

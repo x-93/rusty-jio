@@ -18,12 +18,7 @@ impl DbKey {
         TKey: Clone + AsRef<[u8]>,
     {
         Self {
-            path: prefix
-                .iter()
-                .chain(std::iter::once(&SEP))
-                .chain(key.as_ref().iter())
-                .copied()
-                .collect(),
+            path: prefix.iter().chain(std::iter::once(&SEP)).chain(key.as_ref().iter()).copied().collect(),
             prefix_len: prefix.len() + SEP_SIZE, // Include `SEP` as part of the prefix
         }
     }

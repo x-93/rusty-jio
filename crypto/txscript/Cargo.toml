@@ -1,23 +1,35 @@
 [package]
 name = "jio-txscript"
+description = "Jio txscript engine lib"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
-jio-hashes = { path = "../hashes" }
-jio-addresses = { path = "../addresses" }
-secp256k1 = { version = "0.29", features = ["alloc", "global-context", "rand-std"] }
-thiserror = "1.0"
-serde = { version = "1.0", features = ["derive"], optional = true }
-borsh = { version = "1.5", features = ["derive"], optional = true }
+jio-consensus-core.workspace = true
+jio-addresses.workspace = true
+log.workspace = true
+jio-hashes.workspace = true
+blake2b_simd.workspace = true
+sha2.workspace = true
+itertools.workspace = true
+rand.workspace = true
+indexmap.workspace = true
+secp256k1 = { version = "0.24", features = ["global-context", "rand-std"] }
+parking_lot.workspace = true
+jio-txscript-errors.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
+borsh.workspace = true
+serde.workspace = true
 
 [dev-dependencies]
-rand = "0.8"
+criterion.workspace = true
+smallvec.workspace = true
+hex = "0.4"
 
-[features]
-default = ["serde", "borsh"]
-serde = ["dep:serde"]
-borsh = ["dep:borsh"]
+[[bench]]
+name = "bench"
+harness = false

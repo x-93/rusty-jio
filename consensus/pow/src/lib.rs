@@ -1,130 +1,63 @@
+// public for benchmarks
+#[doc(hidden)]
 pub mod matrix;
-pub mod wasm;
+#[doc(hidden)]
 pub mod xoshiro;
 
-use jio_consensus_core::config::constants::consensus::MAX_DIFFICULTY_TARGET;
-use jio_consensus_core::hashing;
-use jio_consensus_core::header::Header;
-use jio_consensus_core::BlueWorkType;
-use jio_hashes::Hash;
-use jio_math::{Uint192, Uint256};
-pub use matrix::{calculate_pow, Matrix, MATRIX_SIZE};
-use thiserror::Error;
+use std::cmp::max;
 
-#[derive(Error, Debug, PartialEq, Eq)]
-pub enum Error {
-    #[error("proof of work target exceeds maximum")]
-    TargetTooHigh,
-}
+use crate::matrix::Matrix;
+use jio_consensus_core::{hashing, header::Header, BlockLevel};
+use jio_hashes::PowHash;
+use jio_math::Uint256;
 
-pub fn calc_target(bits: u32) -> Uint256 {
-    Uint256::from_compact_target_bits(bits)
-}
-
-pub fn calc_work(target: Uint256) -> BlueWorkType {
-    if target == Uint256::ZERO {
-        return BlueWorkType::MAX;
-    }
-    let work = Uint256::MAX / (target + Uint256::from_u64(1));
-    Uint192::try_from(work).unwrap_or(Uint192::MAX)
-}
-
-/// Matrix-based PoW hasher for the mining algorithm.
-#[derive(Clone, Debug)]
-pub struct PowHash {
-    pub matrix: Matrix,
-    pub pre_pow_hash: Hash,
-}
-
-impl PowHash {
-    pub fn new(pre_pow_hash: Hash) -> Self {
-        let matrix = Matrix::generate(pre_pow_hash);
-        Self { matrix, pre_pow_hash }
-    }
-
-    #[inline(always)]
-    pub fn calculate_pow(&self, nonce: u64) -> Hash {
-        calculate_pow(&self.matrix, self.pre_pow_hash, nonce)
-    }
-}
-
-/// Blake3-optimized matrix PoW hasher.
-#[derive(Clone, Debug)]
-pub struct PowB3Hash {
-    inner: PowHash,
-}
-
-impl PowB3Hash {
-    pub fn new(pre_pow_hash: Hash) -> Self {
-        Self {
-            inner: PowHash::new(pre_pow_hash),
-        }
-    }
-
-    #[inline(always)]
-    pub fn calculate_pow(&self, nonce: u64) -> Hash {
-        self.inner.calculate_pow(nonce)
-    }
-}
-
+/// State is an intermediate data structure with pre-computed values to speed up mining.
 pub struct State {
-    pub matrix: Matrix,
-    pub target: Uint256,
-    pub pre_pow_hash: Hash,
+    matrix: Matrix,
+    target: Uint256,
+    // PRE_POW_HASH || TIME || 32 zero byte padding; without NONCE
+    hasher: PowHash,
 }
 
 impl State {
-    pub fn new(header: &Header) -> Result<Self, Error> {
-        let target = calc_target(header.bits);
-        if target > MAX_DIFFICULTY_TARGET {
-            return Err(Error::TargetTooHigh);
-        }
-        let pre_pow_hash = hashing::header::pre_pow_hash(header);
+    #[inline]
+    pub fn new(header: &Header) -> Self {
+        let target = Uint256::from_compact_target_bits(header.bits);
+        // Zero out the time and nonce.
+        let pre_pow_hash = hashing::header::hash_override_nonce_time(header, 0, 0);
+        // PRE_POW_HASH || TIME || 32 zero byte padding || NONCE
+        let hasher = PowHash::new(pre_pow_hash, header.timestamp);
         let matrix = Matrix::generate(pre_pow_hash);
-        Ok(Self {
-            matrix,
-            target,
-            pre_pow_hash,
-        })
+
+        Self { matrix, target, hasher }
     }
 
-    #[inline(always)]
-    pub fn calculate_pow(&self, nonce: u64) -> Hash {
-        calculate_pow(&self.matrix, self.pre_pow_hash, nonce)
+    #[inline]
+    #[must_use]
+    /// PRE_POW_HASH || TIME || 32 zero byte padding || NONCE
+    pub fn calculate_pow(&self, nonce: u64) -> Uint256 {
+        // Hasher already contains PRE_POW_HASH || TIME || 32 zero byte padding; so only the NONCE is missing
+        let hash = self.hasher.clone().finalize_with_nonce(nonce);
+        let hash = self.matrix.heavy_hash(hash);
+        Uint256::from_le_bytes(hash.as_bytes())
     }
 
-    pub fn check_pow(&self, nonce: u64) -> (bool, BlueWorkType) {
-        let pow_hash = self.calculate_pow(nonce);
-        let pow_val = Uint256::from_be_bytes(pow_hash.as_bytes());
-        let is_valid = pow_val <= self.target;
-        let work = calc_work(self.target);
-        (is_valid, work)
+    #[inline]
+    #[must_use]
+    pub fn check_pow(&self, nonce: u64) -> (bool, Uint256) {
+        let pow = self.calculate_pow(nonce);
+        // The pow hash must be less or equal than the claimed target.
+        (pow <= self.target, pow)
     }
 }
 
-pub fn check_pow(header: &Header) -> Result<(bool, BlueWorkType), Error> {
-    let state = State::new(header)?;
-    Ok(state.check_pow(header.nonce))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_calc_target_and_work() {
-        let target = calc_target(0x1d00ffff);
-        assert_ne!(target, Uint256::ZERO);
-        let work = calc_work(target);
-        assert_ne!(work, BlueWorkType::ZERO);
+pub fn calc_block_level(header: &Header, max_block_level: BlockLevel) -> BlockLevel {
+    if header.parents_by_level.is_empty() {
+        return max_block_level; // Genesis has the max block level
     }
 
-    #[test]
-    fn test_pow_hash() {
-        let pre_pow = Hash::from_u64_word(9999);
-        let pow_hasher = PowHash::new(pre_pow);
-        let h1 = pow_hasher.calculate_pow(1);
-        let h2 = pow_hasher.calculate_pow(2);
-        assert_ne!(h1, h2);
-    }
+    let state = State::new(header);
+    let (_, pow) = state.check_pow(header.nonce);
+    let signed_block_level = max_block_level as i64 - pow.bits() as i64;
+    max(signed_block_level, 0) as BlockLevel
 }

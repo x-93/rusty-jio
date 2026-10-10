@@ -1,3 +1,5 @@
-﻿//! Module implementation.
+use jio_notify::{collector::CollectorFrom, converter::ConverterFrom};
+use jio_rpc_core::Notification;
 
-// Types and logic definitions for collector.rs
+pub type GrpcServiceConverter = ConverterFrom<Notification, Notification>;
+pub type GrpcServiceCollector = CollectorFrom<GrpcServiceConverter>;

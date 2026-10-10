@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>jio</title>
-</head>
-<body>
-    <h1>jio</h1>
-</body>
+<html>
+    <head>
+        <script type="module">
+            import * as workflow from './jio-wallet/jio-wallet.js';
+            (async () => {
+                const wasm = await workflow.default('./jio-wallet/jio-wallet_bg.wasm');
+            })();
+        </script>
+    </head>
+    <body></body>
 </html>

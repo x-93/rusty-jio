@@ -1,4 +1,6 @@
+// use sha3::CShake256;
 use once_cell::sync::Lazy;
+
 pub trait HasherBase {
     fn update<A: AsRef<[u8]>>(&mut self, data: A) -> &mut Self;
 }
@@ -14,6 +16,10 @@ pub trait Hasher: HasherBase + Clone + Default {
     }
 }
 
+// Implemented manually in pow_hashers:
+//  struct PowHash => `cSHAKE256("ProofOfWorkHash")
+//  struct KHeavyHash => `cSHAKE256("HeavyHash")
+pub use crate::pow_hashers::{KHeavyHash, PowHash};
 blake2b_hasher! {
     struct TransactionHash => b"TransactionHash",
     struct TransactionID => b"TransactionID",
@@ -44,7 +50,7 @@ macro_rules! sha256_hasher {
                     // SHA256 doesn't natively support domain separation, so we hash it to make it constant size.
                     let mut tmp_state = Sha256::new();
                     tmp_state.update($domain_sep);
-                    let mut out = $name(Sha256::new());
+                    let mut out = Self(Sha256::new());
                     out.write(tmp_state.finalize());
 
                     out
@@ -54,12 +60,6 @@ macro_rules! sha256_hasher {
 
             pub fn write<A: AsRef<[u8]>>(&mut self, data: A) {
                 sha2::Digest::update(&mut self.0, data.as_ref());
-            }
-
-            #[inline(always)]
-            pub fn update<A: AsRef<[u8]>>(&mut self, data: A) -> &mut Self {
-                self.write(data);
-                self
             }
 
             #[inline(always)]
@@ -91,12 +91,6 @@ macro_rules! blake2b_hasher {
 
             pub fn write<A: AsRef<[u8]>>(&mut self, data: A) {
                 self.0.update(data.as_ref());
-            }
-
-            #[inline(always)]
-            pub fn update<A: AsRef<[u8]>>(&mut self, data: A) -> &mut Self {
-                self.write(data);
-                self
             }
 
             #[inline(always)]
@@ -150,8 +144,8 @@ mod tests {
             &[],
             &[1][..],
             &[
-                5, 199, 126, 44, 71, 32, 82, 139, 122, 217, 43, 48, 52, 112, 40, 209, 180, 83, 139, 231, 72, 48, 136,
-                48, 168, 226, 133, 7, 60, 4, 160, 205,
+                5, 199, 126, 44, 71, 32, 82, 139, 122, 217, 43, 48, 52, 112, 40, 209, 180, 83, 139, 231, 72, 48, 136, 48, 168, 226,
+                133, 7, 60, 4, 160, 205,
             ][..],
             &[42; 64],
             &[0; 8][..],

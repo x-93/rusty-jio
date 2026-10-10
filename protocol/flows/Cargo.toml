@@ -1,9 +1,36 @@
 [package]
-name = "jio-protocol-flows"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-repository.workspace = true
+name = "jio-p2p-flows"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+jio-core.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+jio-p2p-lib.workspace = true
+jio-utils.workspace = true
+jio-hashes.workspace = true
+jio-muhash.workspace = true
+jio-connectionmanager.workspace = true
+jio-addressmanager.workspace = true
+jio-consensusmanager.workspace = true
+jio-mining.workspace = true
+jio-notify.workspace = true
+
+parking_lot.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+log.workspace = true
+itertools.workspace = true
+indexmap.workspace = true
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+tokio = { version = "1.21.2", features = [
+    "rt-multi-thread",
+    "macros",
+    "signal",
+] }
+tokio-stream = { version = "0.1.11", features = ["net"] }
+uuid = { version = "1.2.2", features = ["v4", "fast-rng"] }
+async-trait = "0.1.57"

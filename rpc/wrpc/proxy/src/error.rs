@@ -1,3 +1,23 @@
-﻿//! Module implementation.
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error("{0}")]
+    Other(String),
 
-// Types and logic definitions for error.rs
+    #[error(transparent)]
+    GrpcApi(#[from] jio_rpc_core::error::RpcError),
+
+    #[error(transparent)]
+    GrpcClient(#[from] jio_grpc_client::error::Error),
+
+    #[error(transparent)]
+    Wrpc(#[from] jio_wrpc_server::error::Error),
+
+    #[error(transparent)]
+    WebSocket(#[from] workflow_rpc::server::WebSocketError),
+}
+
+impl From<String> for Error {
+    fn from(s: String) -> Self {
+        Error::Other(s)
+    }
+}

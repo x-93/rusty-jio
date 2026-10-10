@@ -1,9 +1,12 @@
 [package]
-name = "jio-wallet-native"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
-repository.workspace = true
+name = "jio-wallet-cli-native"
+version = "0.1.0"
+edition = "2021"
 
 [dependencies]
+jio-wallet-cli.workspace = true
+workflow-terminal.workspace = true
+workflow-log.workspace = true
+async-std.workspace = true
+async-trait.workspace = true
+tokio.workspace = true

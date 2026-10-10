@@ -1,3 +1,1 @@
-﻿//! Module implementation.
-
-// Types and logic definitions for blue_work.rs
+pub type RpcBlueWorkType = jio_consensus_core::BlueWorkType;

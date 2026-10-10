@@ -1,3 +1,13 @@
-﻿//! Module implementation.
+use jio_notify::events::EventType;
+use jio_utxoindex::errors::UtxoIndexError;
+use thiserror::Error;
 
-// Types and logic definitions for errors.rs
+#[derive(Error, Debug)]
+pub enum IndexError {
+    #[error("{0}")]
+    UtxoIndexError(#[from] UtxoIndexError),
+
+    #[error("event type {0:?} is not supported")]
+    NotSupported(EventType),
+}
+pub type IndexResult<T> = std::result::Result<T, IndexError>;

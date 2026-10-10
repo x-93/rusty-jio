@@ -1,3 +1,1 @@
-﻿//! Module implementation.
-
-// Types and logic definitions for hash.rs
+pub type RpcHash = jio_hashes::Hash;

@@ -1,15 +1,30 @@
-use super::block::BlockRuleError;
-use super::tx::TxRuleError;
+use jio_hashes::Hash;
 use thiserror::Error;
+
+use super::{sync::SyncManagerError, traversal::TraversalError};
 
 #[derive(Error, Debug, Clone)]
 pub enum ConsensusError {
-    #[error("block rule error: {0}")]
-    BlockRuleError(#[from] BlockRuleError),
+    #[error("couldn't find block {0}")]
+    BlockNotFound(Hash),
 
-    #[error("tx rule error: {0}")]
-    TxRuleError(#[from] TxRuleError),
+    #[error("block {0} is invalid")]
+    InvalidBlock(Hash),
 
-    #[error("consensus error: {0}")]
-    General(String),
+    #[error("some data is missing for block {0}")]
+    MissingData(Hash),
+
+    #[error("got unexpected pruning point")]
+    UnexpectedPruningPoint,
+
+    #[error("sync manager error")]
+    SyncManagerError(#[from] SyncManagerError),
+
+    #[error("traversal error")]
+    TraversalError(#[from] TraversalError),
+
+    #[error("{0}")]
+    General(&'static str),
 }
+
+pub type ConsensusResult<T> = std::result::Result<T, ConsensusError>;

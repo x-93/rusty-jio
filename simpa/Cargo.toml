@@ -1,9 +1,30 @@
 [package]
-name = "jio-simpa"
+name = "simpa"
+description = "Jio Network Simulator"
 version.workspace = true
-authors.workspace = true
-license.workspace = true
 edition.workspace = true
-repository.workspace = true
+authors.workspace = true
+include.workspace = true
+license.workspace = true
 
 [dependencies]
+jio-hashes.workspace = true
+jio-core.workspace = true
+jio-consensus.workspace = true
+jio-consensus-core.workspace = true
+jio-consensus-notify.workspace = true
+
+rand.workspace = true
+itertools.workspace = true
+futures-util.workspace = true
+rayon.workspace = true
+clap.workspace = true
+indexmap.workspace = true
+log.workspace = true
+async-channel.workspace = true
+num_cpus.workspace = true
+futures.workspace = true
+
+rand_distr = "0.4"
+tokio = { workspace = true, features = ["rt", "macros", "rt-multi-thread"] }
+secp256k1 = { version = "0.24", features = ["global-context", "rand-std"] }

@@ -1,3 +1,37 @@
-﻿//! Module implementation.
+use thiserror::Error;
+use tokio::sync::mpsc::error::TrySendError;
 
-// Types and logic definitions for error.rs
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("RpcApi error: {0}")]
+    RpcApiError(#[from] jio_rpc_core::error::RpcError),
+
+    #[error("Notification subsystem error: {0}")]
+    NotificationError(#[from] jio_notify::error::Error),
+}
+
+impl From<Error> for jio_rpc_core::error::RpcError {
+    fn from(err: Error) -> Self {
+        match err {
+            Error::RpcApiError(err) => err,
+            Error::NotificationError(err) => err.into(),
+        }
+    }
+}
+
+impl From<Error> for jio_notify::error::Error {
+    fn from(err: Error) -> Self {
+        match err {
+            Error::RpcApiError(err) => jio_notify::error::Error::General(err.to_string()),
+            Error::NotificationError(err) => err,
+        }
+    }
+}
+
+impl<T> From<TrySendError<T>> for Error {
+    fn from(_: TrySendError<T>) -> Self {
+        jio_notify::error::Error::ChannelSendError.into()
+    }
+}
+
+pub type Result<T> = std::result::Result<T, Error>;

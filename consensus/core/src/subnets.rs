@@ -1,76 +1,17 @@
-use borsh::{BorshDeserialize, BorshSerialize};
-use jio_utils::mem_size::MemSizeEstimator;
-use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display, Formatter};
-use std::str::FromStr;
+use std::str::{self, FromStr};
 
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
+use serde::{Deserialize, Serialize};
+
+/// The size of the array used to store subnetwork IDs.
 pub const SUBNETWORK_ID_SIZE: usize = 20;
 
+/// The domain representation of a Subnetwork ID
 #[derive(
-    Clone, Copy, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+    Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize, BorshSchema,
 )]
 pub struct SubnetworkId([u8; SUBNETWORK_ID_SIZE]);
-
-impl SubnetworkId {
-    pub const fn from_bytes(bytes: [u8; SUBNETWORK_ID_SIZE]) -> Self {
-        Self(bytes)
-    }
-
-    pub const fn as_bytes(&self) -> &[u8; SUBNETWORK_ID_SIZE] {
-        &self.0
-    }
-
-    pub const fn is_native(&self) -> bool {
-        let mut i = 0;
-        while i < SUBNETWORK_ID_SIZE {
-            if self.0[i] != 0 {
-                return false;
-            }
-            i += 1;
-        }
-        true
-    }
-
-    pub const fn is_coinbase(&self) -> bool {
-        if self.0[0] != 1 {
-            return false;
-        }
-        let mut i = 1;
-        while i < SUBNETWORK_ID_SIZE {
-            if self.0[i] != 0 {
-                return false;
-            }
-            i += 1;
-        }
-        true
-    }
-
-    pub const fn is_registry(&self) -> bool {
-        if self.0[0] != 2 {
-            return false;
-        }
-        let mut i = 1;
-        while i < SUBNETWORK_ID_SIZE {
-            if self.0[i] != 0 {
-                return false;
-            }
-            i += 1;
-        }
-        true
-    }
-
-    pub const fn is_builtin(&self) -> bool {
-        self.is_native() || self.is_coinbase() || self.is_registry()
-    }
-}
-
-pub const SUBNETWORK_ID_NATIVE: SubnetworkId = SubnetworkId([0; SUBNETWORK_ID_SIZE]);
-
-pub const SUBNETWORK_ID_COINBASE: SubnetworkId =
-    SubnetworkId([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-
-pub const SUBNETWORK_ID_REGISTRY: SubnetworkId =
-    SubnetworkId([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
 impl AsRef<[u8]> for SubnetworkId {
     fn as_ref(&self) -> &[u8] {
@@ -78,53 +19,66 @@ impl AsRef<[u8]> for SubnetworkId {
     }
 }
 
-impl Display for SubnetworkId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        for byte in self.0 {
-            write!(f, "{:02x}", byte)?;
-        }
-        Ok(())
-    }
-}
-
-impl Debug for SubnetworkId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        Display::fmt(self, f)
-    }
-}
-
-#[derive(thiserror::Error, Debug)]
-#[error("invalid hex string for subnetwork id")]
-pub struct SubnetworkHexError;
-
-impl FromStr for SubnetworkId {
-    type Err = SubnetworkHexError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.len() != SUBNETWORK_ID_SIZE * 2 {
-            return Err(SubnetworkHexError);
-        }
+impl SubnetworkId {
+    pub const fn from_byte(b: u8) -> SubnetworkId {
         let mut bytes = [0u8; SUBNETWORK_ID_SIZE];
-        for (i, byte) in bytes.iter_mut().enumerate() {
-            let high = char_to_hex(s.as_bytes()[i * 2])?;
-            let low = char_to_hex(s.as_bytes()[i * 2 + 1])?;
-            *byte = (high << 4) | low;
-        }
+        bytes[0] = b;
+        SubnetworkId(bytes)
+    }
+
+    pub const fn from_bytes(bytes: [u8; SUBNETWORK_ID_SIZE]) -> SubnetworkId {
+        SubnetworkId(bytes)
+    }
+
+    /// Returns true if the subnetwork is a built-in subnetwork, which
+    /// means all nodes, including partial nodes, must validate it, and its transactions
+    /// always use 0 gas.
+    #[inline]
+    pub fn is_builtin(&self) -> bool {
+        *self == SUBNETWORK_ID_COINBASE || *self == SUBNETWORK_ID_REGISTRY
+    }
+
+    /// Returns true if the subnetwork is the native or a built-in subnetwork
+    #[inline]
+    pub fn is_builtin_or_native(&self) -> bool {
+        *self == SUBNETWORK_ID_NATIVE || self.is_builtin()
+    }
+}
+
+impl TryFrom<&[u8]> for SubnetworkId {
+    type Error = std::array::TryFromSliceError;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let bytes = <[u8; SUBNETWORK_ID_SIZE]>::try_from(value)?;
         Ok(Self(bytes))
     }
 }
 
-fn char_to_hex(b: u8) -> Result<u8, SubnetworkHexError> {
-    match b {
-        b'0'..=b'9' => Ok(b - b'0'),
-        b'a'..=b'f' => Ok(b - b'a' + 10),
-        b'A'..=b'F' => Ok(b - b'A' + 10),
-        _ => Err(SubnetworkHexError),
+impl Display for SubnetworkId {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut hex = [0u8; SUBNETWORK_ID_SIZE * 2];
+        faster_hex::hex_encode(&self.0, &mut hex).expect("The output is exactly twice the size of the input");
+        f.write_str(str::from_utf8(&hex).expect("hex is always valid UTF-8"))
     }
 }
 
-impl MemSizeEstimator for SubnetworkId {
-    fn estimate_mem_bytes(&self) -> usize {
-        size_of::<Self>()
+impl FromStr for SubnetworkId {
+    type Err = faster_hex::Error;
+
+    #[inline]
+    fn from_str(str: &str) -> Result<Self, Self::Err> {
+        let mut bytes = [0u8; SUBNETWORK_ID_SIZE];
+        faster_hex::hex_decode(str.as_bytes(), &mut bytes)?;
+        Ok(SubnetworkId(bytes))
     }
 }
+
+/// The default subnetwork ID which is used for transactions without related payload data
+pub const SUBNETWORK_ID_NATIVE: SubnetworkId = SubnetworkId::from_byte(0);
+
+/// The subnetwork ID which is used for the coinbase transaction
+pub const SUBNETWORK_ID_COINBASE: SubnetworkId = SubnetworkId::from_byte(1);
+
+/// The subnetwork ID which is used for adding new sub networks to the registry
+pub const SUBNETWORK_ID_REGISTRY: SubnetworkId = SubnetworkId::from_byte(2);

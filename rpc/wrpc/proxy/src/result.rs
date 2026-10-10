@@ -1,3 +1,1 @@
-﻿//! Module implementation.
-
-// Types and logic definitions for result.rs
+pub type Result<T> = std::result::Result<T, crate::error::Error>;

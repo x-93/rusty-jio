@@ -1,7 +1,17 @@
-//! Jio core runtime, service lifecycle, task supervisor, and environment detection.
+extern crate self as jio_core;
 
-pub mod jiopad_env;
-pub mod task;
+pub mod assert;
+pub mod console;
+pub mod log;
+pub mod panic;
+pub mod time;
+pub mod version;
 
-pub use jiopad_env::JiopadEnv;
-pub use task::{cooperative_tick, AsyncRuntime, AsyncService, ServiceSupervisor, ShutdownSignal, TickService};
+cfg_if::cfg_if! {
+    if #[cfg(not(target_arch = "wasm32"))] {
+        pub mod core;
+        pub mod service;
+        pub mod signals;
+        pub mod task;
+    }
+}

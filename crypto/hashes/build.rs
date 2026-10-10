@@ -1,18 +1,16 @@
-fn main() {
-    #[cfg(feature = "asm")]
-    {
-        use std::env;
-        let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
-        let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+use std::env;
 
-        if target_arch == "x86_64" {
-            let mut build = cc::Build::new();
-            if target_os == "macos" || target_os == "ios" {
-                build.file("src/keccakf1600_x86-64-osx.s");
-            } else if target_os != "windows" {
-                build.file("src/keccakf1600_x86-64.s");
-            }
-            let _ = build.try_compile("keccakf1600");
-        }
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("cargo:rerun-if-changed=src/keccakf1600_x86-64.s");
+    println!("cargo:rerun-if-changed=src/keccakf1600_x86-64-osx.s");
+
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+    if target_arch == "x86_64" && target_os != "windows" && target_os != "macos" {
+        cc::Build::new().flag("-c").file("src/keccakf1600_x86-64.s").compile("libkeccak.a");
     }
+    if target_arch == "x86_64" && target_os == "macos" {
+        cc::Build::new().flag("-c").file("src/keccakf1600_x86-64-osx.s").compile("libkeccak.a");
+    }
+    Ok(())
 }
