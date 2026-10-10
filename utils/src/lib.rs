@@ -8,4 +8,4 @@ pub mod mem_size;
 pub use buffer::{BufferPool, PooledBuffer, ZeroBuffer};
 pub use channel::{bounded, ChannelError, ChannelMetrics, ChannelReceiver, ChannelSender};
 pub use fd_budget::{FdBudget, FdBudgetExhausted, FdGuard};
-pub use mem_size::MemSize;
+pub use mem_size::{MemSize, MemSizeEstimator};

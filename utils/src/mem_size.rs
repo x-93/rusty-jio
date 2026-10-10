@@ -11,6 +11,11 @@ pub trait MemSize {
     fn mem_size(&self) -> usize;
 }
 
+/// Trait for estimating memory bytes (used across consensus structures).
+pub trait MemSizeEstimator {
+    fn estimate_mem_bytes(&self) -> usize;
+}
+
 macro_rules! impl_mem_size_primitive {
     ($($t:ty),*) => {
         $(

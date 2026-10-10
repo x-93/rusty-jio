@@ -1,3 +1,3 @@
-﻿//! Module implementation.
+pub use jio_hashes::Hash as BlockHash;
 
-// Types and logic definitions for blockhash.rs
+pub const ORIGIN: BlockHash = BlockHash::from_bytes([0; 32]);

@@ -1,3 +1,18 @@
-﻿//! Module implementation.
+﻿use jio_hashes::Hash;
+use serde::{Deserialize, Serialize};
 
-// Types and logic definitions for acceptance_data.rs
+use crate::tx::TransactionId;
+
+pub type AcceptanceData = Vec<MergesetBlockAcceptanceData>;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MergesetBlockAcceptanceData {
+    pub block_hash: Hash,
+    pub accepted_transactions: Vec<AcceptedTxEntry>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AcceptedTxEntry {
+    pub transaction_id: TransactionId,
+    pub index_within_block: u32,
+}

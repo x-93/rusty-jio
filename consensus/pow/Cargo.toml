@@ -7,3 +7,9 @@ edition.workspace = true
 repository.workspace = true
 
 [dependencies]
+jio-hashes = { path = "../../crypto/hashes" }
+jio-consensus-core = { path = "../core" }
+jio-math = { path = "../../math" }
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+smallvec = "1.13"
