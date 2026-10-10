@@ -2,7 +2,6 @@ pub use crate::client::*;
 pub use crate::result::Result;
 pub use async_trait::async_trait;
 pub use futures::*;
-pub use js_sys::Function;
 pub use jio_notify::{
     error::{Error as NotifyError, Result as NotifyResult},
     events::EVENT_TYPE_ARRAY,
@@ -18,6 +17,7 @@ pub use jio_rpc_core::{
     notify::{collector::RpcCoreCollector, connection::ChannelConnection},
     prelude::*,
 };
+pub use js_sys::Function;
 pub use regex::Regex;
 pub use std::sync::{
     atomic::{AtomicBool, Ordering},

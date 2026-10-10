@@ -682,8 +682,12 @@ impl ConsensusApi for Consensus {
     fn get_virtual_merge_depth_root(&self) -> Option<Hash> {
         // TODO: consider saving the merge depth root as part of virtual state
         // TODO: unwrap on pruning_point and virtual state reads when staging consensus is implemented
-        let Some(pruning_point) = self.pruning_store.read().pruning_point().unwrap_option() else { return None; };
-        let Some(virtual_state) = self.virtual_processor.virtual_stores.read().state.get().unwrap_option() else { return None; };
+        let Some(pruning_point) = self.pruning_store.read().pruning_point().unwrap_option() else {
+            return None;
+        };
+        let Some(virtual_state) = self.virtual_processor.virtual_stores.read().state.get().unwrap_option() else {
+            return None;
+        };
         let virtual_ghostdag_data = &virtual_state.ghostdag_data;
         let root = self.depth_manager.calc_merge_depth_root(virtual_ghostdag_data, pruning_point);
         if root.is_origin() {
@@ -862,8 +866,7 @@ impl ConsensusApi for Consensus {
 
     fn get_pruning_point_anticone_and_trusted_data(
         &self,
-    ) -> Arc<(Vec<Hash>, Vec<jio_consensus_core::trusted::TrustedHeader>, Vec<jio_consensus_core::trusted::TrustedGhostdagData>)>
-    {
+    ) -> Arc<(Vec<Hash>, Vec<jio_consensus_core::trusted::TrustedHeader>, Vec<jio_consensus_core::trusted::TrustedGhostdagData>)> {
         self.pruning_proof_manager.get_pruning_point_anticone_and_trusted_data()
     }
 

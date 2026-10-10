@@ -302,7 +302,11 @@ impl RpcApi<ChannelConnection> for RpcCoreService {
     }
 
     async fn get_mempool_entry_call(&self, request: GetMempoolEntryRequest) -> RpcResult<GetMempoolEntryResponse> {
-        let Some(transaction) = self.mining_manager.get_transaction(&request.transaction_id, !request.filter_transaction_pool, request.include_orphan_pool) else {
+        let Some(transaction) = self.mining_manager.get_transaction(
+            &request.transaction_id,
+            !request.filter_transaction_pool,
+            request.include_orphan_pool,
+        ) else {
             return Err(RpcError::TransactionNotFound(request.transaction_id));
         };
         let consensus = self.consensus_manager.consensus();

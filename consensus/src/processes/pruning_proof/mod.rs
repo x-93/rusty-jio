@@ -117,10 +117,7 @@ impl HeaderStoreReader for HeaderStoreMock {
         unimplemented!()
     }
 
-    fn get_compact_header_data(
-        &self,
-        hash: jio_hashes::Hash,
-    ) -> Result<crate::model::stores::headers::CompactHeaderData, StoreError> {
+    fn get_compact_header_data(&self, hash: jio_hashes::Hash) -> Result<crate::model::stores::headers::CompactHeaderData, StoreError> {
         unimplemented!()
     }
 }

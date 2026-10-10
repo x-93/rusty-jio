@@ -171,7 +171,9 @@ impl RelayTransactionsFlow {
                     request.req, transaction_id
                 )));
             }
-            let Response::Transaction(transaction) = response else { continue; };
+            let Response::Transaction(transaction) = response else {
+                continue;
+            };
             match self.ctx.mining_manager().validate_and_insert_transaction(consensus, transaction, Priority::Low, Orphan::Allowed) {
                 Ok(accepted_transactions) => {
                     // trace!("Broadcast {} accepted transaction ids", accepted_transactions.len());

@@ -225,7 +225,9 @@ impl IbdFlow {
         debug!("received trusted data with {} daa entries and {} ghostdag entries", pkg.daa_window.len(), pkg.ghostdag_window.len());
 
         let mut entry_stream = TrustedEntryStream::new(&self.router, &mut self.incoming_route);
-        let Some(pruning_point_entry) = entry_stream.next().await? else { return Err(ProtocolError::Other("got `done` message before receiving the pruning point")); };
+        let Some(pruning_point_entry) = entry_stream.next().await? else {
+            return Err(ProtocolError::Other("got `done` message before receiving the pruning point"));
+        };
 
         // TODO: verify trusted pruning point matches proof pruning point
 

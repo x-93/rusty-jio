@@ -183,7 +183,9 @@ impl HandleRelayInvsFlow {
 
     async fn request_block(&mut self, requested_hash: Hash) -> Result<Option<Block>, ProtocolError> {
         // TODO: perhaps the request scope should be captured until block processing is completed
-        let Some(_request_scope) = self.ctx.try_adding_block_request(requested_hash) else { return Ok(None); };
+        let Some(_request_scope) = self.ctx.try_adding_block_request(requested_hash) else {
+            return Ok(None);
+        };
         self.router
             .enqueue(make_message!(Payload::RequestRelayBlocks, RequestRelayBlocksMessage { hashes: vec![requested_hash.into()] }))
             .await?;
