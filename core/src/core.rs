@@ -13,10 +13,12 @@ pub enum CoreState {
     Stopped,
 }
 
+pub type ServiceTaskHandle = (&'static str, JoinHandle<Result<(), CoreError>>);
+
 /// The central daemon runtime that manages background service lifecycles.
 pub struct Core {
     services: Mutex<Vec<Arc<dyn AsyncService>>>,
-    running_handles: Mutex<Vec<(&'static str, JoinHandle<Result<(), CoreError>>)>>,
+    running_handles: Mutex<Vec<ServiceTaskHandle>>,
     shutdown_trigger: SingleTrigger,
     state: Mutex<CoreState>,
 }

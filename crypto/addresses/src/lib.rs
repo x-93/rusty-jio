@@ -25,7 +25,16 @@ impl Prefix {
         }
     }
 
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Result<Self, AddressError> {
+        <Self as std::str::FromStr>::from_str(s)
+    }
+}
+
+impl std::str::FromStr for Prefix {
+    type Err = AddressError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "jio" => Ok(Prefix::Mainnet),
             "jiotest" => Ok(Prefix::Testnet),

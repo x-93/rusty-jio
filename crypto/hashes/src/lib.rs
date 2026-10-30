@@ -1,3 +1,5 @@
+#![allow(clippy::chunks_exact_to_as_chunks)]
+
 pub mod hashers;
 pub mod pow_hashers;
 

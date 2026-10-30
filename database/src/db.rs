@@ -5,6 +5,8 @@ use std::path::Path;
 use std::sync::Arc;
 
 pub type RawDb = DBWithThreadMode<SingleThreaded>;
+pub type DbEntry = (Box<[u8]>, Box<[u8]>);
+pub type DbEntryResult = Result<DbEntry, DatabaseError>;
 
 /// Thread-safe RocksDB instance wrapper.
 pub struct DB {
@@ -63,7 +65,7 @@ impl DB {
     }
 
     /// Iterate over database entries starting from a given mode.
-    pub fn iterator(&self, mode: IteratorMode) -> impl Iterator<Item = Result<(Box<[u8]>, Box<[u8]>), DatabaseError>> + '_ {
+    pub fn iterator(&self, mode: IteratorMode) -> impl Iterator<Item = DbEntryResult> + '_ {
         self.inner
             .iterator(mode)
             .map(|res| res.map_err(DatabaseError::from))

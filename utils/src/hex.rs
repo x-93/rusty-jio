@@ -43,7 +43,7 @@ impl FromHex for Vec<u8> {
 
     fn from_hex(hex: &str) -> Result<Self, Self::Error> {
         let hex = hex.strip_prefix("0x").unwrap_or(hex);
-        if hex.len() % 2 != 0 {
+        if !hex.len().is_multiple_of(2) {
             return Err(HexError::InvalidLength);
         }
         let mut bytes = Vec::with_capacity(hex.len() / 2);

@@ -1,3 +1,5 @@
+#![allow(clippy::needless_range_loop)]
+
 use std::cmp::Ordering;
 use std::fmt;
 use std::ops::{
@@ -616,7 +618,7 @@ impl Uint256 {
 
     /// Encode a 256-bit PoW target into compact format (32-bit compact target).
     pub fn to_compact_target_bits(&self) -> u32 {
-        let mut size = (self.bits() + 7) / 8;
+        let mut size = self.bits().div_ceil(8);
         let mut compact = if size <= 3 {
             (self.as_u64() << (8 * (3 - size))) as u32
         } else {

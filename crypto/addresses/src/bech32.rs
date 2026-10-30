@@ -47,10 +47,7 @@ where
 
 // Convert 8bit array to 5bit array with right padding
 fn conv8to5(payload: &[u8]) -> Vec<u8> {
-    let padding = match payload.len() % 5 == 0 {
-        true => 0,
-        false => 1,
-    };
+    let padding = if payload.len().is_multiple_of(5) { 0 } else { 1 };
     let mut five_bit = vec![0u8; payload.len() * 8 / 5 + padding];
     let mut current_idx = 0;
     let mut buff = 0u16;
