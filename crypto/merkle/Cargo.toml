@@ -1,0 +1,8 @@
+[package]
+name = "jio-merkle"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+jio-hashes.workspace = true
