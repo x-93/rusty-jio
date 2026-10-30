@@ -1,0 +1,13 @@
+[package]
+name = "jio-database"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+parking_lot.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+rocksdb.workspace = true
+rand.workspace = true
+tempfile.workspace = true
