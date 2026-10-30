@@ -1,40 +1,49 @@
 #![allow(clippy::chunks_exact_to_as_chunks)]
 
-pub mod hashers;
-pub mod pow_hashers;
+mod hashers;
+mod pow_hashers;
 
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::fmt::{self, Debug, Display, Formatter};
+use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
+use serde::{Deserialize, Serialize};
+use std::fmt::{Debug, Display, Formatter};
 use std::hash::{Hash as StdHash, Hasher as StdHasher};
-use std::str::FromStr;
+use std::str::{self, FromStr};
 
 pub const HASH_SIZE: usize = 32;
 
 pub use hashers::*;
 
-/// A 32-byte cryptographic hash identifier used throughout the BlockDAG.
-#[derive(Eq, Clone, Copy, Default, PartialOrd, Ord)]
-pub struct Hash(pub [u8; HASH_SIZE]);
+// TODO: Check if we use hash more as an array of u64 or of bytes and change the default accordingly
+#[derive(
+    Eq,
+    Clone,
+    Copy,
+    Default,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+    BorshSchema,
+)]
+pub struct Hash([u8; HASH_SIZE]);
 
 impl Hash {
-    pub const ZERO: Self = Self([0u8; HASH_SIZE]);
-
+    pub const ZERO: Self = Self([0; HASH_SIZE]);
     #[inline(always)]
     pub const fn from_bytes(bytes: [u8; HASH_SIZE]) -> Self {
         Hash(bytes)
     }
 
     #[inline(always)]
-    pub const fn as_bytes(&self) -> &[u8; HASH_SIZE] {
-        &self.0
-    }
-
-    #[inline(always)]
-    pub const fn to_bytes(self) -> [u8; HASH_SIZE] {
+    pub const fn as_bytes(self) -> [u8; 32] {
         self.0
     }
 
     #[inline(always)]
+    /// # Panics
+    /// Panics if `bytes` length is not exactly `HASH_SIZE`.
     pub fn from_slice(bytes: &[u8]) -> Self {
         Self(<[u8; HASH_SIZE]>::try_from(bytes).expect("Slice must have the length of Hash"))
     }
@@ -68,13 +77,10 @@ impl Hash {
     pub fn from_u64_word(word: u64) -> Self {
         Self::from_le_u64([0, 0, 0, word])
     }
-
-    pub fn to_vec(&self) -> Vec<u8> {
-        self.0.to_vec()
-    }
 }
 
-// Override the default Hash implementation for fast hashing (siphash over u64s)
+// Override the default Hash implementation, to: A. improve perf a bit (siphash works over u64s), B. allow a hasher to just take the first u64.
+// Don't change this without looking at `consensus/core/src/blockhash/BlockHashMap`.
 impl StdHash for Hash {
     #[inline(always)]
     fn hash<H: StdHasher>(&self, state: &mut H) {
@@ -82,6 +88,8 @@ impl StdHash for Hash {
     }
 }
 
+/// We only override PartialEq because clippy wants us to.
+/// This should always hold: PartialEq(x,y) => Hash(x) == Hash(y)
 impl PartialEq for Hash {
     #[inline(always)]
     fn eq(&self, other: &Self) -> bool {
@@ -91,39 +99,27 @@ impl PartialEq for Hash {
 
 impl Display for Hash {
     #[inline]
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        for byte in &self.0 {
-            write!(f, "{:02x}", byte)?;
-        }
-        Ok(())
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut hex = [0u8; HASH_SIZE * 2];
+        faster_hex::hex_encode(&self.0, &mut hex)
+            .expect("The output is exactly twice the size of the input");
+        f.write_str(unsafe { str::from_utf8_unchecked(&hex) })
     }
 }
 
 impl Debug for Hash {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(&self, f)
     }
 }
 
 impl FromStr for Hash {
-    type Err = &'static str;
+    type Err = faster_hex::Error;
 
     #[inline]
     fn from_str(hash_str: &str) -> Result<Self, Self::Err> {
-        let s = hash_str.trim();
-        let s = s
-            .strip_prefix("0x")
-            .or_else(|| s.strip_prefix("0X"))
-            .unwrap_or(s);
-        if s.len() != HASH_SIZE * 2 {
-            return Err("Invalid hash hex string length");
-        }
         let mut bytes = [0u8; HASH_SIZE];
-        for (i, chunk) in s.as_bytes().chunks(2).enumerate() {
-            let hi = parse_hex_digit(chunk[0])?;
-            let lo = parse_hex_digit(chunk[1])?;
-            bytes[i] = (hi << 4) | lo;
-        }
+        faster_hex::hex_decode(hash_str.as_bytes(), &mut bytes)?;
         Ok(Hash(bytes))
     }
 }
@@ -135,20 +131,6 @@ impl From<u64> for Hash {
     }
 }
 
-impl From<[u8; HASH_SIZE]> for Hash {
-    #[inline(always)]
-    fn from(bytes: [u8; HASH_SIZE]) -> Self {
-        Self::from_bytes(bytes)
-    }
-}
-
-impl From<Hash> for [u8; HASH_SIZE] {
-    #[inline(always)]
-    fn from(hash: Hash) -> Self {
-        hash.0
-    }
-}
-
 impl AsRef<[u8]> for Hash {
     #[inline(always)]
     fn as_ref(&self) -> &[u8] {
@@ -156,106 +138,34 @@ impl AsRef<[u8]> for Hash {
     }
 }
 
-impl AsMut<[u8]> for Hash {
-    #[inline(always)]
-    fn as_mut(&mut self) -> &mut [u8] {
-        &mut self.0
-    }
-}
-
 pub const ZERO_HASH: Hash = Hash([0; HASH_SIZE]);
-
-impl Serialize for Hash {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        if serializer.is_human_readable() {
-            serializer.serialize_str(&self.to_string())
-        } else {
-            self.0.serialize(serializer)
-        }
-    }
-}
-
-impl<'de> Deserialize<'de> for Hash {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        if deserializer.is_human_readable() {
-            let s = String::deserialize(deserializer)?;
-            Self::from_str(&s).map_err(serde::de::Error::custom)
-        } else {
-            let bytes = <[u8; HASH_SIZE]>::deserialize(deserializer)?;
-            Ok(Self(bytes))
-        }
-    }
-}
-
-fn parse_hex_digit(b: u8) -> Result<u8, &'static str> {
-    match b {
-        b'0'..=b'9' => Ok(b - b'0'),
-        b'a'..=b'f' => Ok(b - b'a' + 10),
-        b'A'..=b'F' => Ok(b - b'A' + 10),
-        _ => Err("Invalid hex character in hash string"),
-    }
-}
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::Hash;
+    use std::str::FromStr;
 
     #[test]
-    fn test_domain_separation_produces_distinct_hashes() {
-        let payload = b"common test payload for block and tx";
+    fn test_hash_basics() {
+        let hash_str = "8e40af02265360d59f4ecf9ae9ebf8f00a3118408f5a9cdcbcc9c0f93642f3af";
+        let hash = Hash::from_str(hash_str).unwrap();
+        assert_eq!(hash_str, hash.to_string());
+        let hash2 = Hash::from_str(hash_str).unwrap();
+        assert_eq!(hash, hash2);
 
-        let block_h = BlockHash::hash(payload);
-        let tx_h = TransactionHash::hash(payload);
-        let tx_id = TransactionID::hash(payload);
-        let branch_h = MerkleBranchHash::hash(payload);
-        let ecdsa_h = TransactionSigningHashECDSA::hash(payload);
+        let hash3 =
+            Hash::from_str("8e40af02265360d59f4ecf9ae9ebf8f00a3118408f5a9cdcbcc9c0f93642f3ab")
+                .unwrap();
+        assert_ne!(hash2, hash3);
 
-        assert_ne!(block_h, tx_h);
-        assert_ne!(block_h, tx_id);
-        assert_ne!(tx_h, tx_id);
-        assert_ne!(block_h, branch_h);
-        assert_ne!(block_h, ecdsa_h);
-        assert_ne!(block_h, Hash::ZERO);
-        assert_ne!(ecdsa_h, Hash::ZERO);
-    }
+        let odd_str = "8e40af02265360d59f4ecf9ae9ebf8f00a3118408f5a9cdcbcc9c0f93642f3a";
+        let short_str = "8e40af02265360d59f4ecf9ae9ebf8f00a3118408f5a9cdcbcc9c0f93642f3";
 
-    #[test]
-    fn test_streaming_update_matches_one_shot_hash() {
-        let data = b"streaming incremental data test";
-
-        let one_shot = BlockHash::hash(data);
-
-        let mut hasher = BlockHash::new();
-        hasher.update(&data[..10]);
-        hasher.update(&data[10..]);
-        let incremental = hasher.finalize();
-
-        assert_eq!(one_shot, incremental);
-    }
-
-    #[test]
-    fn test_hash_hex_serde_roundtrip() {
-        let original = BlockHash::hash(b"serialization target");
-        let json = serde_json::to_string(&original).unwrap();
-
-        let deserialized: Hash = serde_json::from_str(&json).unwrap();
-        assert_eq!(original, deserialized);
-
-        let with_prefix = format!("\"0x{}\"", original);
-        let de_prefix: Hash = serde_json::from_str(&with_prefix).unwrap();
-        assert_eq!(original, de_prefix);
-    }
-
-    #[test]
-    fn test_le_u64_roundtrip() {
-        let words = [123456789u64, 987654321u64, 42u64, 0xdeadbeefu64];
-        let hash = Hash::from_le_u64(words);
-        assert_eq!(hash.to_le_u64(), words);
+        assert!(
+            matches!(dbg!(Hash::from_str(odd_str)), Err(faster_hex::Error::InvalidLength(len)) if len == 64)
+        );
+        assert!(
+            matches!(dbg!(Hash::from_str(short_str)), Err(faster_hex::Error::InvalidLength(len)) if len == 64)
+        );
     }
 }

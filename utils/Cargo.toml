@@ -5,5 +5,10 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+faster-hex.workspace = true
+smallvec.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+triggered.workspace = true
 tokio.workspace = true
 parking_lot.workspace = true

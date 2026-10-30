@@ -29,6 +29,10 @@ blake2b_simd = "1.0"
 sha2 = "0.10"
 once_cell = "1.19"
 bech32 = "0.9"
+triggered = "0.1"
+faster-hex = "0.10"
+smallvec = { version = "1.13", features = ["serde"] }
+borsh = { version = "1.5", features = ["derive", "unstable__schema"] }
 
 # Internal workspace crates
 jio-math = { path = "math" }

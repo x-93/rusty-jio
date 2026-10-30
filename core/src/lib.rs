@@ -57,13 +57,13 @@ mod tests {
         fn start(self: Arc<Self>) -> AsyncServiceFuture {
             Box::pin(async move {
                 self.started.store(true, Ordering::SeqCst);
-                self.exit_trigger.wait().await;
+                self.exit_trigger.listener.clone().await;
                 Ok(())
             })
         }
 
         fn signal_exit(self: Arc<Self>) {
-            self.exit_trigger.trigger();
+            self.exit_trigger.trigger.trigger();
         }
 
         fn stop(self: Arc<Self>) -> AsyncServiceFuture {
@@ -112,7 +112,7 @@ mod tests {
         assert!(s3.started.load(Ordering::SeqCst));
 
         // Signal shutdown
-        shutdown_trigger.trigger();
+        shutdown_trigger.trigger.trigger();
 
         let result = run_handle.await.unwrap();
         assert!(result.is_ok());

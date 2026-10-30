@@ -19,7 +19,7 @@ pub type ServiceTaskHandle = (&'static str, JoinHandle<Result<(), CoreError>>);
 pub struct Core {
     services: Mutex<Vec<Arc<dyn AsyncService>>>,
     running_handles: Mutex<Vec<ServiceTaskHandle>>,
-    shutdown_trigger: SingleTrigger,
+    shutdown_trigger: Mutex<SingleTrigger>,
     state: Mutex<CoreState>,
 }
 
@@ -34,14 +34,14 @@ impl Core {
         Self {
             services: Mutex::new(Vec::new()),
             running_handles: Mutex::new(Vec::new()),
-            shutdown_trigger: SingleTrigger::new(),
+            shutdown_trigger: Mutex::new(SingleTrigger::new()),
             state: Mutex::new(CoreState::Idle),
         }
     }
 
     /// Access the shutdown trigger to initiate daemon shutdown from any component.
     pub fn shutdown_trigger(&self) -> SingleTrigger {
-        self.shutdown_trigger.clone()
+        self.shutdown_trigger.lock().clone()
     }
 
     /// Register a new background service with the daemon.
@@ -62,7 +62,9 @@ impl Core {
             return Err(CoreError::AlreadyRunning);
         }
 
-        self.shutdown_trigger.reset();
+        if self.shutdown_trigger.lock().trigger.is_triggered() {
+            *self.shutdown_trigger.lock() = SingleTrigger::new();
+        }
 
         let services = self.services.lock().clone();
         let mut handles = Vec::with_capacity(services.len());
@@ -85,7 +87,7 @@ impl Core {
         for service in &services {
             service.clone().signal_exit();
         }
-        self.shutdown_trigger.trigger();
+        self.shutdown_trigger.lock().trigger.trigger();
     }
 
     /// Gracefully stop all services and wait for cleanup in reverse order.
@@ -147,9 +149,9 @@ impl Core {
     {
         self.start()?;
 
-        let trigger = self.shutdown_trigger.clone();
+        let listener = self.shutdown_trigger.lock().listener.clone();
         tokio::select! {
-            _ = trigger.wait() => {},
+            _ = listener => {},
             _ = shutdown_signal => {
                 self.signal_exit();
             }

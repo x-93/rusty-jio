@@ -42,14 +42,14 @@ mod tests {
     fn test_merkle_root_empty_and_single() {
         assert_eq!(calc_merkle_root(vec![]), Hash::ZERO);
 
-        let h1 = Hash([1u8; 32]);
+        let h1 = Hash::from_bytes([1u8; 32]);
         assert_eq!(calc_merkle_root(vec![h1]), h1);
     }
 
     #[test]
     fn test_merkle_root_even_count() {
-        let h1 = Hash([1u8; 32]);
-        let h2 = Hash([2u8; 32]);
+        let h1 = Hash::from_bytes([1u8; 32]);
+        let h2 = Hash::from_bytes([2u8; 32]);
 
         let expected = hash_branch(&h1, &h2);
         assert_eq!(calc_merkle_root(vec![h1, h2]), expected);
@@ -57,9 +57,9 @@ mod tests {
 
     #[test]
     fn test_merkle_root_odd_count() {
-        let h1 = Hash([1u8; 32]);
-        let h2 = Hash([2u8; 32]);
-        let h3 = Hash([3u8; 32]);
+        let h1 = Hash::from_bytes([1u8; 32]);
+        let h2 = Hash::from_bytes([2u8; 32]);
+        let h3 = Hash::from_bytes([3u8; 32]);
 
         // Level 1:
         // pair 1: branch(h1, h2)
@@ -75,10 +75,10 @@ mod tests {
 
     #[test]
     fn test_merkle_root_four_leaves() {
-        let h1 = Hash([1u8; 32]);
-        let h2 = Hash([2u8; 32]);
-        let h3 = Hash([3u8; 32]);
-        let h4 = Hash([4u8; 32]);
+        let h1 = Hash::from_bytes([1u8; 32]);
+        let h2 = Hash::from_bytes([2u8; 32]);
+        let h3 = Hash::from_bytes([3u8; 32]);
+        let h4 = Hash::from_bytes([4u8; 32]);
 
         let left = hash_branch(&h1, &h2);
         let right = hash_branch(&h3, &h4);
