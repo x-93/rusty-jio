@@ -1,0 +1,12 @@
+[package]
+name = "jio-pow"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+jio-math.workspace = true
+jio-hashes.workspace = true
+jio-consensus-core.workspace = true
+
+thiserror.workspace = true

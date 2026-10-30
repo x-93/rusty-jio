@@ -8,6 +8,8 @@ members = [
     "crypto/hashes",
     "crypto/merkle",
     "crypto/addresses",
+    "consensus/core",
+    "consensus/pow",
 ]
 
 [workspace.package]
@@ -33,6 +35,9 @@ triggered = "0.1"
 faster-hex = "0.10"
 smallvec = { version = "1.13", features = ["serde"] }
 borsh = { version = "1.5", features = ["derive", "unstable__schema"] }
+indexmap = { version = "2.2", features = ["serde"] }
+malachite-base = "0.4"
+malachite-nz = "0.4"
 
 # Internal workspace crates
 jio-math = { path = "math" }
@@ -42,3 +47,5 @@ jio-database = { path = "database" }
 jio-hashes = { path = "crypto/hashes" }
 jio-merkle = { path = "crypto/merkle" }
 jio-addresses = { path = "crypto/addresses" }
+jio-consensus-core = { path = "consensus/core" }
+jio-pow = { path = "consensus/pow" }

@@ -1,0 +1,17 @@
+[package]
+name = "jio-consensus-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+jio-math.workspace = true
+jio-hashes.workspace = true
+jio-merkle.workspace = true
+jio-addresses.workspace = true
+
+serde.workspace = true
+borsh.workspace = true
+thiserror.workspace = true
+indexmap.workspace = true
+smallvec.workspace = true
