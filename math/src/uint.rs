@@ -1,12 +1,12 @@
 #![allow(clippy::needless_range_loop)]
 
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::fmt;
 use std::ops::{
-    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Mul, Not,
-    Shl, Shr, Sub, SubAssign,
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Mul, Not, Shl,
+    Shr, Sub, SubAssign,
 };
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 /// A 192-bit unsigned integer stored as three 64-bit limbs in little-endian order.
 /// Commonly used for cumulative blue work in GHOSTDAG consensus.
@@ -896,9 +896,16 @@ impl<'de> Deserialize<'de> for Uint256 {
 
 fn hex_decode_192(hex: &str) -> Result<[u8; 24], String> {
     let hex = hex.trim();
-    let hex = hex.strip_prefix("0x").or_else(|| hex.strip_prefix("0X")).unwrap_or(hex);
+    let hex = hex
+        .strip_prefix("0x")
+        .or_else(|| hex.strip_prefix("0X"))
+        .unwrap_or(hex);
     let hex_trimmed = hex.trim_start_matches('0');
-    let hex = if hex_trimmed.is_empty() { "0" } else { hex_trimmed };
+    let hex = if hex_trimmed.is_empty() {
+        "0"
+    } else {
+        hex_trimmed
+    };
     if hex.len() > 48 {
         return Err(format!("Hex string too long for Uint192: {}", hex.len()));
     }
@@ -914,9 +921,16 @@ fn hex_decode_192(hex: &str) -> Result<[u8; 24], String> {
 
 fn hex_decode_256(hex: &str) -> Result<[u8; 32], String> {
     let hex = hex.trim();
-    let hex = hex.strip_prefix("0x").or_else(|| hex.strip_prefix("0X")).unwrap_or(hex);
+    let hex = hex
+        .strip_prefix("0x")
+        .or_else(|| hex.strip_prefix("0X"))
+        .unwrap_or(hex);
     let hex_trimmed = hex.trim_start_matches('0');
-    let hex = if hex_trimmed.is_empty() { "0" } else { hex_trimmed };
+    let hex = if hex_trimmed.is_empty() {
+        "0"
+    } else {
+        hex_trimmed
+    };
     if hex.len() > 64 {
         return Err(format!("Hex string too long for Uint256: {}", hex.len()));
     }

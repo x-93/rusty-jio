@@ -17,7 +17,7 @@ pub fn calc_merkle_root(mut hashes: Vec<Hash>) -> Hash {
     }
 
     while hashes.len() > 1 {
-        let mut next_level = Vec::with_capacity((hashes.len() + 1) / 2);
+        let mut next_level = Vec::with_capacity(hashes.len().div_ceil(2));
 
         for chunk in hashes.chunks(2) {
             if chunk.len() == 2 {

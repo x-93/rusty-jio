@@ -127,9 +127,7 @@ impl Core {
         let services: Vec<_> = self.services.lock().iter().cloned().rev().collect();
         for service in services {
             if let Err(e) = service.stop().await {
-                if first_error.is_none() {
-                    first_error = Some(e);
-                }
+                first_error.get_or_insert(e);
             }
         }
 

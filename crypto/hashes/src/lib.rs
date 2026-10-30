@@ -111,7 +111,10 @@ impl FromStr for Hash {
     #[inline]
     fn from_str(hash_str: &str) -> Result<Self, Self::Err> {
         let s = hash_str.trim();
-        let s = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")).unwrap_or(s);
+        let s = s
+            .strip_prefix("0x")
+            .or_else(|| s.strip_prefix("0X"))
+            .unwrap_or(s);
         if s.len() != HASH_SIZE * 2 {
             return Err("Invalid hash hex string length");
         }

@@ -141,8 +141,14 @@ mod tests {
             std::mem::size_of::<DatabaseStorePrefixes>(),
             "DatabaseStorePrefixes is expected to have the same memory layout of u8"
         );
-        assert_eq!(DatabaseStorePrefixes::from_u8(1), Some(DatabaseStorePrefixes::AcceptanceData));
-        assert_eq!(DatabaseStorePrefixes::from_u8(255), Some(DatabaseStorePrefixes::Separator));
+        assert_eq!(
+            DatabaseStorePrefixes::from_u8(1),
+            Some(DatabaseStorePrefixes::AcceptanceData)
+        );
+        assert_eq!(
+            DatabaseStorePrefixes::from_u8(255),
+            Some(DatabaseStorePrefixes::Separator)
+        );
         assert_eq!(DatabaseStorePrefixes::from_u8(99), None);
     }
 }

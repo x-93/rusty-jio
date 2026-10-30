@@ -9,8 +9,8 @@ mod tests {
     use super::*;
     use jio_utils::triggers::SingleTrigger;
     use parking_lot::Mutex;
-    use std::sync::atomic::{AtomicBool, Ordering};
     use std::sync::Arc;
+    use std::sync::atomic::{AtomicBool, Ordering};
     use std::time::Duration;
 
     struct TestService {
@@ -34,7 +34,10 @@ mod tests {
             }
         }
 
-        fn with_failing_stop(name: &'static str, stop_order: Arc<Mutex<Vec<&'static str>>>) -> Self {
+        fn with_failing_stop(
+            name: &'static str,
+            stop_order: Arc<Mutex<Vec<&'static str>>>,
+        ) -> Self {
             Self {
                 name,
                 exit_trigger: SingleTrigger::new(),
@@ -68,7 +71,10 @@ mod tests {
                 self.stopped.store(true, Ordering::SeqCst);
                 self.stop_order.lock().push(self.name);
                 if self.should_fail_stop {
-                    Err(CoreError::ServiceError(self.name, "intentional stop error".into()))
+                    Err(CoreError::ServiceError(
+                        self.name,
+                        "intentional stop error".into(),
+                    ))
                 } else {
                     Ok(())
                 }
@@ -96,9 +102,7 @@ mod tests {
         // Run daemon in background task
         let core_arc = Arc::new(core);
         let core_clone = core_arc.clone();
-        let run_handle = tokio::spawn(async move {
-            core_clone.run().await
-        });
+        let run_handle = tokio::spawn(async move { core_clone.run().await });
 
         // Give tasks a brief moment to start
         tokio::time::sleep(Duration::from_millis(50)).await;
@@ -120,7 +124,10 @@ mod tests {
 
         // Must stop in reverse order of registration: s3 (p2p), s2 (consensus), s1 (database)
         let order = stop_order.lock().clone();
-        assert_eq!(order, vec!["service-p2p", "service-consensus", "service-database"]);
+        assert_eq!(
+            order,
+            vec!["service-p2p", "service-consensus", "service-database"]
+        );
     }
 
     #[tokio::test]
@@ -129,7 +136,10 @@ mod tests {
         let stop_order = Arc::new(Mutex::new(Vec::new()));
 
         let s1 = Arc::new(TestService::new("s1-base", stop_order.clone()));
-        let s2 = Arc::new(TestService::with_failing_stop("s2-failing", stop_order.clone()));
+        let s2 = Arc::new(TestService::with_failing_stop(
+            "s2-failing",
+            stop_order.clone(),
+        ));
         let s3 = Arc::new(TestService::new("s3-top", stop_order.clone()));
 
         core.bind(s1.clone());

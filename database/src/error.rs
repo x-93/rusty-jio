@@ -20,4 +20,3 @@ pub enum DatabaseError {
     #[error("Invalid key: {0}")]
     InvalidKey(String),
 }
-

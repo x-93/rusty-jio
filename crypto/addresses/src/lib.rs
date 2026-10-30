@@ -248,7 +248,10 @@ mod tests {
     #[test]
     fn test_invalid_address_rejection() {
         // Missing colon delimiter
-        assert_eq!(Address::decode("jiotestqp3d"), Err(AddressError::InvalidFormat));
+        assert_eq!(
+            Address::decode("jiotestqp3d"),
+            Err(AddressError::InvalidFormat)
+        );
 
         // Unknown prefix
         assert!(matches!(

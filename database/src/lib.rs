@@ -81,12 +81,8 @@ mod tests {
     fn test_random_cache_policy() {
         let (db, _dir) = DB::create_temp_db().unwrap();
 
-        let table = CachedDbAccess::new_with_policy(
-            db.clone(),
-            b"utxos/".to_vec(),
-            CachePolicy::Random,
-            5,
-        );
+        let table =
+            CachedDbAccess::new_with_policy(db.clone(), b"utxos/".to_vec(), CachePolicy::Random, 5);
 
         for i in 0..20u8 {
             table.write(&[i], vec![i * 2]).unwrap();

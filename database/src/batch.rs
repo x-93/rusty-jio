@@ -66,4 +66,3 @@ impl BatchDbWriter {
         &mut self.batch
     }
 }
-
