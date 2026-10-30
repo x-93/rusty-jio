@@ -16,14 +16,14 @@ pub trait Hasher: HasherBase + Clone + Default {
 #[macro_export]
 macro_rules! impl_hasher {
     (struct $name:ident) => {
-        impl $crate::hasher::HasherBase for $name {
+        impl $crate::hashers::HasherBase for $name {
             #[inline(always)]
             fn update<A: AsRef<[u8]>>(&mut self, data: A) -> &mut Self {
                 self.write(data);
                 self
             }
         }
-        impl $crate::hasher::Hasher for $name {
+        impl $crate::hashers::Hasher for $name {
             #[inline(always)]
             fn finalize(self) -> $crate::Hash {
                 $name::finalize(self)
