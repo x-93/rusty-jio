@@ -73,6 +73,7 @@ impl SigHashReusedValues {
 }
 
 /// Computes the Schnorr signature hash for a specific transaction input.
+#[allow(clippy::collapsible_if)]
 pub fn calc_schnorr_signature_hash(
     tx: &Transaction,
     input_index: usize,

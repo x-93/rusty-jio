@@ -28,8 +28,8 @@ impl Matrix64x64 {
         let mut out = [0u8; 64];
         for i in 0..64 {
             let mut sum: u32 = 0;
-            for j in 0..64 {
-                sum = sum.wrapping_add((self.rows[i][j] as u32) * (vector[j] as u32));
+            for (j, &v) in vector.iter().enumerate() {
+                sum = sum.wrapping_add((self.rows[i][j] as u32) * (v as u32));
             }
             let shifted = (sum >> 10) as u8;
             out[i] = (shifted ^ vector[i]) & 0x0F;
