@@ -411,11 +411,13 @@ name = "jio-consensus-core"
 version = "0.1.0"
 dependencies = [
  "borsh",
+ "faster-hex",
  "indexmap",
  "jio-addresses",
  "jio-hashes",
  "jio-math",
  "jio-merkle",
+ "jio-utils",
  "serde",
  "smallvec",
  "thiserror 1.0.69",
@@ -466,6 +468,7 @@ dependencies = [
  "malachite-base",
  "malachite-nz",
  "rand",
+ "rand_chacha",
  "serde",
  "serde_json",
 ]

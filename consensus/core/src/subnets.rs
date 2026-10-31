@@ -3,24 +3,34 @@ use std::str::{self, FromStr};
 
 use borsh::{BorshDeserialize, BorshSerialize};
 use jio_utils::hex::{FromHex, ToHex};
-use jio_utils::{serde_impl_deser_fixed_bytes_ref, serde_impl_ser_fixed_bytes_ref};
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// The size of the array used to store subnetwork IDs.
 pub const SUBNETWORK_ID_SIZE: usize = 20;
 
 /// The domain representation of a Subnetwork ID
-#[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, BorshSerialize, BorshDeserialize)]
-pub struct SubnetworkId([u8; SUBNETWORK_ID_SIZE]);
+#[derive(
+    Clone,
+    Copy,
+    Default,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
+    BorshSerialize,
+    BorshDeserialize,
+    Serialize,
+    Deserialize,
+)]
+pub struct SubnetworkId(pub [u8; SUBNETWORK_ID_SIZE]);
 
 impl Debug for SubnetworkId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("SubnetworkId").field("", &self.to_hex()).finish()
     }
 }
-
-serde_impl_ser_fixed_bytes_ref!(SubnetworkId, SUBNETWORK_ID_SIZE);
-serde_impl_deser_fixed_bytes_ref!(SubnetworkId, SUBNETWORK_ID_SIZE);
 
 impl AsRef<[u8; SUBNETWORK_ID_SIZE]> for SubnetworkId {
     fn as_ref(&self) -> &[u8; SUBNETWORK_ID_SIZE] {
@@ -41,6 +51,10 @@ impl From<[u8; SUBNETWORK_ID_SIZE]> for SubnetworkId {
 }
 
 impl SubnetworkId {
+    pub const NATIVE: SubnetworkId = SUBNETWORK_ID_NATIVE;
+    pub const COINBASE: SubnetworkId = SUBNETWORK_ID_COINBASE;
+    pub const REGISTRY: SubnetworkId = SUBNETWORK_ID_REGISTRY;
+
     pub const fn from_byte(b: u8) -> SubnetworkId {
         let mut bytes = [0u8; SUBNETWORK_ID_SIZE];
         bytes[0] = b;

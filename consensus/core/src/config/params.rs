@@ -26,6 +26,10 @@ pub struct Params {
 }
 
 impl Params {
+    pub fn bps(&self) -> u64 {
+        self.bps.bps()
+    }
+
     pub fn mainnet() -> Self {
         let bps = Bps::Bps10;
         Self {

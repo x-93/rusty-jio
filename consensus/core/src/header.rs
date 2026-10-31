@@ -1,6 +1,6 @@
-use crate::{BlueWorkType, hashing};
+use crate::BlueWorkType;
 use borsh::{BorshDeserialize, BorshSchema, BorshSerialize};
-use jio_hashes::Hash;
+use jio_hashes::{BlockHash, Hash, ProofOfWorkHash};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize, BorshSchema)]
@@ -38,7 +38,7 @@ impl Header {
         pruning_point: Hash,
     ) -> Self {
         let mut header = Self {
-            hash: Default::default(), // Temp init before the finalize below
+            hash: Hash::ZERO,
             version,
             parents_by_level,
             hash_merkle_root,
@@ -58,7 +58,7 @@ impl Header {
 
     /// Finalizes the header and recomputes the header hash
     pub fn finalize(&mut self) {
-        self.hash = hashing::header::hash(self);
+        self.hash = self.compute_hash();
     }
 
     pub fn direct_parents(&self) -> &[Hash] {
@@ -67,6 +67,75 @@ impl Header {
         } else {
             &self.parents_by_level[0]
         }
+    }
+
+    /// Check if this header is a genesis block header (no parents).
+    pub fn is_genesis(&self) -> bool {
+        self.parents_by_level.is_empty() || self.parents_by_level[0].is_empty()
+    }
+
+    /// Computes the domain-separated BlockHash over all header fields.
+    pub fn compute_hash(&self) -> Hash {
+        let mut hasher = BlockHash::new();
+        hasher.update(self.version.to_le_bytes());
+
+        let num_levels = self.parents_by_level.len() as u32;
+        hasher.update(num_levels.to_le_bytes());
+        for level in &self.parents_by_level {
+            let num_parents = level.len() as u32;
+            hasher.update(num_parents.to_le_bytes());
+            for parent in level {
+                hasher.update(parent.as_bytes());
+            }
+        }
+
+        hasher.update(self.hash_merkle_root.as_bytes());
+        hasher.update(self.accepted_id_merkle_root.as_bytes());
+        hasher.update(self.utxo_commitment.as_bytes());
+        hasher.update(self.timestamp.to_le_bytes());
+        hasher.update(self.bits.to_le_bytes());
+        hasher.update(self.nonce.to_le_bytes());
+        hasher.update(self.daa_score.to_le_bytes());
+
+        let work_bytes = self.blue_work.to_le_bytes();
+        hasher.update(work_bytes);
+        hasher.update(self.blue_score.to_le_bytes());
+        hasher.update(self.pruning_point.as_bytes());
+
+        hasher.finalize()
+    }
+
+    /// Computes the PrePowHash (hash of header with timestamp=0 and nonce=0).
+    pub fn compute_pre_pow_hash(&self) -> Hash {
+        let mut hasher = ProofOfWorkHash::new();
+        hasher.update(self.version.to_le_bytes());
+
+        let num_levels = self.parents_by_level.len() as u32;
+        hasher.update(num_levels.to_le_bytes());
+        for level in &self.parents_by_level {
+            let num_parents = level.len() as u32;
+            hasher.update(num_parents.to_le_bytes());
+            for parent in level {
+                hasher.update(parent.as_bytes());
+            }
+        }
+
+        hasher.update(self.hash_merkle_root.as_bytes());
+        hasher.update(self.accepted_id_merkle_root.as_bytes());
+        hasher.update(self.utxo_commitment.as_bytes());
+
+        // Zero timestamp and zero nonce for pre-pow commitments
+        hasher.update(0u64.to_le_bytes());
+        hasher.update(self.bits.to_le_bytes());
+        hasher.update(0u64.to_le_bytes());
+
+        hasher.update(self.daa_score.to_le_bytes());
+        let work_bytes = self.blue_work.to_le_bytes();
+        hasher.update(work_bytes);
+        hasher.update(self.blue_score.to_le_bytes());
+        hasher.update(self.pruning_point.as_bytes());
+
+        hasher.finalize()
     }
 
     /// WARNING: To be used for test purposes only

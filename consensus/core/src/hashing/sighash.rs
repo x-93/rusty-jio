@@ -1,6 +1,6 @@
 use crate::tx::Transaction;
 use crate::utxo::UtxoEntry;
-use jio_hashes::{Hash, Hasher, TransactionSigningHash};
+use jio_hashes::{Hash, TransactionSigningHash};
 
 pub const SIG_HASH_ALL: u8 = 0b00000001;
 pub const SIG_HASH_NONE: u8 = 0b00000010;

@@ -6,6 +6,7 @@ license.workspace = true
 
 [dependencies]
 jio-math.workspace = true
+jio-utils.workspace = true
 jio-hashes.workspace = true
 jio-merkle.workspace = true
 jio-addresses.workspace = true
@@ -15,3 +16,4 @@ borsh.workspace = true
 thiserror.workspace = true
 indexmap.workspace = true
 smallvec.workspace = true
+faster-hex.workspace = true

@@ -1,6 +1,8 @@
+pub mod calc;
 pub mod matrix;
 pub mod xoshiro;
 
+pub use calc::{calculate_pow, check_pow, hash_to_nibbles, nibbles_to_bytes};
 pub use matrix::Matrix64x64;
 pub use xoshiro::XoShiRo256PlusPlus;
 
@@ -36,7 +38,7 @@ mod tests {
 
     #[test]
     fn test_nibble_roundtrip_conversion() {
-        let hash = Hash::from(0x123456789ABCDEF0u64);
+        let hash = Hash::from_u64_word(0x123456789ABCDEF0);
         let nibbles = hash_to_nibbles(&hash);
         let recovered = nibbles_to_bytes(&nibbles);
         assert_eq!(hash.as_bytes(), recovered);

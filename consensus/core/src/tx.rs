@@ -1,5 +1,5 @@
 use borsh::{BorshDeserialize, BorshSerialize};
-use jio_hashes::{Hash, Hasher, TransactionHash, TransactionID};
+use jio_hashes::{Hash, TransactionHash, TransactionID};
 use serde::{Deserialize, Serialize};
 
 #[derive(
@@ -45,16 +45,9 @@ pub struct TransactionOutput {
     pub script_public_key: ScriptPublicKey,
 }
 
-#[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
-)]
-pub struct SubnetworkId(pub [u8; 20]);
+pub use crate::subnets::SubnetworkId;
 
-impl SubnetworkId {
-    pub const NATIVE: SubnetworkId = SubnetworkId([0u8; 20]);
-    pub const COINBASE: SubnetworkId =
-        SubnetworkId([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-}
+pub type TransactionId = Hash;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 pub struct Transaction {
