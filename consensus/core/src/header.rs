@@ -1,4 +1,4 @@
-use crate::{hashing, BlueWorkType};
+use crate::{BlueWorkType, hashing};
 use borsh::{BorshDeserialize, BorshSerialize};
 use jio_hashes::Hash;
 use jio_utils::mem_size::MemSizeEstimator;
@@ -177,12 +177,7 @@ impl AsRef<Header> for Header {
 impl MemSizeEstimator for Header {
     fn estimate_mem_bytes(&self) -> usize {
         size_of::<Self>()
-            + self
-                .parents_by_level
-                .iter()
-                .map(|l| l.len())
-                .sum::<usize>()
-                * size_of::<Hash>()
+            + self.parents_by_level.iter().map(|l| l.len()).sum::<usize>() * size_of::<Hash>()
     }
 }
 
@@ -214,7 +209,10 @@ mod tests {
         let v = serde_json::from_str::<Value>(&json).unwrap();
         let blue_work = v.get("blueWork").expect("missing `blueWork` property");
         let blue_work = blue_work.as_str().expect("`blueWork` is not a string");
-        assert_eq!(blue_work, "1234567890abcdefc0dec0ffeec0ffee1234567890abcfed");
+        assert_eq!(
+            blue_work,
+            "1234567890abcdefc0dec0ffeec0ffee1234567890abcfed"
+        );
         let blue_score = v.get("blueScore").expect("missing `blueScore` property");
         let blue_score: u64 = blue_score
             .as_u64()

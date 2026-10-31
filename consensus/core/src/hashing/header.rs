@@ -1,6 +1,6 @@
 use super::HasherExtensions;
 use crate::header::Header;
-use jio_hashes::{Hash, HasherBase};
+use jio_hashes::Hash;
 
 /// Returns the header hash using the provided nonce+timestamp instead of those in the header.
 #[inline]
