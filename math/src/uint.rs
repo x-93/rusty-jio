@@ -900,8 +900,8 @@ impl From<core::convert::Infallible> for TryFromSliceError {
 #[cfg(test)]
 mod tests {
     use rand_chacha::{
-        rand_core::{RngCore, SeedableRng},
         ChaCha8Rng,
+        rand_core::{RngCore, SeedableRng},
     };
     use std::fmt::Write;
     construct_uint!(Uint128, 2);
@@ -931,7 +931,7 @@ mod tests {
             assert_equal_args(format_args!("{a:0128b}"), format_args!("{b:0128b}")); // Test binary with length
             assert_equal_args(format_args!("{a:x}"), format_args!("{b:x}")); // Test LowerHex
             assert_equal_args(format_args!("{a:#x}"), format_args!("{b:#x}")); // Test LowerHex with prefix
-                                                                               // Test LowerHex with padding
+            // Test LowerHex with padding
             assert_equal_args(format_args!("{a:032x}"), format_args!("{b:032x}"));
         };
         let mut rng = ChaCha8Rng::from_seed([0; 32]);
@@ -950,7 +950,11 @@ mod tests {
             assert_equal(mine2, default2, check_fmt);
 
             let mine = mine.overflowing_add(mine2).0.overflowing_mul(mine2).0;
-            let default = default.overflowing_add(default2).0.overflowing_mul(default2).0;
+            let default = default
+                .overflowing_add(default2)
+                .0
+                .overflowing_mul(default2)
+                .0;
             assert_equal(mine, default, check_fmt);
             let shift = rng.next_u32() % 4096;
             {
@@ -981,7 +985,10 @@ mod tests {
             {
                 let rand_u64 = rng.next_u64();
                 let mine_divrem = mine.div_rem_u64(rand_u64);
-                let default_divrem = (default / u128::from(rand_u64), default % u128::from(rand_u64));
+                let default_divrem = (
+                    default / u128::from(rand_u64),
+                    default % u128::from(rand_u64),
+                );
                 assert_equal(mine_divrem.0, default_divrem.0, check_fmt);
                 assert_eq!(mine_divrem.1, u64::try_from(default_divrem.1).unwrap());
             }

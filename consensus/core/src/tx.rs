@@ -3,7 +3,16 @@ use jio_hashes::{Hash, TransactionHash, TransactionID};
 use serde::{Deserialize, Serialize};
 
 #[derive(
-    Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
 )]
 pub struct TransactionOutpoint {
     pub transaction_id: Hash,

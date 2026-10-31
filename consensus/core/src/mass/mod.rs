@@ -48,11 +48,7 @@ pub fn calc_storage_mass(tx: &Transaction, utxo_entries: &[UtxoEntry]) -> u64 {
     }
 
     let diff = out_harmonic_sum - in_harmonic_sum;
-    if diff > 0.0 {
-        diff.ceil() as u64
-    } else {
-        0
-    }
+    if diff > 0.0 { diff.ceil() as u64 } else { 0 }
 }
 
 /// Overall transaction mass is max(compute_mass, storage_mass).

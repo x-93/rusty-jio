@@ -241,7 +241,15 @@ mod tests {
             value: 100,
             script_public_key: ScriptPublicKey::new(0, vec![]),
         };
-        let tx = Transaction::new(1, vec![input], vec![dust_out], 0, SubnetworkId::NATIVE, 0, vec![]);
+        let tx = Transaction::new(
+            1,
+            vec![input],
+            vec![dust_out],
+            0,
+            SubnetworkId::NATIVE,
+            0,
+            vec![],
+        );
 
         let storage_mass = mass::calc_storage_mass(&tx, &[in_entry]);
         // Storage mass must penalize dust with massive mass!
