@@ -81,6 +81,11 @@ pub fn calc_schnorr_signature_hash(
     hash_type: u8,
     reused: &SigHashReusedValues,
 ) -> Hash {
+    assert!(
+        input_index < tx.inputs.len(),
+        "input_index out of bounds for transaction inputs"
+    );
+
     let mut hasher = TransactionSigningHash::new();
 
     // 1. Version
@@ -131,15 +136,19 @@ pub fn calc_schnorr_signature_hash(
         if let Some(h) = reused.outputs_hash {
             hasher.update(h.as_bytes());
         }
-    } else if (hash_type & 0x07) == SIG_HASH_SINGLE && input_index < tx.outputs.len() {
-        let mut single_hasher = TransactionSigningHash::new();
-        let output = &tx.outputs[input_index];
-        single_hasher.update(output.value.to_le_bytes());
-        single_hasher.update(output.script_public_key.version.to_le_bytes());
-        let script_len = output.script_public_key.script.len() as u32;
-        single_hasher.update(script_len.to_le_bytes());
-        single_hasher.update(&output.script_public_key.script);
-        hasher.update(single_hasher.finalize().as_bytes());
+    } else if (hash_type & 0x07) == SIG_HASH_SINGLE {
+        if input_index < tx.outputs.len() {
+            let mut single_hasher = TransactionSigningHash::new();
+            let output = &tx.outputs[input_index];
+            single_hasher.update(output.value.to_le_bytes());
+            single_hasher.update(output.script_public_key.version.to_le_bytes());
+            let script_len = output.script_public_key.script.len() as u32;
+            single_hasher.update(script_len.to_le_bytes());
+            single_hasher.update(&output.script_public_key.script);
+            hasher.update(single_hasher.finalize().as_bytes());
+        } else {
+            hasher.update(Hash::ZERO.as_bytes());
+        }
     }
 
     // 9. Lock time, Subnetwork, and Hash type

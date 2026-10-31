@@ -253,6 +253,10 @@ mod tests {
             Err(AddressError::InvalidFormat)
         );
 
+        // Short or empty payload
+        assert!(Address::decode("jio:").is_err());
+        assert!(Address::decode("jio:qqqqqqqq").is_err());
+
         // Unknown prefix
         assert!(matches!(
             Address::decode("bitcoin:qp3d"),

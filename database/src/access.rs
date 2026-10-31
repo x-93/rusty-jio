@@ -100,10 +100,10 @@ impl CachedDbAccess {
         Ok(())
     }
 
-    /// Record a write in a `BatchDbWriter` and update the local cache immediately.
+    /// Record a write in a `BatchDbWriter` and evict from local cache to prevent uncommitted dirty reads.
     pub fn write_batch(&self, batch: &mut BatchDbWriter, key: &[u8], value: &[u8]) {
         batch.put_prefixed(&self.prefix, key, value);
-        self.cache.insert(key.to_vec(), value.to_vec());
+        self.cache.remove(&key.to_vec());
     }
 
     /// Record a delete in a `BatchDbWriter` and evict from the local cache immediately.

@@ -30,25 +30,25 @@ pub fn calc_compute_mass(tx: &Transaction) -> u64 {
 /// Calculates storage mass according to KIP-0009:
 /// StorageMass = max(0, C * ( sum(1 / v_out) - sum(1 / v_in) ))
 /// Dust outputs with tiny values produce large storage mass penalties!
+/// Uses deterministic integer arithmetic to avoid cross-architecture floating-point forks.
 pub fn calc_storage_mass(tx: &Transaction, utxo_entries: &[UtxoEntry]) -> u64 {
     if tx.is_coinbase() {
         return 0;
     }
 
-    let mut out_harmonic_sum: f64 = 0.0;
+    let mut out_harmonic_sum: u64 = 0;
     for out in &tx.outputs {
-        let val = out.value.max(1) as f64;
-        out_harmonic_sum += (STORAGE_MASS_PARAMETER as f64) / val;
+        let val = out.value.max(1);
+        out_harmonic_sum = out_harmonic_sum.saturating_add(STORAGE_MASS_PARAMETER / val);
     }
 
-    let mut in_harmonic_sum: f64 = 0.0;
+    let mut in_harmonic_sum: u64 = 0;
     for entry in utxo_entries {
-        let val = entry.amount.max(1) as f64;
-        in_harmonic_sum += (STORAGE_MASS_PARAMETER as f64) / val;
+        let val = entry.amount.max(1);
+        in_harmonic_sum = in_harmonic_sum.saturating_add(STORAGE_MASS_PARAMETER / val);
     }
 
-    let diff = out_harmonic_sum - in_harmonic_sum;
-    if diff > 0.0 { diff.ceil() as u64 } else { 0 }
+    out_harmonic_sum.saturating_sub(in_harmonic_sum)
 }
 
 /// Overall transaction mass is max(compute_mass, storage_mass).
