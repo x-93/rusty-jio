@@ -17,3 +17,6 @@ thiserror.workspace = true
 indexmap.workspace = true
 smallvec.workspace = true
 faster-hex.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

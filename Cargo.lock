@@ -419,6 +419,7 @@ dependencies = [
  "jio-merkle",
  "jio-utils",
  "serde",
+ "serde_json",
  "smallvec",
  "thiserror 1.0.69",
 ]
