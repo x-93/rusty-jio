@@ -68,7 +68,7 @@ pub fn pre_pow_hash(header: &Header) -> Hash {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{blockhash, BlueWorkType};
+    use crate::{BlueWorkType, blockhash};
 
     #[test]
     fn test_header_hashing() {

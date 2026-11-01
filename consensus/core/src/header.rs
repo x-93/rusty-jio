@@ -3,6 +3,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use jio_hashes::Hash;
 use jio_utils::mem_size::MemSizeEstimator;
 use serde::{Deserialize, Serialize};
+use std::mem::size_of;
 
 /// @category Consensus
 #[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
@@ -60,6 +61,37 @@ impl Header {
         header
     }
 
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        version: u16,
+        parents_by_level: Vec<Vec<Hash>>,
+        hash_merkle_root: Hash,
+        accepted_id_merkle_root: Hash,
+        utxo_commitment: Hash,
+        timestamp: u64,
+        bits: u32,
+        nonce: u64,
+        daa_score: u64,
+        blue_work: BlueWorkType,
+        blue_score: u64,
+        pruning_point: Hash,
+    ) -> Self {
+        Self::new_finalized(
+            version,
+            parents_by_level,
+            hash_merkle_root,
+            accepted_id_merkle_root,
+            utxo_commitment,
+            timestamp,
+            bits,
+            nonce,
+            daa_score,
+            blue_work,
+            blue_score,
+            pruning_point,
+        )
+    }
+
     /// Finalizes the header and recomputes the header hash
     pub fn finalize(&mut self) {
         self.hash = hashing::header::hash(self);
@@ -71,6 +103,21 @@ impl Header {
         } else {
             &self.parents_by_level[0]
         }
+    }
+
+    /// Check if this header is a genesis block header (no parents).
+    pub fn is_genesis(&self) -> bool {
+        self.parents_by_level.is_empty() || self.parents_by_level[0].is_empty()
+    }
+
+    /// Computes the domain-separated BlockHash over all header fields.
+    pub fn compute_hash(&self) -> Hash {
+        hashing::header::hash(self)
+    }
+
+    /// Computes the PrePowHash (hash of header with timestamp=0 and nonce=0).
+    pub fn compute_pre_pow_hash(&self) -> Hash {
+        hashing::header::pre_pow_hash(self)
     }
 
     /// WARNING: To be used for test purposes only
