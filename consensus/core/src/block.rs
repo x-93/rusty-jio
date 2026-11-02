@@ -12,10 +12,7 @@ pub struct MutableBlock {
 
 impl MutableBlock {
     pub fn new(header: Header, txs: Vec<Transaction>) -> Self {
-        Self {
-            header,
-            transactions: txs,
-        }
+        Self { header, transactions: txs }
     }
 
     pub fn from_header(header: Header) -> Self {
@@ -38,31 +35,19 @@ pub struct Block {
 
 impl Block {
     pub fn new(header: Header, txs: Vec<Transaction>) -> Self {
-        Self {
-            header: Arc::new(header),
-            transactions: Arc::new(txs),
-        }
+        Self { header: Arc::new(header), transactions: Arc::new(txs) }
     }
 
     pub fn from_arcs(header: Arc<Header>, transactions: Arc<Vec<Transaction>>) -> Self {
-        Self {
-            header,
-            transactions,
-        }
+        Self { header, transactions }
     }
 
     pub fn from_header_arc(header: Arc<Header>) -> Self {
-        Self {
-            header,
-            transactions: Arc::new(Vec::new()),
-        }
+        Self { header, transactions: Arc::new(Vec::new()) }
     }
 
     pub fn from_header(header: Header) -> Self {
-        Self {
-            header: Arc::new(header),
-            transactions: Arc::new(Vec::new()),
-        }
+        Self { header: Arc::new(header), transactions: Arc::new(Vec::new()) }
     }
 
     pub fn is_header_only(&self) -> bool {
@@ -86,23 +71,10 @@ pub struct BlockTemplate {
     pub miner_data: MinerData,
     pub coinbase_has_red_reward: bool,
     pub selected_parent_timestamp: u64,
-    pub selected_parent_daa_score: u64,
 }
 
 impl BlockTemplate {
-    pub fn new(
-        block: MutableBlock,
-        miner_data: MinerData,
-        coinbase_has_red_reward: bool,
-        selected_parent_timestamp: u64,
-        selected_parent_daa_score: u64,
-    ) -> Self {
-        Self {
-            block,
-            miner_data,
-            coinbase_has_red_reward,
-            selected_parent_timestamp,
-            selected_parent_daa_score,
-        }
+    pub fn new(block: MutableBlock, miner_data: MinerData, coinbase_has_red_reward: bool, selected_parent_timestamp: u64) -> Self {
+        Self { block, miner_data, coinbase_has_red_reward, selected_parent_timestamp }
     }
 }

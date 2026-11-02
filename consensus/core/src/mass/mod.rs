@@ -1,59 +1,57 @@
-use crate::tx::Transaction;
-use crate::utxo::UtxoEntry;
+use crate::{
+    subnets::SUBNETWORK_ID_SIZE,
+    tx::{Transaction, TransactionInput, TransactionOutput},
+};
+use jio_hashes::HASH_SIZE;
 
-pub const MASS_PER_TX_BYTE: u64 = 1;
-pub const MASS_PER_SCRIPT_PUB_KEY_BYTE: u64 = 10;
-pub const MASS_PER_SIG_OP: u64 = 1000;
-pub const STORAGE_MASS_PARAMETER: u64 = 10_000_000_000; // C = 10^10 Sompis
+// transaction_estimated_serialized_size is the estimated size of a transaction in some
+// serialization. This has to be deterministic, but not necessarily accurate, since
+// it's only used as the size component in the transaction and block mass limit
+// calculation.
+pub fn transaction_estimated_serialized_size(tx: &Transaction) -> u64 {
+    let mut size: u64 = 0;
+    size += 2; // Tx version (u16)
+    size += 8; // Number of inputs (u64)
+    let inputs_size: u64 = tx.inputs.iter().map(transaction_input_estimated_serialized_size).sum();
+    size += inputs_size;
 
-/// Calculates compute mass based on serialized bytes and signature operations.
-pub fn calc_compute_mass(tx: &Transaction) -> u64 {
-    let mut bytes = 4; // version (2) + lock_time (2)
-    bytes += 4; // inputs len
-    for input in &tx.inputs {
-        bytes += 32 + 4 + 8 + 1 + input.signature_script.len() as u64;
-    }
-    bytes += 4; // outputs len
-    for output in &tx.outputs {
-        bytes += 8 + 2 + 4 + output.script_public_key.script.len() as u64;
-    }
-    bytes += 20 + 8 + 4 + tx.payload.len() as u64;
+    size += 8; // number of outputs (u64)
+    let outputs_size: u64 = tx.outputs.iter().map(transaction_output_estimated_serialized_size).sum();
+    size += outputs_size;
 
-    let mut sig_ops: u64 = 0;
-    for input in &tx.inputs {
-        sig_ops += input.sig_op_count as u64;
-    }
+    size += 8; // lock time (u64)
+    size += SUBNETWORK_ID_SIZE as u64;
+    size += 8; // gas (u64)
+    size += HASH_SIZE as u64; // payload hash
 
-    bytes * MASS_PER_TX_BYTE + sig_ops * MASS_PER_SIG_OP
+    size += 8; // length of the payload (u64)
+    size += tx.payload.len() as u64;
+    size
 }
 
-/// Calculates storage mass according to KIP-0009:
-/// StorageMass = max(0, C * ( sum(1 / v_out) - sum(1 / v_in) ))
-/// Dust outputs with tiny values produce large storage mass penalties!
-/// Uses deterministic integer arithmetic to avoid cross-architecture floating-point forks.
-pub fn calc_storage_mass(tx: &Transaction, utxo_entries: &[UtxoEntry]) -> u64 {
-    if tx.is_coinbase() {
-        return 0;
-    }
+fn transaction_input_estimated_serialized_size(input: &TransactionInput) -> u64 {
+    let mut size = 0;
+    size += outpoint_estimated_serialized_size();
 
-    let mut out_harmonic_sum: u64 = 0;
-    for out in &tx.outputs {
-        let val = out.value.max(1);
-        out_harmonic_sum = out_harmonic_sum.saturating_add(STORAGE_MASS_PARAMETER / val);
-    }
+    size += 8; // length of signature script (u64)
+    size += input.signature_script.len() as u64;
 
-    let mut in_harmonic_sum: u64 = 0;
-    for entry in utxo_entries {
-        let val = entry.amount.max(1);
-        in_harmonic_sum = in_harmonic_sum.saturating_add(STORAGE_MASS_PARAMETER / val);
-    }
-
-    out_harmonic_sum.saturating_sub(in_harmonic_sum)
+    size += 8; // sequence (uint64)
+    size
 }
 
-/// Overall transaction mass is max(compute_mass, storage_mass).
-pub fn calc_overall_mass(tx: &Transaction, utxo_entries: &[UtxoEntry]) -> u64 {
-    let compute = calc_compute_mass(tx);
-    let storage = calc_storage_mass(tx, utxo_entries);
-    compute.max(storage)
+const fn outpoint_estimated_serialized_size() -> u64 {
+    let mut size: u64 = 0;
+    size += HASH_SIZE as u64; // Previous tx ID
+    size += 4; // Index (u32)
+    size
+}
+
+pub fn transaction_output_estimated_serialized_size(output: &TransactionOutput) -> u64 {
+    let mut size: u64 = 0;
+    size += 8; // value (u64)
+    size += 2; // output.ScriptPublicKey.Version (u16)
+    size += 8; // length of script public key (u64)
+    size += output.script_public_key.script().len() as u64;
+    size
 }

@@ -1,0 +1,11 @@
+<html>
+    <head>
+        <script type="module">
+            import * as workflow from './jio-wallet/jio-wallet.js';
+            (async () => {
+                const wasm = await workflow.default('./jio-wallet/jio-wallet_bg.wasm');
+            })();
+        </script>
+    </head>
+    <body></body>
+</html>

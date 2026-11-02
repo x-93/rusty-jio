@@ -1,0 +1,10 @@
+[package]
+name = "jio-wrpc-wasm"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+jio-wrpc-client.workspace = true

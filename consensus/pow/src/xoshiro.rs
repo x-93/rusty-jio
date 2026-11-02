@@ -1,45 +1,32 @@
-/// The XoShiRo256++ pseudo-random number generator.
-/// State consists of 4 64-bit unsigned integers.
-#[derive(Clone, Debug)]
+use jio_hashes::Hash;
+use std::num::Wrapping;
+
 pub struct XoShiRo256PlusPlus {
-    s: [u64; 4],
+    s0: Wrapping<u64>,
+    s1: Wrapping<u64>,
+    s2: Wrapping<u64>,
+    s3: Wrapping<u64>,
 }
 
 impl XoShiRo256PlusPlus {
-    /// Initializes the PRNG deterministically from a 32-byte seed.
-    pub fn from_seed(seed: [u8; 32]) -> Self {
-        let mut s = [0u64; 4];
-        for (i, item) in s.iter_mut().enumerate() {
-            let mut buf = [0u8; 8];
-            buf.copy_from_slice(&seed[i * 8..(i + 1) * 8]);
-            *item = u64::from_le_bytes(buf);
-        }
-        // Ensure state is not all zeros
-        if s[0] == 0 && s[1] == 0 && s[2] == 0 && s[3] == 0 {
-            s[0] = 0x9E3779B97F4A7C15;
-            s[1] = 0xBF58476D1CE4E5B9;
-            s[2] = 0x94D049BB133111EB;
-            s[3] = 0x46D32A15E7C81274;
-        }
-        Self { s }
+    #[inline(always)]
+    pub fn new(hash: Hash) -> Self {
+        let hash = hash.to_le_u64();
+        Self { s0: Wrapping(hash[0]), s1: Wrapping(hash[1]), s2: Wrapping(hash[2]), s3: Wrapping(hash[3]) }
     }
 
-    /// Generates the next 64-bit pseudo-random unsigned integer.
-    pub fn next_u64(&mut self) -> u64 {
-        let result = (self.s[0].wrapping_add(self.s[3]))
-            .rotate_left(23)
-            .wrapping_add(self.s[0]);
+    #[inline(always)]
+    pub fn u64(&mut self) -> u64 {
+        let res = self.s0 + Wrapping((self.s0 + self.s3).0.rotate_left(23));
+        let t = self.s1 << 17;
+        self.s2 ^= self.s0;
+        self.s3 ^= self.s1;
+        self.s1 ^= self.s2;
+        self.s0 ^= self.s3;
 
-        let t = self.s[1] << 17;
+        self.s2 ^= t;
+        self.s3 = Wrapping(self.s3.0.rotate_left(45));
 
-        self.s[2] ^= self.s[0];
-        self.s[3] ^= self.s[1];
-        self.s[1] ^= self.s[2];
-        self.s[0] ^= self.s[3];
-
-        self.s[2] ^= t;
-        self.s[3] = self.s[3].rotate_left(45);
-
-        result
+        res.0
     }
 }

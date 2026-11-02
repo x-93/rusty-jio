@@ -2,13 +2,10 @@
 name = "jio-utils"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
+include.workspace = true
 license.workspace = true
 
 [dependencies]
-faster-hex.workspace = true
-smallvec.workspace = true
-serde.workspace = true
-thiserror.workspace = true
-triggered.workspace = true
-tokio.workspace = true
-parking_lot.workspace = true
+async-channel.workspace = true
+triggered = "0.1"

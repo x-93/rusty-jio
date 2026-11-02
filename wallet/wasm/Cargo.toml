@@ -1,0 +1,19 @@
+[package]
+name = "jio-wallet-cli-wasm"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+jio-wallet-cli.workspace = true
+
+workflow-terminal.workspace = true
+workflow-log.workspace = true
+async-trait.workspace = true
+wasm-bindgen-futures.workspace = true
+js-sys.workspace = true
+wasm-bindgen.workspace = true
+workflow-wasm.workspace = true
+# console_error_panic_hook = "0.1.7"

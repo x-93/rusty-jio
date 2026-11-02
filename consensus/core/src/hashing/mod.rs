@@ -1,15 +1,12 @@
-pub mod header;
-pub mod sighash;
-
 use crate::BlueWorkType;
 use jio_hashes::HasherBase;
 
-pub use sighash::{
-    SIG_HASH_ALL, SIG_HASH_ANYONECANPAY, SIG_HASH_NONE, SIG_HASH_SINGLE, SigHashReusedValues,
-    calc_schnorr_signature_hash,
-};
+pub mod header;
+pub mod sighash;
+pub mod sighash_type;
+pub mod tx;
 
-pub trait HasherExtensions {
+pub(crate) trait HasherExtensions {
     /// Writes the len as u64 little endian bytes
     fn write_len(&mut self, len: usize) -> &mut Self;
 
@@ -76,11 +73,7 @@ impl<T: HasherBase> HasherExtensions for T {
     #[inline(always)]
     fn write_blue_work(&mut self, work: BlueWorkType) -> &mut Self {
         let be_bytes = work.to_be_bytes();
-        let start = be_bytes
-            .iter()
-            .copied()
-            .position(|byte| byte != 0)
-            .unwrap_or(be_bytes.len());
+        let start = be_bytes.iter().copied().position(|byte| byte != 0).unwrap_or(be_bytes.len());
 
         self.write_var_bytes(&be_bytes[start..])
     }

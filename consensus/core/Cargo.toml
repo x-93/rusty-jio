@@ -2,21 +2,24 @@
 name = "jio-consensus-core"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
+include.workspace = true
 license.workspace = true
 
 [dependencies]
-jio-math.workspace = true
-jio-utils.workspace = true
 jio-hashes.workspace = true
+jio-muhash.workspace = true
 jio-merkle.workspace = true
-jio-addresses.workspace = true
-
-serde.workspace = true
-borsh.workspace = true
+jio-math.workspace = true
 thiserror.workspace = true
-indexmap.workspace = true
-smallvec.workspace = true
+serde.workspace = true
 faster-hex.workspace = true
-
-[dev-dependencies]
-serde_json.workspace = true
+smallvec.workspace = true
+borsh.workspace = true
+secp256k1 = { version = "0.24", features = ["global-context", "rand-std"] }
+futures-util.workspace = true
+itertools.workspace = true
+cfg-if.workspace = true
+jio-addresses.workspace = true
+getrandom.workspace = true
+jio-txscript-errors.workspace = true

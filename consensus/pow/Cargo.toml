@@ -2,11 +2,19 @@
 name = "jio-pow"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-jio-math.workspace = true
 jio-hashes.workspace = true
+jio-math.workspace = true
 jio-consensus-core.workspace = true
 
-thiserror.workspace = true
+
+[dev-dependencies]
+criterion.workspace = true
+
+
+[[bench]]
+name = "bench"
+harness = false

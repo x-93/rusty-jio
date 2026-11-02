@@ -2,11 +2,19 @@
 name = "jio-addresses"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
+include.workspace = true
 license.workspace = true
 
 [dependencies]
-thiserror.workspace = true
+borsh.workspace = true
 serde.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
 
 [dev-dependencies]
-serde_json.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "bench"
+harness = false
