@@ -1,6 +1,0 @@
-/target
-/Cargo.lock
-/web/node_modules
-/nodejs/jio-wallet
-/nodejs/node_modules
-/nodejs/package-lock.json
