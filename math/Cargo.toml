@@ -1,0 +1,5 @@
+[package]
+name = "jio-math"
+version.workspace = true
+edition.workspace = true
+
