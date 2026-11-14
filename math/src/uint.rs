@@ -1002,9 +1002,9 @@ mod tests {
                 assert_eq!(mine_overflow_shr.1, default_overflow_shr.1);
             }
             {
-                if default2 != 0 {
+                if let Some(quotient) = default.checked_div(default2) {
                     let mine_divrem = mine.div_rem(mine2);
-                    let default_divrem = (default / default2, default % default2);
+                    let default_divrem = (quotient, default % default2);
                     assert_equal(mine_divrem.0, default_divrem.0, check_fmt);
                     assert_equal(mine_divrem.1, default_divrem.1, check_fmt);
                 }

@@ -27,7 +27,7 @@ impl Matrix {
     pub fn generate(rng: &mut Xoshiro256PlusPlus) -> Self {
         let mut mat = [[0u16; MATRIX_SIZE]; MATRIX_SIZE];
         for row in mat.iter_mut() {
-            for chunk in row.chunks_exact_mut(4) {
+            for chunk in row.as_chunks_mut::<4>().0 {
                 let rand_val = rng.next_u64();
                 chunk[0] = rand_val as u16;
                 chunk[1] = (rand_val >> 16) as u16;
@@ -42,6 +42,7 @@ impl Matrix {
     ///
     /// product[i] = (sum_{j=0..63} matrix[i][j] * vector[j]) mod 2^16
     #[inline(always)]
+    #[allow(clippy::needless_range_loop)]
     pub fn mul_vector(&self, vector: &[u16; MATRIX_SIZE]) -> [u16; MATRIX_SIZE] {
         let mut product = [0u16; MATRIX_SIZE];
         for i in 0..MATRIX_SIZE {
