@@ -1,10 +1,10 @@
 use consensus_core::{BlockHashMap, BlueWorkType, HashKTypeMap, KType};
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-pub const GHOSTDAG_PREFIX: &[u8] = b"ghostdag-data";
+pub const GHOSTDAG_PREFIX: &[u8] = DatabaseStorePrefixes::Ghostdag.as_ref();
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GhostdagData {

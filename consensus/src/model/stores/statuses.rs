@@ -1,9 +1,9 @@
 use consensus_core::blockstatus::BlockStatus;
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use std::sync::Arc;
 
-pub const STATUSES_PREFIX: &[u8] = b"block-statuses";
+pub const STATUSES_PREFIX: &[u8] = DatabaseStorePrefixes::Statuses.as_ref();
 
 pub trait StatusesStoreReader {
     fn has(&self, hash: Hash) -> bool;

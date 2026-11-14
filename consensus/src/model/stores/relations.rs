@@ -1,10 +1,10 @@
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-pub const PARENTS_PREFIX: &[u8] = b"dag-parents";
-pub const CHILDREN_PREFIX: &[u8] = b"dag-children";
+pub const PARENTS_PREFIX: &[u8] = DatabaseStorePrefixes::RelationsParents.as_ref();
+pub const CHILDREN_PREFIX: &[u8] = DatabaseStorePrefixes::RelationsChildren.as_ref();
 
 #[derive(Clone, Default, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BlockChildren(pub Vec<Hash>);

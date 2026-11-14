@@ -1,8 +1,8 @@
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use std::sync::Arc;
 
-pub const DEPTH_PREFIX: &[u8] = b"block-depth";
+pub const DEPTH_PREFIX: &[u8] = DatabaseStorePrefixes::BlockDepth.as_ref();
 
 pub trait DepthStoreReader {
     fn has(&self, hash: Hash) -> bool;

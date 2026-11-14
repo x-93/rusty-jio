@@ -1,9 +1,9 @@
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
-pub const REACHABILITY_PREFIX: &[u8] = b"reachability";
+pub const REACHABILITY_PREFIX: &[u8] = DatabaseStorePrefixes::Reachability.as_ref();
 
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Interval {

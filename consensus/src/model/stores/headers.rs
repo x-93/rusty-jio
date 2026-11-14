@@ -1,9 +1,9 @@
 use consensus_core::header::{ArcHeader, Header};
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use std::sync::Arc;
 
-pub const HEADERS_PREFIX: &[u8] = b"headers";
+pub const HEADERS_PREFIX: &[u8] = DatabaseStorePrefixes::Headers.as_ref();
 
 pub trait HeaderStoreReader {
     fn has(&self, hash: Hash) -> bool;

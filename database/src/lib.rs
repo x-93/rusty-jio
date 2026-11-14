@@ -4,6 +4,7 @@ pub mod db;
 pub mod errors;
 pub mod item;
 pub mod key;
+pub mod registry;
 pub mod writer;
 
 pub mod prelude {
@@ -15,6 +16,7 @@ pub mod prelude {
     };
     pub use super::item::CachedDbItem;
     pub use super::key::{DbKey, SEP, SEP_SIZE};
+    pub use super::registry::{DatabaseStorePrefixes, SEPARATOR};
     pub use super::writer::{BatchDbWriter, DbWriter, DirectDbWriter};
 }
 

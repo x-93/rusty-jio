@@ -1,8 +1,8 @@
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use std::sync::Arc;
 
-pub const DAA_PREFIX: &[u8] = b"daa-score";
+pub const DAA_PREFIX: &[u8] = DatabaseStorePrefixes::DaaScore.as_ref();
 
 pub trait DaaStoreReader {
     fn has(&self, hash: Hash) -> bool;

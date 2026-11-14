@@ -1,9 +1,9 @@
 use consensus_core::utxo::utxo_diff::UtxoDiff;
-use jio_database::prelude::{CachedDbAccess, DB, DbWriter, StoreResult};
+use jio_database::prelude::{CachedDbAccess, DB, DatabaseStorePrefixes, DbWriter, StoreResult};
 use jio_hashes::Hash;
 use std::sync::Arc;
 
-pub const UTXO_DIFFS_PREFIX: &[u8] = b"utxo-diffs";
+pub const UTXO_DIFFS_PREFIX: &[u8] = DatabaseStorePrefixes::UtxoDiffs.as_ref();
 
 pub trait UtxoDiffsStoreReader {
     fn has(&self, hash: Hash) -> bool;
