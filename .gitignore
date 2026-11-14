@@ -1,7 +1,11 @@
 /target
+debug
+target
 **/*.rs.bk
 Cargo.lock
 .idea
 .vscode
 *.log
-
+*.pdb
+**/mutants.out*/
+rustc-ice-*.txt
