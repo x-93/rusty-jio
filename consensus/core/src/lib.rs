@@ -5,6 +5,7 @@ extern crate self as consensus_core;
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasher, Hasher};
 
+pub use header::calc_work;
 pub use jio_hashes::Hash;
 
 pub mod acceptance_data;

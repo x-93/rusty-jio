@@ -4,6 +4,8 @@ use jio_hashes::Hash;
 use jio_utils::mem_size::MemSizeEstimator;
 use serde::{Deserialize, Serialize};
 
+pub type ArcHeader = std::sync::Arc<Header>;
+
 /// @category Consensus
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 #[serde(rename_all = "camelCase")]
@@ -171,11 +173,33 @@ pub mod blue_work_serde {
     }
 }
 
+/// Calculates the proof of work represented by compact target bits as `BlueWorkType`
+pub fn calc_work(bits: u32) -> BlueWorkType {
+    let target = jio_math::Uint256::from_compact_target_bits(bits);
+    if target.is_zero() {
+        return BlueWorkType::ZERO;
+    }
+    let divisor = if target == jio_math::Uint256::MAX {
+        jio_math::Uint256::MAX
+    } else {
+        target + jio_math::Uint256::from_u64(1)
+    };
+    let work256 = jio_math::Uint256::MAX / divisor;
+    jio_math::Uint192([work256.0[0], work256.0[1], work256.0[2]])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use jio_math::Uint192;
     use serde_json::Value;
+
+    #[test]
+    fn test_calc_work() {
+        let work = calc_work(0x1e7fffff);
+        assert!(work > BlueWorkType::ZERO);
+        assert_eq!(calc_work(0), BlueWorkType::ZERO);
+    }
 
     #[test]
     fn test_header_ser() {

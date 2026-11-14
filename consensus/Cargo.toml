@@ -1,0 +1,31 @@
+[package]
+name = "jio-consensus"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+jio-math = { path = "../math" }
+jio-hashes = { path = "../crypto/hashes" }
+jio-consensus-core = { path = "core" }
+jio-database = { path = "../database" }
+jio-core = { path = "../core" }
+jio-pow = { path = "pow" }
+jio-utils = { path = "../utils" }
+
+serde = { workspace = true }
+borsh = { workspace = true }
+bincode = { workspace = true }
+smallvec = { workspace = true }
+parking_lot = { workspace = true }
+rayon = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+faster-hex = { workspace = true }
+itertools = { workspace = true }
+tokio = { workspace = true }
+futures = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
