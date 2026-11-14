@@ -41,7 +41,7 @@ mod tests {
 
         let mut diff = UtxoDiff::default();
         let outpoint = TransactionOutpoint::new(Hash::from_bytes([1u8; 32]), 0);
-        let entry = UtxoEntry::new(50_000, pay_to_pubkey_script(&[3u8; 32]), 10, false);
+        let entry = UtxoEntry::new(50_000, pay_to_pubkey_script(&[3u8; 32]).into(), 10, false);
         diff.add_entry(outpoint, entry.clone());
 
         apply_diff_to_muhash(&mut muhash, &diff);

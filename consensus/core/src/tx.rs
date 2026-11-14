@@ -2,10 +2,12 @@
 //
 // Core Transaction data models for rusty-jio.
 
+pub mod script_public_key;
+pub use script_public_key::{ScriptPublicKey, ScriptPublicKeyVersion, ScriptVec};
+
 use crate::subnets::SubnetworkId;
 use borsh::{BorshDeserialize, BorshSerialize};
 use jio_hashes::{Hash, HasherBase, TransactionHash, TransactionID};
-use jio_txscript::ScriptPublicKey;
 use jio_utils::mem_size::MemSizeEstimator;
 use serde::{Deserialize, Serialize};
 use std::mem::size_of;
@@ -204,6 +206,6 @@ impl MemSizeEstimator for Transaction {
 
 impl MemSizeEstimator for UtxoEntry {
     fn estimate_mem_bytes(&self) -> usize {
-        size_of::<Self>() + self.script_public_key.script.len()
+        size_of::<Self>() + self.script_public_key.estimate_mem_bytes()
     }
 }
