@@ -11,8 +11,10 @@ pub fn open_db(db_path: PathBuf, create_if_missing: bool, parallelism: usize) ->
         opts.increase_parallelism(parallelism as i32);
     }
     opts.create_if_missing(create_if_missing);
-    let db = Arc::new(DB::open(&opts, db_path.to_str().expect("valid path string")).expect("failed to open database"));
-    db
+    Arc::new(
+        DB::open(&opts, db_path.to_str().expect("valid path string"))
+            .expect("failed to open database"),
+    )
 }
 
 /// Deletes an existing DB if it exists

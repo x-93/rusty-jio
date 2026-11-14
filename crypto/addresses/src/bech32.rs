@@ -66,7 +66,7 @@ fn prefix_checksum(prefix: &str) -> u64 {
 pub fn convert_bits_8_to_5(data: &[u8]) -> Vec<u8> {
     let mut acc: u32 = 0;
     let mut bits: u32 = 0;
-    let mut ret = Vec::with_capacity((data.len() * 8 + 4) / 5);
+    let mut ret = Vec::with_capacity((data.len() * 8).div_ceil(5));
     for &value in data {
         acc = (acc << 8) | (value as u32);
         bits += 8;
@@ -204,4 +204,3 @@ mod tests {
         assert_eq!(decode(&corrupted_str), Err(Bech32Error::InvalidChecksum));
     }
 }
-

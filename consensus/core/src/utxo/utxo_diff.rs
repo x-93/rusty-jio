@@ -7,7 +7,9 @@ use crate::tx::{TransactionOutpoint, UtxoEntry};
 use borsh::{BorshDeserialize, BorshSerialize};
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct UtxoDiff {
     pub to_add: UtxoCollection,
     pub to_remove: UtxoCollection,

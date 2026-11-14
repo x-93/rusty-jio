@@ -37,7 +37,7 @@ pub fn calc_merkle_root(leaves: &[Hash]) -> Hash {
 
     while current_level.len() > 1 {
         // If odd, duplicate the last element
-        if current_level.len() % 2 != 0 {
+        if !current_level.len().is_multiple_of(2) {
             let last = *current_level.last().unwrap();
             current_level.push(last);
         }
@@ -45,8 +45,8 @@ pub fn calc_merkle_root(leaves: &[Hash]) -> Hash {
         let next_level_len = current_level.len() / 2;
         let mut next_level = Vec::with_capacity(next_level_len);
 
-        for chunk in current_level.chunks_exact(2) {
-            next_level.push(hash_merkle_branch(&chunk[0], &chunk[1]));
+        for [left, right] in current_level.as_chunks::<2>().0 {
+            next_level.push(hash_merkle_branch(left, right));
         }
 
         current_level = next_level;

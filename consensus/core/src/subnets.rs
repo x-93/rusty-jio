@@ -9,14 +9,27 @@ use std::fmt::{Display, Formatter};
 
 pub const SUBNETWORK_ID_SIZE: usize = 20;
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Debug,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 pub struct SubnetworkId(pub [u8; SUBNETWORK_ID_SIZE]);
 
 impl SubnetworkId {
     pub const NATIVE: SubnetworkId = SubnetworkId([0u8; SUBNETWORK_ID_SIZE]);
-    pub const COINBASE: SubnetworkId = SubnetworkId([
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    ]);
+    pub const COINBASE: SubnetworkId =
+        SubnetworkId([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
     #[inline(always)]
     pub const fn from_bytes(bytes: [u8; SUBNETWORK_ID_SIZE]) -> Self {
@@ -41,4 +54,3 @@ impl Display for SubnetworkId {
         f.write_str(std::str::from_utf8(&hex).unwrap())
     }
 }
-

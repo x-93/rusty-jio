@@ -26,7 +26,9 @@ impl ShutdownHandler {
         let sender = self.sender.clone();
         tokio::spawn(async move {
             if let Ok(()) = tokio::signal::ctrl_c().await {
-                log::info!("Received shutdown signal (CTRL+C), initiating graceful node termination...");
+                log::info!(
+                    "Received shutdown signal (CTRL+C), initiating graceful node termination..."
+                );
                 let _ = sender.send(());
             }
         })

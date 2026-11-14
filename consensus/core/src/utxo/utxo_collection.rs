@@ -9,7 +9,9 @@ use std::collections::HashMap;
 
 pub type UtxoCollection = HashMap<TransactionOutpoint, UtxoEntry>;
 
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct UtxoEntryWithOutpoint {
     pub outpoint: TransactionOutpoint,
     pub entry: UtxoEntry,

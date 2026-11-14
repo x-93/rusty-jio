@@ -17,7 +17,21 @@ use std::sync::Arc;
 pub type TransactionId = Hash;
 
 /// A reference to a specific output of a previous transaction.
-#[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Debug,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 pub struct TransactionOutpoint {
     pub transaction_id: Hash,
     pub index: u32,
@@ -34,7 +48,9 @@ impl TransactionOutpoint {
 }
 
 /// An input spending an existing UTXO.
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct TransactionInput {
     pub previous_outpoint: TransactionOutpoint,
     pub signature_script: Vec<u8>,
@@ -59,7 +75,9 @@ impl TransactionInput {
 }
 
 /// A newly created output (UTXO).
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct TransactionOutput {
     pub value: u64,
     pub script_public_key: ScriptPublicKey,
@@ -76,7 +94,9 @@ impl TransactionOutput {
 }
 
 /// A complete cryptocurrency transaction.
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct Transaction {
     pub version: u16,
     pub inputs: Vec<TransactionInput>,
@@ -152,7 +172,9 @@ impl Transaction {
 pub type ArcTransaction = Arc<Transaction>;
 
 /// UTXO entry representing an unspent transaction output in the DAG.
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct UtxoEntry {
     pub amount: u64,
     pub script_public_key: ScriptPublicKey,
@@ -198,8 +220,16 @@ impl MemSizeEstimator for TransactionOutput {
 impl MemSizeEstimator for Transaction {
     fn estimate_mem_bytes(&self) -> usize {
         size_of::<Self>()
-            + self.inputs.iter().map(TransactionInput::estimate_mem_bytes).sum::<usize>()
-            + self.outputs.iter().map(TransactionOutput::estimate_mem_bytes).sum::<usize>()
+            + self
+                .inputs
+                .iter()
+                .map(TransactionInput::estimate_mem_bytes)
+                .sum::<usize>()
+            + self
+                .outputs
+                .iter()
+                .map(TransactionOutput::estimate_mem_bytes)
+                .sum::<usize>()
             + self.payload.capacity()
     }
 }

@@ -14,7 +14,7 @@ pub mod xoshiro;
 
 use jio_hashes::{Hash, Hasher, HasherBase, PowB3Hash, PowHash};
 use jio_math::Uint256;
-use matrix::{hash_to_vector, vector_to_hash, Matrix};
+use matrix::{Matrix, hash_to_vector, vector_to_hash};
 use thiserror::Error;
 use xoshiro::Xoshiro256PlusPlus;
 

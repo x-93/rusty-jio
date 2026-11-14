@@ -1,5 +1,5 @@
-use crate::prelude::{Cache, DbKey, DbWriter, StoreError, StoreResult, DB};
-use serde::{de::DeserializeOwned, Serialize};
+use crate::prelude::{Cache, DB, DbKey, DbWriter, StoreError, StoreResult};
+use serde::{Serialize, de::DeserializeOwned};
 use std::{collections::hash_map::RandomState, hash::BuildHasher, sync::Arc};
 
 #[derive(Clone)]
@@ -78,8 +78,11 @@ where
             .map(move |item| match item {
                 Ok((k, v)) => {
                     let key_bytes = &k[prefix_len..];
-                    let key = TKey::try_from(key_bytes)
-                        .map_err(|_| StoreError::DeserializationError(Box::new(bincode::ErrorKind::Custom("invalid key".into()))))?;
+                    let key = TKey::try_from(key_bytes).map_err(|_| {
+                        StoreError::DeserializationError(Box::new(bincode::ErrorKind::Custom(
+                            "invalid key".into(),
+                        )))
+                    })?;
                     let data: TData = bincode::deserialize(&v)?;
                     Ok((key, data))
                 }

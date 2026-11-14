@@ -1,6 +1,6 @@
-use crate::prelude::{DbKey, DbWriter, StoreError, StoreResult, DB};
+use crate::prelude::{DB, DbKey, DbWriter, StoreError, StoreResult};
 use parking_lot::RwLock;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 use std::sync::Arc;
 
 /// Cached access for a single database item (such as DAG sink, pruning point, or virtual state).

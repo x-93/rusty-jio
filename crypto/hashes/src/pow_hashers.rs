@@ -151,9 +151,8 @@ pub struct PowB3Hash(blake3::Hasher);
 impl PowB3Hash {
     #[inline(always)]
     pub fn new() -> Self {
-        static HASHER: Lazy<PowB3Hash> = Lazy::new(|| {
-            PowB3Hash(blake3::Hasher::new_keyed(&POW_B3_KEY))
-        });
+        static HASHER: Lazy<PowB3Hash> =
+            Lazy::new(|| PowB3Hash(blake3::Hasher::new_keyed(&POW_B3_KEY)));
         (*HASHER).clone()
     }
 
@@ -207,12 +206,18 @@ mod tests {
     #[test]
     fn test_miner_node_parity() {
         // Simulates honest node verifying a block mined by a miner
-        let pre_pow = Hash::from_le_u64([0x1234567890ABCDEF, 0xFEDCBA0987654321, 0x1122334455667788, 0x99AABBCCDDEEFF00]);
+        let pre_pow = Hash::from_le_u64([
+            0x1234567890ABCDEF,
+            0xFEDCBA0987654321,
+            0x1122334455667788,
+            0x99AABBCCDDEEFF00,
+        ]);
         let timestamp = 1700000000u64;
         let nonce = 987654321u64;
 
         // 1. Miner path
-        let miner_hash = PowHash::from_pre_pow_and_timestamp(pre_pow, timestamp).finalize_with_nonce(nonce);
+        let miner_hash =
+            PowHash::from_pre_pow_and_timestamp(pre_pow, timestamp).finalize_with_nonce(nonce);
 
         // 2. Node canonical validation path
         let node_hash = PowHash::check_pow(pre_pow, timestamp, nonce);
@@ -225,8 +230,14 @@ mod tests {
         stream_hasher.write(nonce.to_le_bytes());
         let stream_hash = stream_hasher.finalize();
 
-        assert_eq!(miner_hash, node_hash, "Miner path and check_pow must be bitwise identical");
-        assert_eq!(miner_hash, stream_hash, "Stream write and fast mining path MUST match 100%");
+        assert_eq!(
+            miner_hash, node_hash,
+            "Miner path and check_pow must be bitwise identical"
+        );
+        assert_eq!(
+            miner_hash, stream_hash,
+            "Stream write and fast mining path MUST match 100%"
+        );
     }
 
     #[test]
@@ -241,7 +252,10 @@ mod tests {
         assert_eq!(h1, h2, "Mining loop with same nonce must be deterministic");
 
         let h3 = hasher.finalize_with_nonce(nonce + 1);
-        assert_ne!(h1, h3, "Different nonce must produce completely different hash");
+        assert_ne!(
+            h1, h3,
+            "Different nonce must produce completely different hash"
+        );
     }
 
     #[test]
@@ -249,7 +263,10 @@ mod tests {
         let data = b"some block payload";
         let b3_pow = PowB3Hash::hash(data);
         let b3_generic = Hash::from_bytes(*blake3::hash(data).as_bytes());
-        assert_ne!(b3_pow, b3_generic, "Keyed PowB3Hash must not match unkeyed blake3");
+        assert_ne!(
+            b3_pow, b3_generic,
+            "Keyed PowB3Hash must not match unkeyed blake3"
+        );
     }
 
     #[test]

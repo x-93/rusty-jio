@@ -80,4 +80,3 @@ mod tests {
         assert_ne!(val, 0);
     }
 }
-

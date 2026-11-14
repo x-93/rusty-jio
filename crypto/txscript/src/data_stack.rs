@@ -45,7 +45,10 @@ impl DataStack {
             return Err(StackError::Overflow(MAX_STACK_SIZE));
         }
         if item.len() > MAX_SCRIPT_ELEMENT_SIZE {
-            return Err(StackError::ElementTooLarge(item.len(), MAX_SCRIPT_ELEMENT_SIZE));
+            return Err(StackError::ElementTooLarge(
+                item.len(),
+                MAX_SCRIPT_ELEMENT_SIZE,
+            ));
         }
         self.stack.push(item);
         Ok(())
@@ -56,7 +59,10 @@ impl DataStack {
     }
 
     pub fn peek(&self) -> Result<&[u8], StackError> {
-        self.stack.last().map(|v| v.as_slice()).ok_or(StackError::Underflow)
+        self.stack
+            .last()
+            .map(|v| v.as_slice())
+            .ok_or(StackError::Underflow)
     }
 
     pub fn dup(&mut self) -> Result<(), StackError> {
@@ -77,4 +83,3 @@ impl DataStack {
         Ok(())
     }
 }
-

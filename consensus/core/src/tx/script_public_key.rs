@@ -181,7 +181,9 @@ mod tests {
         let mut bytes = Vec::new();
         BorshSerialize::serialize(&original, &mut bytes).expect("serialization succeeds");
 
-        let deserialized = <ScriptPublicKey as BorshDeserialize>::deserialize(&mut bytes.as_slice()).expect("deserialization succeeds");
+        let deserialized =
+            <ScriptPublicKey as BorshDeserialize>::deserialize(&mut bytes.as_slice())
+                .expect("deserialization succeeds");
         assert_eq!(original, deserialized);
     }
 

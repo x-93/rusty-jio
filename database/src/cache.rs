@@ -4,16 +4,28 @@ use rand::Rng;
 use std::{collections::hash_map::RandomState, hash::BuildHasher, sync::Arc};
 
 #[derive(Clone)]
-pub struct Cache<TKey: Clone + std::hash::Hash + Eq + Send + Sync, TData: Clone + Send + Sync, S = RandomState> {
+pub struct Cache<
+    TKey: Clone + std::hash::Hash + Eq + Send + Sync,
+    TData: Clone + Send + Sync,
+    S = RandomState,
+> {
     // We use IndexMap because swap_remove_index provides O(1) random eviction when the cache is full.
     map: Arc<RwLock<IndexMap<TKey, TData, S>>>,
     pub size: usize,
 }
 
-impl<TKey: Clone + std::hash::Hash + Eq + Send + Sync, TData: Clone + Send + Sync, S: BuildHasher + Default> Cache<TKey, TData, S> {
+impl<
+    TKey: Clone + std::hash::Hash + Eq + Send + Sync,
+    TData: Clone + Send + Sync,
+    S: BuildHasher + Default,
+> Cache<TKey, TData, S>
+{
     pub fn new(size: u64) -> Self {
         Self {
-            map: Arc::new(RwLock::new(IndexMap::with_capacity_and_hasher(size as usize, S::default()))),
+            map: Arc::new(RwLock::new(IndexMap::with_capacity_and_hasher(
+                size as usize,
+                S::default(),
+            ))),
             size: size as usize,
         }
     }

@@ -15,7 +15,9 @@ pub fn init_panic_hook() {
             "Box<Any>"
         };
 
-        let location = panic_info.location().map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
+        let location = panic_info
+            .location()
+            .map(|loc| format!("{}:{}:{}", loc.file(), loc.line(), loc.column()))
             .unwrap_or_else(|| "<unknown>".to_string());
 
         log::error!(

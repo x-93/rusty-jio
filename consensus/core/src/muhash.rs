@@ -7,7 +7,9 @@ use jio_muhash::MuHash;
 /// Serializes a UTXO entry with its outpoint into canonical byte representation for MuHash.
 pub fn serialize_utxo_for_muhash(outpoint: &TransactionOutpoint, entry: &UtxoEntry) -> Vec<u8> {
     let mut bytes = Vec::with_capacity(64);
-    outpoint.serialize(&mut bytes).expect("serialization succeeds");
+    outpoint
+        .serialize(&mut bytes)
+        .expect("serialization succeeds");
     entry.serialize(&mut bytes).expect("serialization succeeds");
     bytes
 }

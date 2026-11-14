@@ -15,7 +15,9 @@ pub use standard::*;
 
 use jio_hashes::{Hash, HasherBase};
 use secp256k1::schnorr::Signature as SchnorrSignature;
-use secp256k1::{ecdsa::Signature as EcdsaSignature, Message, PublicKey, Secp256k1, XOnlyPublicKey};
+use secp256k1::{
+    Message, PublicKey, Secp256k1, XOnlyPublicKey, ecdsa::Signature as EcdsaSignature,
+};
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq, Eq)]
@@ -195,7 +197,9 @@ impl TxScriptEngine {
                     let sig_bytes = self.stack.pop()?;
 
                     if pk_bytes.len() != 32 {
-                        return Err(ScriptError::InvalidPublicKey("Expected 32-byte Schnorr pubkey".into()));
+                        return Err(ScriptError::InvalidPublicKey(
+                            "Expected 32-byte Schnorr pubkey".into(),
+                        ));
                     }
                     let xonly_pk = XOnlyPublicKey::from_slice(&pk_bytes)
                         .map_err(|e| ScriptError::InvalidPublicKey(e.to_string()))?;
@@ -287,7 +291,9 @@ mod tests {
         let sig_script = ScriptBuilder::new().add_data(&sig[..]).drain();
 
         // Verification fails with wrong sighash
-        let verifier = MockSignatureVerifier { sighash: wrong_sighash };
+        let verifier = MockSignatureVerifier {
+            sighash: wrong_sighash,
+        };
         let mut engine = TxScriptEngine::new();
 
         assert_eq!(
@@ -309,7 +315,9 @@ mod tests {
         // Unlocking script: <secret>
         let sig_script = ScriptBuilder::new().add_data(secret).drain();
 
-        let verifier = MockSignatureVerifier { sighash: Hash::from_bytes([0; 32]) };
+        let verifier = MockSignatureVerifier {
+            sighash: Hash::from_bytes([0; 32]),
+        };
         let mut engine = TxScriptEngine::new();
 
         assert!(engine.execute(&sig_script, &spk, &verifier).is_ok());

@@ -1,7 +1,7 @@
-use crate::config::constants::consensus::*;
-use crate::config::genesis::{create_genesis_header, GenesisBlock};
-use crate::network::NetworkId;
 use crate::KType;
+use crate::config::constants::consensus::*;
+use crate::config::genesis::{GenesisBlock, create_genesis_header};
+use crate::network::NetworkId;
 use jio_math::Uint256;
 
 #[derive(Clone, Debug)]

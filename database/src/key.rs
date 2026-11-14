@@ -18,7 +18,12 @@ impl DbKey {
         TKey: Clone + AsRef<[u8]>,
     {
         Self {
-            path: prefix.iter().chain(std::iter::once(&SEP)).chain(key.as_ref().iter()).copied().collect(),
+            path: prefix
+                .iter()
+                .chain(std::iter::once(&SEP))
+                .chain(key.as_ref().iter())
+                .copied()
+                .collect(),
             prefix_len: prefix.len() + SEP_SIZE, // Include `SEP` as part of the prefix
         }
     }
@@ -56,7 +61,8 @@ impl Display for DbKey {
         } else {
             // Otherwise fallback to hex encoding
             let mut hex = vec![0u8; (prefix.len() - SEP_SIZE) * 2];
-            faster_hex::hex_encode(&prefix[..prefix.len() - SEP_SIZE], &mut hex).map_err(|_| std::fmt::Error)?;
+            faster_hex::hex_encode(&prefix[..prefix.len() - SEP_SIZE], &mut hex)
+                .map_err(|_| std::fmt::Error)?;
             let hex_str = str::from_utf8(&hex).map_err(|_| std::fmt::Error)?;
             f.write_str(hex_str)?;
             f.write_str("/")?;

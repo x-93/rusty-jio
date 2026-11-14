@@ -51,4 +51,3 @@ pub fn pre_pow_hash(header: &Header) -> Hash {
     hasher.update(header.pruning_point.as_bytes());
     hasher.finalize()
 }
-

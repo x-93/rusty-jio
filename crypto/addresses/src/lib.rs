@@ -28,7 +28,18 @@ pub enum AddressError {
 }
 
 /// Network identifier embedded in address prefix
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 pub enum Prefix {
     Mainnet,
     Testnet,
@@ -68,7 +79,18 @@ impl FromStr for Prefix {
 }
 
 /// Address type / script version
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 #[borsh(use_discriminant = true)]
 #[repr(u8)]
 pub enum Version {
@@ -167,7 +189,10 @@ impl Serialize for Address {
         if serializer.is_human_readable() {
             serializer.serialize_str(&self.encode_bech32())
         } else {
-            Serialize::serialize(&(self.prefix, self.version, self.payload.as_slice()), serializer)
+            Serialize::serialize(
+                &(self.prefix, self.version, self.payload.as_slice()),
+                serializer,
+            )
         }
     }
 }
@@ -265,7 +290,8 @@ mod tests {
         let addr = Address::new(Prefix::Devnet, Version::PubKey, &pubkey_bytes).unwrap();
         let mut encoded = Vec::new();
         BorshSerialize::serialize(&addr, &mut encoded).unwrap();
-        let de_addr: Address = BorshDeserialize::deserialize_reader(&mut encoded.as_slice()).unwrap();
+        let de_addr: Address =
+            BorshDeserialize::deserialize_reader(&mut encoded.as_slice()).unwrap();
         assert_eq!(addr, de_addr);
     }
 }

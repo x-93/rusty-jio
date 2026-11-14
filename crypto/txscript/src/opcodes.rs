@@ -49,4 +49,3 @@ pub mod codes {
     pub const OP_CHECKSIGVERIFY: u8 = 0xad;
     pub const OP_CHECKSIG_ECDSA: u8 = 0xab;
 }
-

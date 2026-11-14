@@ -20,15 +20,18 @@ macro_rules! impl_primitive_mem_size {
 }
 
 impl_primitive_mem_size!(
-    u8, u16, u32, u64, u128, usize,
-    i8, i16, i32, i64, i128, isize,
-    f32, f64, bool, char
+    u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize, f32, f64, bool, char
 );
 
 impl<T: MemSizeEstimator, const N: usize> MemSizeEstimator for [T; N] {
     #[inline(always)]
     fn estimate_mem_bytes(&self) -> usize {
-        size_of::<Self>() + self.iter().map(MemSizeEstimator::estimate_mem_bytes).sum::<usize>() - (size_of::<T>() * N)
+        size_of::<Self>()
+            + self
+                .iter()
+                .map(MemSizeEstimator::estimate_mem_bytes)
+                .sum::<usize>()
+            - (size_of::<T>() * N)
     }
 }
 
@@ -37,7 +40,10 @@ impl<T: MemSizeEstimator> MemSizeEstimator for Vec<T> {
     fn estimate_mem_bytes(&self) -> usize {
         size_of::<Self>()
             + self.capacity() * size_of::<T>()
-            + self.iter().map(MemSizeEstimator::estimate_mem_bytes).sum::<usize>()
+            + self
+                .iter()
+                .map(MemSizeEstimator::estimate_mem_bytes)
+                .sum::<usize>()
             - (size_of::<T>() * self.len())
     }
 }
@@ -52,7 +58,11 @@ impl<T: MemSizeEstimator> MemSizeEstimator for Arc<T> {
 impl<T: MemSizeEstimator> MemSizeEstimator for Option<T> {
     #[inline(always)]
     fn estimate_mem_bytes(&self) -> usize {
-        size_of::<Self>() + self.as_ref().map(MemSizeEstimator::estimate_mem_bytes).unwrap_or(0)
+        size_of::<Self>()
+            + self
+                .as_ref()
+                .map(MemSizeEstimator::estimate_mem_bytes)
+                .unwrap_or(0)
     }
 }
 

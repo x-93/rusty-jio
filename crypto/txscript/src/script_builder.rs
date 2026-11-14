@@ -56,4 +56,3 @@ impl ScriptBuilder {
         SmallVec::from_vec(self.script)
     }
 }
-

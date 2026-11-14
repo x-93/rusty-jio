@@ -4,7 +4,18 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 pub enum NetworkType {
     Mainnet,
     Testnet,
@@ -52,7 +63,18 @@ impl FromStr for NetworkType {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 pub struct NetworkId {
     pub network_type: NetworkType,
     pub suffix: Option<u32>,
@@ -60,11 +82,17 @@ pub struct NetworkId {
 
 impl NetworkId {
     pub const fn new(network_type: NetworkType) -> Self {
-        Self { network_type, suffix: None }
+        Self {
+            network_type,
+            suffix: None,
+        }
     }
 
     pub const fn with_suffix(network_type: NetworkType, suffix: u32) -> Self {
-        Self { network_type, suffix: Some(suffix) }
+        Self {
+            network_type,
+            suffix: Some(suffix),
+        }
     }
 
     pub fn to_prefixed(&self) -> Prefix {

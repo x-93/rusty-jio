@@ -9,8 +9,10 @@ pub mod writer;
 pub mod prelude {
     pub use super::access::CachedDbAccess;
     pub use super::cache::Cache;
-    pub use super::db::{delete_db, open_db, DB};
-    pub use super::errors::{StoreError, StoreResult, StoreResultEmptyTuple, StoreResultExtensions};
+    pub use super::db::{DB, delete_db, open_db};
+    pub use super::errors::{
+        StoreError, StoreResult, StoreResultEmptyTuple, StoreResultExtensions,
+    };
     pub use super::item::CachedDbItem;
     pub use super::key::{DbKey, SEP, SEP_SIZE};
     pub use super::writer::{BatchDbWriter, DbWriter, DirectDbWriter};

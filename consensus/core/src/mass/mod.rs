@@ -12,7 +12,11 @@ pub struct TxMassCalculator {
 }
 
 impl TxMassCalculator {
-    pub const fn new(mass_per_tx_byte: u64, mass_per_script_pub_key_byte: u64, mass_per_sig_op: u64) -> Self {
+    pub const fn new(
+        mass_per_tx_byte: u64,
+        mass_per_script_pub_key_byte: u64,
+        mass_per_sig_op: u64,
+    ) -> Self {
         Self {
             mass_per_tx_byte,
             mass_per_script_pub_key_byte,
@@ -62,7 +66,11 @@ mod tests {
 
     #[test]
     fn test_mass_calculator() {
-        let calc = TxMassCalculator::new(MASS_PER_TX_BYTE, MASS_PER_SCRIPT_PUB_KEY_BYTE, MASS_PER_SIG_OP);
+        let calc = TxMassCalculator::new(
+            MASS_PER_TX_BYTE,
+            MASS_PER_SCRIPT_PUB_KEY_BYTE,
+            MASS_PER_SIG_OP,
+        );
         let tx = Transaction::new(1, vec![], vec![], 0, SubnetworkId::NATIVE, 0, vec![]);
         assert!(calc.calc_tx_mass(&tx) > 0);
 

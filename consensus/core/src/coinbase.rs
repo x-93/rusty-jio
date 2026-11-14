@@ -6,7 +6,9 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use jio_txscript::ScriptPublicKey;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone, Default, PartialEq, Eq, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize,
+)]
 pub struct MinerData {
     pub script_public_key: ScriptPublicKey,
     pub extra_data: Vec<u8>,
@@ -20,4 +22,3 @@ impl MinerData {
         }
     }
 }
-

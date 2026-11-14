@@ -3,7 +3,18 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use jio_hashes::{Hash, HasherBase, TransactionSigningHash, TransactionSigningHashECDSA};
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    BorshSerialize,
+    BorshDeserialize,
+)]
 pub struct SigHashType(u8);
 
 impl SigHashType {
@@ -50,7 +61,11 @@ impl Default for SigHashType {
 }
 
 /// Computes the Schnorr signature hash for a given transaction input.
-pub fn calc_schnorr_signature_hash(tx: &Transaction, input_idx: usize, hash_type: SigHashType) -> Hash {
+pub fn calc_schnorr_signature_hash(
+    tx: &Transaction,
+    input_idx: usize,
+    hash_type: SigHashType,
+) -> Hash {
     let mut hasher = TransactionSigningHash::new();
     hasher.update(tx.version.to_le_bytes());
     hasher.update([hash_type.to_bits()]);
@@ -72,7 +87,11 @@ pub fn calc_schnorr_signature_hash(tx: &Transaction, input_idx: usize, hash_type
 }
 
 /// Computes the ECDSA signature hash for a given transaction input.
-pub fn calc_ecdsa_signature_hash(tx: &Transaction, input_idx: usize, hash_type: SigHashType) -> Hash {
+pub fn calc_ecdsa_signature_hash(
+    tx: &Transaction,
+    input_idx: usize,
+    hash_type: SigHashType,
+) -> Hash {
     let mut hasher = TransactionSigningHashECDSA::new();
     hasher.update(tx.version.to_le_bytes());
     hasher.update([hash_type.to_bits()]);
