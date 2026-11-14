@@ -1,0 +1,19 @@
+[package]
+name        = "jio-hashes"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+borsh        = { workspace = true }
+serde        = { workspace = true }
+faster-hex   = { workspace = true }
+blake2b_simd = { workspace = true }
+sha2         = { workspace = true }
+sha3         = { workspace = true }
+keccak       = { workspace = true }
+once_cell    = { workspace = true }
+blake3       = { workspace = true }
+
+
+
+

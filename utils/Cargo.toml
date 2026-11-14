@@ -1,0 +1,10 @@
+[package]
+name = "jio-utils"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+smallvec = { workspace = true, optional = true }
+
+[features]
+default = []

@@ -3,3 +3,20 @@ name = "jio-math"
 version.workspace = true
 edition.workspace = true
 
+[dependencies]
+serde.workspace = true
+borsh.workspace = true
+faster-hex.workspace = true
+malachite-base.workspace = true
+malachite-nz.workspace = true
+wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+
+[features]
+default = []
+wasm = ["wasm-bindgen", "js-sys"]
+
+[dev-dependencies]
+serde_json.workspace = true
+rand.workspace = true
+rand_chacha.workspace = true

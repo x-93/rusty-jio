@@ -1,0 +1,13 @@
+[package]
+name = "jio-pow"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+jio-math   = { path = "../../math" }
+jio-hashes = { path = "../../crypto/hashes" }
+serde      = { workspace = true }
+borsh      = { workspace = true }
+thiserror  = { workspace = true }
+log        = { workspace = true }
+

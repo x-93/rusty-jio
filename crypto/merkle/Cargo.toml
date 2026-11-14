@@ -1,0 +1,11 @@
+[package]
+name = "jio-merkle"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+jio-hashes = { path = "../hashes" }
+serde      = { workspace = true }
+borsh      = { workspace = true }
+thiserror  = { workspace = true }
+

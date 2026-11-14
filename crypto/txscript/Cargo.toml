@@ -1,0 +1,14 @@
+[package]
+name = "jio-txscript"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+jio-hashes    = { path = "../hashes" }
+jio-addresses = { path = "../addresses" }
+secp256k1     = { workspace = true }
+serde         = { workspace = true }
+borsh         = { workspace = true }
+smallvec      = { workspace = true }
+thiserror     = { workspace = true }
+

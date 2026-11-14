@@ -1,0 +1,14 @@
+[package]
+name = "jio-addresses"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde      = { workspace = true }
+borsh      = { workspace = true }
+thiserror  = { workspace = true }
+smallvec   = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+

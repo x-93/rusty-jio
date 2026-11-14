@@ -1,0 +1,24 @@
+[package]
+name = "jio-consensus-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+jio-math      = { path = "../../math" }
+jio-hashes    = { path = "../../crypto/hashes" }
+jio-addresses = { path = "../../crypto/addresses" }
+jio-merkle    = { path = "../../crypto/merkle" }
+jio-muhash    = { path = "../../crypto/muhash" }
+jio-txscript  = { path = "../../crypto/txscript" }
+jio-pow       = { path = "../pow" }
+jio-utils     = { path = "../../utils" }
+serde         = { workspace = true }
+borsh         = { workspace = true }
+smallvec      = { workspace = true }
+thiserror     = { workspace = true }
+log           = { workspace = true }
+faster-hex    = { workspace = true }
+
+[dev-dependencies]
+serde_json    = { workspace = true }
+

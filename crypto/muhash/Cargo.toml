@@ -1,0 +1,18 @@
+[package]
+name = "jio-muhash"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+jio-math    = { path = "../../math" }
+jio-hashes  = { path = "../hashes" }
+serde       = { workspace = true }
+borsh       = { workspace = true }
+rand        = { workspace = true }
+rand_chacha = { workspace = true }
+thiserror   = { workspace = true }
+rayon       = { workspace = true, optional = true }
+
+[features]
+default = []
+rayon   = ["dep:rayon"]
