@@ -11,6 +11,8 @@ jio-database = { path = "../database" }
 jio-core = { path = "../core" }
 jio-pow = { path = "pow" }
 jio-utils = { path = "../utils" }
+jio-txscript = { path = "../crypto/txscript" }
+jio-muhash = { path = "../crypto/muhash" }
 
 serde = { workspace = true }
 borsh = { workspace = true }
@@ -29,3 +31,4 @@ futures = { workspace = true }
 tempfile = { workspace = true }
 rand = { workspace = true }
 rand_chacha = { workspace = true }
+secp256k1 = { workspace = true }

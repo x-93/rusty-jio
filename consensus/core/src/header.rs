@@ -100,6 +100,11 @@ impl Header {
         self.hash = hashing::header::hash(self);
     }
 
+    /// Computes the pre-PoW hash for this header
+    pub fn pre_pow_hash(&self) -> Hash {
+        hashing::header::pre_pow_hash(self)
+    }
+
     pub fn direct_parents(&self) -> &[Hash] {
         if self.parents_by_level.is_empty() {
             &[]
