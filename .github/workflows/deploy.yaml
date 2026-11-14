@@ -1,0 +1,182 @@
+name: Deploy & Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release Version Tag (e.g., v0.1.0)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-binaries:
+    name: Build Release Binary (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: rusty-jio-linux-x86_64
+            asset_ext: tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: rusty-jio-windows-x86_64
+            asset_ext: zip
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: rusty-jio-macos-x86_64
+            asset_ext: tar.gz
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: rusty-jio-macos-arm64
+            asset_ext: tar.gz
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang libclang-dev llvm-dev pkg-config libssl-dev
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Build Release
+        run: cargo build --workspace --release --target ${{ matrix.target }}
+
+      - name: Package Release Assets (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          STAGING="${{ matrix.artifact_name }}"
+          mkdir -p "$STAGING"
+          find target/${{ matrix.target }}/release -maxdepth 1 -type f -executable -exec cp {} "$STAGING/" \;
+          cp README.md LICENSE* "$STAGING/" 2>/dev/null || true
+          tar -czvf "${{ matrix.artifact_name }}.tar.gz" "$STAGING"
+          shasum -a 256 "${{ matrix.artifact_name }}.tar.gz" > "${{ matrix.artifact_name }}.tar.gz.sha256"
+
+      - name: Package Release Assets (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $staging = "${{ matrix.artifact_name }}"
+          New-Item -ItemType Directory -Force -Path $staging
+          Get-ChildItem -Path target/${{ matrix.target }}/release/*.exe | Copy-Item -Destination $staging/
+          if (Test-Path "README.md") { Copy-Item "README.md" -Destination $staging/ }
+          Compress-Archive -Path "$staging/*" -DestinationPath "${{ matrix.artifact_name }}.zip"
+          $hash = (Get-FileHash -Algorithm SHA256 "${{ matrix.artifact_name }}.zip").Hash.ToLower()
+          "$hash  ${{ matrix.artifact_name }}.zip" | Out-File -FilePath "${{ matrix.artifact_name }}.zip.sha256" -Encoding ascii
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ${{ matrix.artifact_name }}.${{ matrix.asset_ext }}
+            ${{ matrix.artifact_name }}.${{ matrix.asset_ext }}.sha256
+          retention-days: 5
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets
+          merge-multiple: true
+
+      - name: Generate Consolidated SHA256SUMS
+        run: |
+          cd release_assets
+          cat *.sha256 > SHA256SUMS.txt
+          rm -f *.sha256
+          ls -la
+
+      - name: Determine Release Tag
+        id: release_info
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_info.outputs.tag }}
+          name: Release ${{ steps.release_info.outputs.tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: release_assets/*
+
+  docker-build:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: publish-release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
